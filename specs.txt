@@ -3,7 +3,7 @@
 
 
 Internet Engineering Task Force (IETF)                             A. Yu
-Request for Comments: 65535                             21 February 2022
+Request for Comments: 65535                              7 February 2022
 Category: Informational                                                 
 ISSN: 2070-1721
 
