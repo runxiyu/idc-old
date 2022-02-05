@@ -32,7 +32,7 @@ import pickle
 from misc import *
 
 servers = []
-clients = []
+users = []
 
 listen_port = int(sys.argv[1])
 
@@ -41,8 +41,11 @@ class Connection:
     def __init__(self, c, ca):
         self.c = c
         self.ca = ca
-        self.user_modes = list[str]
-        self.in_channels = list[str]
+        self.modes:list[str]
+        self.in_channels:list[str]
+        self.t = "" # "user" or "server"
+        self.modes = []
+        self.in_channels = []
 
     def send(self, m):
         self.c.send(t_b(m + "\r\n"))
@@ -60,7 +63,10 @@ class Connection:
         nuh = p[1]
         arg = p[2]
         if cmd == "USER":
-            
+            self.t = "user"
+            self.send("LURK")
+        elif cmd == "SERVER":
+            self.t = "server"
         self.send(str(p))
 
     def wait(self):
