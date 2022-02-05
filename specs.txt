@@ -57,8 +57,8 @@ Table of Contents
 1.  Introduction
 
    The IDC (Internet Delay Chat) protocol has been designed over a
-   number of decades for use with federated multimedia conferencing.
-   This document describes the current IDC protocol.
+   number of days for use with federated multimedia conferencing.  This
+   document describes the current IDC protocol.
 
    IDC itself is a messaging system, which (through the use of the
    client-server and server-to-server model) is well-suited to running
@@ -78,10 +78,16 @@ Table of Contents
    IRC is not federated, causing most people to be on the few large
    networks, imparing user freedom.
 
+   Most modern IRC networks use dedicated "services" servers for user,
+   channel, group, etc. management and dedicated client bots for
+   extensible channel management.  Compared with these features built
+   into the server, this is ineffective and redundent.
+
    The Extensible Messaging and Presence Protocol was designed for
    presense, instant messaging, and conferences.  However, it is based
    on XML, and implementations are large and buggy.  IRC is a simple
-   text-oriented protocol.
+   text-oriented protocol, where implementing is more straightforward
+   and is harder to bug.
 
    SMS does not work over the Internet, and is generally expensive.
 

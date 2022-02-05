@@ -37,7 +37,7 @@ This document specifies a new Internet Protocol for Instant Messaging over the I
 
 #  Introduction
 
-The IDC (Internet Delay Chat) protocol has been designed over a number of decades for use with federated multimedia conferencing.  This document describes the current IDC protocol.
+The IDC (Internet Delay Chat) protocol has been designed over a number of days for use with federated multimedia conferencing.  This document describes the current IDC protocol.
 
 IDC itself is a messaging system, which (through the use of the client-server and server-to-server model) is well-suited to running on many machines in a distributed fashion.  A typical setup involves multiple servers each with multiple clients, that connect to each other in order to exchange messages, in a multi-centered fashion.
 
@@ -45,7 +45,9 @@ Internet Relay Chat as in RFC 1459 has been in use since May 1993, a very simple
 
 IRC is real time.  When a client disconnects, the server no longer recognizes the client, and messages during the client's downtime are not saved.  This renders IRC unfit for instant messaging, where clients are forced to disconnect but messages are to be read later.  IRC is not federated, causing most people to be on the few large networks, imparing user freedom.
 
-The Extensible Messaging and Presence Protocol was designed for presense, instant messaging, and conferences.  However, it is based on XML, and implementations are large and buggy.  IRC is a simple text-oriented protocol.
+Most modern IRC networks use dedicated "services" servers for user, channel, group, etc. management and dedicated client bots for extensible channel management.  Compared with these features built into the server, this is ineffective and redundent.
+
+The Extensible Messaging and Presence Protocol was designed for presense, instant messaging, and conferences.  However, it is based on XML, and implementations are large and buggy.  IRC is a simple text-oriented protocol, where implementing is more straightforward and is harder to bug.
 
 SMS does not work over the Internet, and is generally expensive.
 
