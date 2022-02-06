@@ -1356,10 +1356,24 @@ li > p:last-of-type {
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1.2.6">
                     <p id="section-toc.1-1.4.2.1.2.6.1"><a href="#section-4.1.6" class="xref">4.1.6</a>.  <a href="#name-server-quit-message-2" class="xref">Server quit message</a></p>
 </li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1.2.7">
-                    <p id="section-toc.1-1.4.2.1.2.7.1"><a href="#section-4.1.7" class="xref">4.1.7</a>.  <a href="#name-channel-operations-2" class="xref">Channel operations</a></p>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
+                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="xref">4.2</a>.  <a href="#name-channel-operations-2" class="xref">Channel operations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.1">
+                    <p id="section-toc.1-1.4.2.2.2.1.1"><a href="#section-4.2.1" class="xref">4.2.1</a>.  <a href="#name-join-message-2" class="xref">Join message</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.2">
+                    <p id="section-toc.1-1.4.2.2.2.2.1"><a href="#section-4.2.2" class="xref">4.2.2</a>.  <a href="#name-part-message-2" class="xref">Part message</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.3">
+                    <p id="section-toc.1-1.4.2.2.2.3.1"><a href="#section-4.2.3" class="xref">4.2.3</a>.  <a href="#name-mode-message-2" class="xref">Mode message</a></p>
 </li>
                 </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3">
+                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="xref">4.3</a>.  <a href="#name-server-queries-and-commands-2" class="xref">Server queries and commands</a></p>
 </li>
             </ul>
 </li>
@@ -1729,14 +1743,204 @@ several means to achieve this, each serving its own purpose.<a href="#section-3.
 </div>
 </section>
 </div>
-<div id="channel-operations">
-<section id="section-4.1.7">
-          <h4 id="name-channel-operations-2">
-<a href="#section-4.1.7" class="section-number selfRef">4.1.7. </a><a href="#name-channel-operations-2" class="section-name selfRef">Channel operations</a>
-          </h4>
-<p id="section-4.1.7-1">Hi<a href="#section-4.1.7-1" class="pilcrow">¶</a></p>
 </section>
 </div>
+<div id="channel-operations">
+<section id="section-4.2">
+        <h3 id="name-channel-operations-2">
+<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-channel-operations-2" class="section-name selfRef">Channel operations</a>
+        </h3>
+<p id="section-4.2-1">This group of messages is concerned with manipulating channels, their properties (channel modes), and their contents (typically users).  In implementing these, a number of race conditions are inevitable when users send commands which will ultimately clash.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<div id="join-message">
+<section id="section-4.2.1">
+          <h4 id="name-join-message-2">
+<a href="#section-4.2.1" class="section-number selfRef">4.2.1. </a><a href="#name-join-message-2" class="section-name selfRef">Join message</a>
+          </h4>
+<p id="section-4.2.1-1">Command: JOIN
+   Parameters: &lt;channel&gt;{,&lt;channel&gt;} [&lt;key&gt;{,&lt;key&gt;}]<a href="#section-4.2.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.2.1-2">The JOIN command is used by user to start listening a specific
+channel. Whether or not a user is allowed to join a channel is
+checked by the server hosting the channel.<a href="#section-4.2.1-2" class="pilcrow">¶</a></p>
+<p id="section-4.2.1-3">The conditions of joining are as follows:<a href="#section-4.2.1-3" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="compact type-1" id="section-4.2.1-4">
+<li id="section-4.2.1-4.1">the user must be invited if the channel is invite-only;<a href="#section-4.2.1-4.1" class="pilcrow">¶</a>
+</li>
+            <li id="section-4.2.1-4.2">the user's UID and per server must not match any active bans;<a href="#section-4.2.1-4.2" class="pilcrow">¶</a>
+</li>
+            <li id="section-4.2.1-4.3">the correct key (password) must be correct if it is set.<a href="#section-4.2.1-4.3" class="pilcrow">¶</a>
+</li>
+          </ol>
+<p id="section-4.2.1-5">These are discussed in more detail under the MODE command (see
+section 4.2.3 for more details).<a href="#section-4.2.1-5" class="pilcrow">¶</a></p>
+<p id="section-4.2.1-6">Once a user has joined a channel, they receive notice about all commands their server receives which affect the channel.  This includes MODE, KICK, PART, QUIT and of course PRIVMSG/NOTICE.  The JOIN command needs to be broadcast to all servers where a user thereof is on the said channel so that each server knows where to find the users who are on the channel.  This allows optimal delivery of PRIVMSG/NOTICE messages to the channel.<a href="#section-4.2.1-6" class="pilcrow">¶</a></p>
+<p id="section-4.2.1-7">If a JOIN is successful, the user is then sent the channel's topic (using RPL_TOPIC) and the list of users who are on the channel (using RPL_NAMREPLY), which must include the user joining.<a href="#section-4.2.1-7" class="pilcrow">¶</a></p>
+<p id="section-4.2.1-8">Replies:<a href="#section-4.2.1-8" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-4.2.1-9">
+<pre>    ERR_NEEDMOREPARAMS              ERR_BANNEDFROMCHAN
+    ERR_INVITEONLYCHAN              ERR_BADCHANNELKEY
+    ERR_CHANNELISFULL               ERR_BADCHANMASK
+    ERR_NOSUCHCHANNEL               ERR_TOOMANYCHANNELS
+    RPL_TOPIC
+</pre><a href="#section-4.2.1-9" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="part-message">
+<section id="section-4.2.2">
+          <h4 id="name-part-message-2">
+<a href="#section-4.2.2" class="section-number selfRef">4.2.2. </a><a href="#name-part-message-2" class="section-name selfRef">Part message</a>
+          </h4>
+<p id="section-4.2.2-1">Command: PART
+   Parameters: &lt;channel&gt;{,&lt;channel&gt;}<a href="#section-4.2.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.2.2-2">The PART message causes the client sending the message to be removed from the list of active users for all given channels listed in the parameter string.<a href="#section-4.2.2-2" class="pilcrow">¶</a></p>
+<p id="section-4.2.2-3">Replies:<a href="#section-4.2.2-3" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-4.2.2-4">
+<pre>    ERR_NEEDMOREPARAMS              ERR_NOSUCHCHANNEL
+    ERR_NOTONCHANNEL
+</pre><a href="#section-4.2.2-4" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="mode-message">
+<section id="section-4.2.3">
+          <h4 id="name-mode-message-2">
+<a href="#section-4.2.3" class="section-number selfRef">4.2.3. </a><a href="#name-mode-message-2" class="section-name selfRef">Mode message</a>
+          </h4>
+<p id="section-4.2.3-1">Command: MODE<a href="#section-4.2.3-1" class="pilcrow">¶</a></p>
+<p id="section-4.2.3-2">The MODE command is a dual-purpose command in IDC.  It allows both usernames and channels to have their mode changed.<a href="#section-4.2.3-2" class="pilcrow">¶</a></p>
+<p id="section-4.2.3-3">When parsing MODE messages, it is recommended that the entire message be parsed first and then the changes which resulted then passed on.<a href="#section-4.2.3-3" class="pilcrow">¶</a></p>
+<div id="channel-modes">
+<section id="section-4.2.3.1">
+            <h5 id="name-channel-modes-2">
+<a href="#section-4.2.3.1" class="section-number selfRef">4.2.3.1. </a><a href="#name-channel-modes-2" class="section-name selfRef">Channel modes</a>
+            </h5>
+<p id="section-4.2.3.1-1">Parameters: &lt;channel&gt; {[+|-]|&lt;modes&gt;} [&lt;param&gt;]<a href="#section-4.2.3.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.2.3.1-2">The MODE command is provided so that channel operators may change the characteristics of `their' channel.  It is also required that servers be able to change channel modes so that channel operators may be created.<a href="#section-4.2.3.1-2" class="pilcrow">¶</a></p>
+<p id="section-4.2.3.1-3">The various modes available for channels are as follows:<a href="#section-4.2.3.1-3" class="pilcrow">¶</a></p>
+<p id="section-4.2.3.1-4">OPERATOR - give/take channel operator privileges;
+   SECRET - secret channel flag;
+   INVITE_ONLY - invite-only channel flag;
+   TOPIC_OPERATOR_ONLY - topic settable by channel operator only flag;
+   NO_EXTERNAL_MESSAGES - no messages to channel from clients on the outside;
+   MODERATED - moderated channel;
+   BAN - set a ban mask to keep users out;
+   QUIET - set a quiet mask to keep users silent;
+   VOICE - give/take the ability to speak on a moderated channel;
+   KEY - set a channel key (password).<a href="#section-4.2.3.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="user-modes">
+<section id="section-4.2.3.2">
+            <h5 id="name-user-modes-2">
+<a href="#section-4.2.3.2" class="section-number selfRef">4.2.3.2. </a><a href="#name-user-modes-2" class="section-name selfRef">User modes</a>
+            </h5>
+<p id="section-4.2.3.2-1">Parameters: &lt;nickname&gt; {[+|-]|&lt;modes&gt;} [&lt;param&gt;]<a href="#section-4.2.3.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.2.3.2-2">The user MODEs are typically changes which affect either how the
+client is seen by others or what 'extra' messages the client is sent.
+A user MODE command may only be accepted if both the sender of the
+message and the nickname given as a parameter are both the same.<a href="#section-4.2.3.2-2" class="pilcrow">¶</a></p>
+<p id="section-4.2.3.2-3">The available modes are as follows:<a href="#section-4.2.3.2-3" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-4.2.3.2-4">
+<pre>    SERVER_NOTICES - marks a user for receipt of server notices;
+    ADMINISTRATOR - operator flag.
+</pre><a href="#section-4.2.3.2-4" class="pilcrow">¶</a>
+</div>
+<p id="section-4.2.3.2-5">If a user attempts to make themselves an administrator using the "+ADMINISTRATOR" flag, the attempt should return ERR_NOPRIVILEGES.  There is no restriction, however, on anyone `deadministratoring' themselves (using "-ADMINISTRATOR").<a href="#section-4.2.3.2-5" class="pilcrow">¶</a></p>
+<p id="section-4.2.3.2-6">Replies:<a href="#section-4.2.3.2-6" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-4.2.3.2-7">
+<pre>    ERR_NEEDMOREPARAMS              RPL_CHANNELMODEIS
+    ERR_CHANOPRIVSNEEDED            ERR_NOSUCHNICK
+    ERR_NOTONCHANNEL                ERR_KEYSET
+    RPL_BANLIST                     RPL_ENDOFBANLIST
+    ERR_UNKNOWNMODE                 ERR_NOSUCHCHANNEL
+    ERR_USERSDONTMATCH              RPL_UMODEIS
+    ERR_UMODEUNKNOWNFLAG
+</pre><a href="#section-4.2.3.2-7" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="topic-message">
+<section id="section-4.2.3.3">
+            <h5 id="name-topic-message-2">
+<a href="#section-4.2.3.3" class="section-number selfRef">4.2.3.3. </a><a href="#name-topic-message-2" class="section-name selfRef">Topic message</a>
+            </h5>
+<p id="section-4.2.3.3-1">Command: TOPIC
+   Parameters: &lt;channel&gt; [&lt;topic&gt;]<a href="#section-4.2.3.3-1" class="pilcrow">¶</a></p>
+<p id="section-4.2.3.3-2">The TOPIC message is used to change or view the topic of a channel. The topic for channel &lt;channel&gt; is returned if there is no &lt;topic&gt; given.  If the &lt;topic&gt; parameter is present, the topic for that channel will be changed, if the channel modes permit this action.<a href="#section-4.2.3.3-2" class="pilcrow">¶</a></p>
+<p id="section-4.2.3.3-3">Replies:<a href="#section-4.2.3.3-3" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-4.2.3.3-4">
+<pre>    ERR_NEEDMOREPARAMS              ERR_NOTONCHANNEL
+    RPL_NOTOPIC                     RPL_TOPIC
+    ERR_CHANOPRIVSNEEDED
+</pre><a href="#section-4.2.3.3-4" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="names-message">
+<section id="section-4.2.3.4">
+            <h5 id="name-names-message-2">
+<a href="#section-4.2.3.4" class="section-number selfRef">4.2.3.4. </a><a href="#name-names-message-2" class="section-name selfRef">Names message</a>
+            </h5>
+<p id="section-4.2.3.4-1">Command: NAMES
+   Parameters: [&lt;channel&gt;{,&lt;channel&gt;}]<a href="#section-4.2.3.4-1" class="pilcrow">¶</a></p>
+<p id="section-4.2.3.4-2">By using the NAMES command, a user can list all nicknames that are visible to them on any channel that they can see.  Channel names which they can see are those which aren't secret (+s) or those which they are actually on.  The &lt;channel&gt; parameter specifies which channel(s) to return information about if valid. There is no error reply for bad channel names.<a href="#section-4.2.3.4-2" class="pilcrow">¶</a></p>
+<p id="section-4.2.3.4-3">If no &lt;channel&gt; parameter is given, a list of all channels and their occupants is returned.  At the end of this list, a list of users who are visible but either not on any channel or not on a visible channel are listed as being on `channel' "*".<a href="#section-4.2.3.4-3" class="pilcrow">¶</a></p>
+<p id="section-4.2.3.4-4">Numerics:<a href="#section-4.2.3.4-4" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-4.2.3.4-5">
+<pre>    RPL_NAMREPLY                    RPL_ENDOFNAMES
+</pre><a href="#section-4.2.3.4-5" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="invite-message">
+<section id="section-4.2.3.5">
+            <h5 id="name-invite-message-2">
+<a href="#section-4.2.3.5" class="section-number selfRef">4.2.3.5. </a><a href="#name-invite-message-2" class="section-name selfRef">Invite message</a>
+            </h5>
+<p id="section-4.2.3.5-1">Command: INVITE
+   Parameters: &lt;nickname&gt; &lt;channel&gt;<a href="#section-4.2.3.5-1" class="pilcrow">¶</a></p>
+<p id="section-4.2.3.5-2">The INVITE message is used to invite users to a channel.  The parameter &lt;nickname&gt; is the nickname of the person to be invited to the target channel &lt;channel&gt;.  The target user is being invited to must exist or be a valid channel.  To invite a user to a channel which is invite only (MODE +i), the client sending the invite must be recognised as being a channel operator on the given channel.<a href="#section-4.2.3.5-2" class="pilcrow">¶</a></p>
+<p id="section-4.2.3.5-3">Replies:<a href="#section-4.2.3.5-3" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-4.2.3.5-4">
+<pre>       ERR_NEEDMOREPARAMS              ERR_NOSUCHNICK
+       ERR_NOTONCHANNEL                ERR_USERONCHANNEL
+       ERR_CHANOPRIVSNEEDED
+       RPL_INVITING                    RPL_AWAY
+</pre><a href="#section-4.2.3.5-4" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="kick-command">
+<section id="section-4.2.3.6">
+            <h5 id="name-kick-command-2">
+<a href="#section-4.2.3.6" class="section-number selfRef">4.2.3.6. </a><a href="#name-kick-command-2" class="section-name selfRef">Kick command</a>
+            </h5>
+<p id="section-4.2.3.6-1">Command: KICK
+   Parameters: &lt;channel&gt; &lt;user&gt; [&lt;comment&gt;]<a href="#section-4.2.3.6-1" class="pilcrow">¶</a></p>
+<p id="section-4.2.3.6-2">The KICK command can be  used  to  forcibly  remove  a  user  from  a
+channel.   It  'kicks  them  out'  of the channel (forced PART).<a href="#section-4.2.3.6-2" class="pilcrow">¶</a></p>
+<p id="section-4.2.3.6-3">Only a channel operator may kick another user out of a  channel.
+Each  server that  receives  a KICK message checks that it is valid
+(ie the sender is actually a  channel  operator)  before  removing
+the  victim  from  the channel.<a href="#section-4.2.3.6-3" class="pilcrow">¶</a></p>
+<p id="section-4.2.3.6-4">Replies:<a href="#section-4.2.3.6-4" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-4.2.3.6-5">
+<pre>    ERR_NEEDMOREPARAMS              ERR_NOSUCHCHANNEL
+    ERR_BADCHANMASK                 ERR_CHANOPRIVSNEEDED
+    ERR_NOTONCHANNEL
+</pre><a href="#section-4.2.3.6-5" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="server-queries-and-commands">
+<section id="section-4.3">
+        <h3 id="name-server-queries-and-commands-2">
+<a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-server-queries-and-commands-2" class="section-name selfRef">Server queries and commands</a>
+      </h3>
 </section>
 </div>
 </section>

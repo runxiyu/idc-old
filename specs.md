@@ -324,9 +324,146 @@ The conditions of joining are as follows:
 2.  the user's UID and per server must not match any active bans;
 3.  the correct key (password) must be correct if it is set.
 
+These are discussed in more detail under the MODE command (see
+section 4.2.3 for more details).
 
+Once a user has joined a channel, they receive notice about all commands their server receives which affect the channel.  This includes MODE, KICK, PART, QUIT and of course PRIVMSG/NOTICE.  The JOIN command needs to be broadcast to all servers where a user thereof is on the said channel so that each server knows where to find the users who are on the channel.  This allows optimal delivery of PRIVMSG/NOTICE messages to the channel.
 
+If a JOIN is successful, the user is then sent the channel's topic (using RPL_TOPIC) and the list of users who are on the channel (using RPL_NAMREPLY), which must include the user joining.
 
+Replies:
+
+        ERR_NEEDMOREPARAMS              ERR_BANNEDFROMCHAN
+        ERR_INVITEONLYCHAN              ERR_BADCHANNELKEY
+        ERR_CHANNELISFULL               ERR_BADCHANMASK
+        ERR_NOSUCHCHANNEL               ERR_TOOMANYCHANNELS
+        RPL_TOPIC
+
+### Part message
+
+   Command: PART
+   Parameters: <channel>{,<channel>}
+
+The PART message causes the client sending the message to be removed from the list of active users for all given channels listed in the parameter string.
+
+Replies:
+
+        ERR_NEEDMOREPARAMS              ERR_NOSUCHCHANNEL
+        ERR_NOTONCHANNEL
+
+### Mode message
+
+   Command: MODE
+
+The MODE command is a dual-purpose command in IDC.  It allows both usernames and channels to have their mode changed.
+
+When parsing MODE messages, it is recommended that the entire message be parsed first and then the changes which resulted then passed on.
+
+#### Channel modes
+
+   Parameters: <channel> {[+|-]|<modes>} [<param>]
+
+The MODE command is provided so that channel operators may change the characteristics of `their' channel.  It is also required that servers be able to change channel modes so that channel operators may be created.
+
+The various modes available for channels are as follows:
+
+   OPERATOR - give/take channel operator privileges;
+   SECRET - secret channel flag;
+   INVITE_ONLY - invite-only channel flag;
+   TOPIC_OPERATOR_ONLY - topic settable by channel operator only flag;
+   NO_EXTERNAL_MESSAGES - no messages to channel from clients on the outside;
+   MODERATED - moderated channel;
+   BAN - set a ban mask to keep users out;
+   QUIET - set a quiet mask to keep users silent;
+   VOICE - give/take the ability to speak on a moderated channel;
+   KEY - set a channel key (password).
+
+#### User modes
+
+   Parameters: <nickname> {[+|-]|<modes>} [<param>]
+
+The user MODEs are typically changes which affect either how the
+client is seen by others or what 'extra' messages the client is sent.
+A user MODE command may only be accepted if both the sender of the
+message and the nickname given as a parameter are both the same.
+
+The available modes are as follows:
+
+        SERVER_NOTICES - marks a user for receipt of server notices;
+        ADMINISTRATOR - operator flag.
+
+If a user attempts to make themselves an administrator using the "+ADMINISTRATOR" flag, the attempt should return ERR_NOPRIVILEGES.  There is no restriction, however, on anyone `deadministratoring' themselves (using "-ADMINISTRATOR").
+
+Replies:
+
+        ERR_NEEDMOREPARAMS              RPL_CHANNELMODEIS
+        ERR_CHANOPRIVSNEEDED            ERR_NOSUCHNICK
+        ERR_NOTONCHANNEL                ERR_KEYSET
+        RPL_BANLIST                     RPL_ENDOFBANLIST
+        ERR_UNKNOWNMODE                 ERR_NOSUCHCHANNEL
+        ERR_USERSDONTMATCH              RPL_UMODEIS
+        ERR_UMODEUNKNOWNFLAG
+
+#### Topic message
+
+   Command: TOPIC
+   Parameters: <channel> [<topic>]
+
+The TOPIC message is used to change or view the topic of a channel. The topic for channel <channel> is returned if there is no <topic> given.  If the <topic> parameter is present, the topic for that channel will be changed, if the channel modes permit this action.
+
+Replies:
+
+        ERR_NEEDMOREPARAMS              ERR_NOTONCHANNEL
+        RPL_NOTOPIC                     RPL_TOPIC
+        ERR_CHANOPRIVSNEEDED
+
+#### Names message
+
+   Command: NAMES
+   Parameters: [<channel>{,<channel>}]
+
+By using the NAMES command, a user can list all nicknames that are visible to them on any channel that they can see.  Channel names which they can see are those which aren't secret (+s) or those which they are actually on.  The <channel> parameter specifies which channel(s) to return information about if valid. There is no error reply for bad channel names.
+
+If no <channel> parameter is given, a list of all channels and their occupants is returned.  At the end of this list, a list of users who are visible but either not on any channel or not on a visible channel are listed as being on `channel' "*".
+
+Numerics:
+
+        RPL_NAMREPLY                    RPL_ENDOFNAMES
+
+#### Invite message
+
+   Command: INVITE
+   Parameters: <nickname> <channel>
+
+The INVITE message is used to invite users to a channel.  The parameter <nickname> is the nickname of the person to be invited to the target channel <channel>.  The target user is being invited to must exist or be a valid channel.  To invite a user to a channel which is invite only (MODE +i), the client sending the invite must be recognised as being a channel operator on the given channel.
+
+Replies:
+
+           ERR_NEEDMOREPARAMS              ERR_NOSUCHNICK
+           ERR_NOTONCHANNEL                ERR_USERONCHANNEL
+           ERR_CHANOPRIVSNEEDED
+           RPL_INVITING                    RPL_AWAY
+
+#### Kick command
+
+   Command: KICK
+   Parameters: <channel> <user> [<comment>]
+
+The KICK command can be  used  to  forcibly  remove  a  user  from  a
+channel.   It  'kicks  them  out'  of the channel (forced PART).
+
+Only a channel operator may kick another user out of a  channel.
+Each  server that  receives  a KICK message checks that it is valid
+(ie the sender is actually a  channel  operator)  before  removing
+the  victim  from  the channel.
+
+Replies:
+
+        ERR_NEEDMOREPARAMS              ERR_NOSUCHCHANNEL
+        ERR_BADCHANMASK                 ERR_CHANOPRIVSNEEDED
+        ERR_NOTONCHANNEL
+
+## Server queries and commands
 
 
 # Acknowledgements
