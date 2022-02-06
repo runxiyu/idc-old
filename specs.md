@@ -49,10 +49,20 @@ Most modern IRC networks use dedicated "services" servers for user, channel, gro
 
 The Extensible Messaging and Presence Protocol was designed for presense, instant messaging, and conferences.  However, it is based on XML, and implementations are large and buggy.  IRC is a simple text-oriented protocol, where implementing is more straightforward and is harder to bug.
 
+Blah blah blah.
+
 SMS does not work over the Internet, and is generally expensive.
+
+## Servers
+
+The server forms the backbone of IDC, providing a point to which clients may connect to to talk to each other, and a point for other servers to connect to, forming the global IDC network.  The only network configuration allowed for IDC servers is that of a mesh where each server connects to other servers directly.
+
+## Clients
+
+A client is anything connecting to a server that is not another server.  Each client is distinguished from other clients by a unique CID having a length of 9 characters, private to each server.  In addition to the nickname, the server must have the following information about the client: the real name of the host that the client is running on, the username of the client on that host, and the server to which the client is connected.
 
 {backmatter}
 
 # Acknowledgements
 
-This document has multiple ideas suggested by Test_User \<hax@andrewyu.org\>.
+This document has multiple ideas suggested by Test_User \<hax@andrewyu.org\> and luk3yx.

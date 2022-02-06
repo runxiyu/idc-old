@@ -1276,12 +1276,20 @@ li > p:last-of-type {
 <nav class="toc"><ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
             <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="xref">1</a>.  <a href="#name-introduction-2" class="xref">Introduction</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1">
+                <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1" class="xref">1.1</a>.  <a href="#name-servers-2" class="xref">Servers</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2">
+                <p id="section-toc.1-1.1.2.2.1" class="keepWithNext"><a href="#section-1.2" class="xref">1.2</a>.  <a href="#name-clients-2" class="xref">Clients</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
-            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#appendix-A" class="xref">Appendix A</a>.  <a href="#name-acknowledgements-2" class="xref">Acknowledgements</a></p>
+            <p id="section-toc.1-1.2.1"><a href="#appendix-A" class="xref">Appendix A</a>.  <a href="#name-acknowledgements-2" class="xref">Acknowledgements</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
-            <p id="section-toc.1-1.3.1" class="keepWithNext"><a href="#appendix-B" class="xref"></a><a href="#name-authors-address-2" class="xref">Author's Address</a></p>
+            <p id="section-toc.1-1.3.1"><a href="#appendix-B" class="xref"></a><a href="#name-authors-address-2" class="xref">Author's Address</a></p>
 </li>
         </ul>
 </nav>
@@ -1298,7 +1306,24 @@ li > p:last-of-type {
 <p id="section-1-4">IRC is real time.  When a client disconnects, the server no longer recognizes the client, and messages during the client's downtime are not saved.  This renders IRC unfit for instant messaging, where clients are forced to disconnect but messages are to be read later.  IRC is not federated, causing most people to be on the few large networks, imparing user freedom.<a href="#section-1-4" class="pilcrow">¶</a></p>
 <p id="section-1-5">Most modern IRC networks use dedicated "services" servers for user, channel, group, etc. management and dedicated client bots for extensible channel management.  Compared with these features built into the server, this is ineffective and redundent.<a href="#section-1-5" class="pilcrow">¶</a></p>
 <p id="section-1-6">The Extensible Messaging and Presence Protocol was designed for presense, instant messaging, and conferences.  However, it is based on XML, and implementations are large and buggy.  IRC is a simple text-oriented protocol, where implementing is more straightforward and is harder to bug.<a href="#section-1-6" class="pilcrow">¶</a></p>
-<p id="section-1-7">SMS does not work over the Internet, and is generally expensive.<a href="#section-1-7" class="pilcrow">¶</a></p>
+<p id="section-1-7">Blah blah blah.<a href="#section-1-7" class="pilcrow">¶</a></p>
+<p id="section-1-8">SMS does not work over the Internet, and is generally expensive.<a href="#section-1-8" class="pilcrow">¶</a></p>
+<div id="servers">
+<section id="section-1.1">
+        <h3 id="name-servers-2">
+<a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-servers-2" class="section-name selfRef">Servers</a>
+        </h3>
+<p id="section-1.1-1">The server forms the backbone of IDC, providing a point to which clients may connect to to talk to each other, and a point for other servers to connect to, forming the global IDC network.  The only network configuration allowed for IDC servers is that of a mesh where each server connects to other servers directly.<a href="#section-1.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="clients">
+<section id="section-1.2">
+        <h3 id="name-clients-2">
+<a href="#section-1.2" class="section-number selfRef">1.2. </a><a href="#name-clients-2" class="section-name selfRef">Clients</a>
+        </h3>
+<p id="section-1.2-1">A client is anything connecting to a server that is not another server.  Each client is distinguished from other clients by a unique CID having a length of 9 characters, private to each server.  In addition to the nickname, the server must have the following information about the client: the real name of the host that the client is running on, the username of the client on that host, and the server to which the client is connected.<a href="#section-1.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="acknowledgements">
@@ -1306,7 +1331,7 @@ li > p:last-of-type {
       <h2 id="name-acknowledgements-2">
 <a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-acknowledgements-2" class="section-name selfRef">Acknowledgements</a>
       </h2>
-<p id="appendix-A-1">This document has multiple ideas suggested by Test_User &lt;hax@andrewyu.org&gt;.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<p id="appendix-A-1">This document has multiple ideas suggested by Test_User &lt;hax@andrewyu.org&gt; and luk3yx.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="authors-addresses">

@@ -51,6 +51,8 @@ Copyright Notice
 Table of Contents
 
    1.  Introduction
+     1.1.  Servers
+     1.2.  Clients
    Appendix A.  Acknowledgements
    Author's Address
 
@@ -89,12 +91,32 @@ Table of Contents
    text-oriented protocol, where implementing is more straightforward
    and is harder to bug.
 
+   Blah blah blah.
+
    SMS does not work over the Internet, and is generally expensive.
+
+1.1.  Servers
+
+   The server forms the backbone of IDC, providing a point to which
+   clients may connect to to talk to each other, and a point for other
+   servers to connect to, forming the global IDC network.  The only
+   network configuration allowed for IDC servers is that of a mesh where
+   each server connects to other servers directly.
+
+1.2.  Clients
+
+   A client is anything connecting to a server that is not another
+   server.  Each client is distinguished from other clients by a unique
+   CID having a length of 9 characters, private to each server.  In
+   addition to the nickname, the server must have the following
+   information about the client: the real name of the host that the
+   client is running on, the username of the client on that host, and
+   the server to which the client is connected.
 
 Appendix A.  Acknowledgements
 
    This document has multiple ideas suggested by Test_User
-   <hax@andrewyu.org>.
+   <hax@andrewyu.org> and luk3yx.
 
 Author's Address
 

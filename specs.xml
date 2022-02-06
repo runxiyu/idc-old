@@ -27,7 +27,16 @@
 <t>IRC is real time.  When a client disconnects, the server no longer recognizes the client, and messages during the client's downtime are not saved.  This renders IRC unfit for instant messaging, where clients are forced to disconnect but messages are to be read later.  IRC is not federated, causing most people to be on the few large networks, imparing user freedom.</t>
 <t>Most modern IRC networks use dedicated &quot;services&quot; servers for user, channel, group, etc. management and dedicated client bots for extensible channel management.  Compared with these features built into the server, this is ineffective and redundent.</t>
 <t>The Extensible Messaging and Presence Protocol was designed for presense, instant messaging, and conferences.  However, it is based on XML, and implementations are large and buggy.  IRC is a simple text-oriented protocol, where implementing is more straightforward and is harder to bug.</t>
+<t>Blah blah blah.</t>
 <t>SMS does not work over the Internet, and is generally expensive.</t>
+
+<section anchor="servers"><name>Servers</name>
+<t>The server forms the backbone of IDC, providing a point to which clients may connect to to talk to each other, and a point for other servers to connect to, forming the global IDC network.  The only network configuration allowed for IDC servers is that of a mesh where each server connects to other servers directly.</t>
+</section>
+
+<section anchor="clients"><name>Clients</name>
+<t>A client is anything connecting to a server that is not another server.  Each client is distinguished from other clients by a unique CID having a length of 9 characters, private to each server.  In addition to the nickname, the server must have the following information about the client: the real name of the host that the client is running on, the username of the client on that host, and the server to which the client is connected.</t>
+</section>
 </section>
 
 </middle>
@@ -35,7 +44,7 @@
 <back>
 
 <section anchor="acknowledgements"><name>Acknowledgements</name>
-<t>This document has multiple ideas suggested by Test_User &lt;hax@andrewyu.org&gt;.</t>
+<t>This document has multiple ideas suggested by Test_User &lt;hax@andrewyu.org&gt; and luk3yx.</t>
 </section>
 
 </back>
