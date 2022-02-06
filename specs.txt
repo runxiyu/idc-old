@@ -177,7 +177,7 @@ Table of Contents
 
    The channel operator (also referred to as a "chop" or "chanop") on a
    given channel is considered to 'own' that channel.  In recognition of
-   tper status, channel operators are endowed with certain powers which
+   oper status, channel operators are endowed with certain powers which
    enable them to keep control and some sort of sanity in their channel.
    As an owner of a channel, a channel operator is not required to have
    reasons for their actions, although if their actions are generally
@@ -190,7 +190,7 @@ Table of Contents
 
     KICK    - Eject a client from the channel
     MODE    - Change the channel's mode
-    INVITE  - Invite a client to an invite-only channel (mode +i)
+    INVITE  - Invite a client to an invite-only channel (mode +invite_only)
     TOPIC   - Change the channel topic in a mode +t channel
 
 2.  The IDC Specification
