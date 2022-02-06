@@ -53,6 +53,14 @@ Table of Contents
    1.  Introduction
      1.1.  Servers
      1.2.  Clients
+     1.3.  Users
+       1.3.1.  Administrators
+     1.4.  Channels
+     1.5.  Channel Operators
+   2.  The IDC Specification
+     2.1.  Overview
+     2.2.  Character codes
+     2.3.  Messages
    Appendix A.  Acknowledgements
    Author's Address
 
@@ -107,11 +115,196 @@ Table of Contents
 
    A client is anything connecting to a server that is not another
    server.  Each client is distinguished from other clients by a unique
-   CID having a length of 9 characters, private to each server.  In
-   addition to the nickname, the server must have the following
-   information about the client: the real name of the host that the
-   client is running on, the username of the client on that host, and
-   the server to which the client is connected.
+   CID having a length of 9 characters, private to each server.
+
+1.3.  Users
+
+   Each client is associated with a user.  Users are identified by a
+   UID, in the form of user@host, where host is the server's FQDN, each
+   unique in the Internet.  Messages are directed at users, which are
+   then sent to all connected clients of the said user.  If the user has
+   no connected clients, i.e. the user is offline, the message should be
+   kept until the user reconnects.
+
+1.3.1.  Administrators
+
+   To allow a reasonable amount of order to be kept within a server, a
+   special class of users (administrators) is allowed to perform general
+   maintenance functions on the server.  Although the powers granted to
+   an administrator can be considered as 'dangerous', they are
+   nonetheless required.  Administrators should be able to perform basic
+   network tasks such as disconnecting and reconnecting servers as
+   needed to prevent long-term use of bad network routing.  In
+   recognition of this need, the protocol discussed herein provides for
+   operators only to be able to perform such functions.
+
+1.4.  Channels
+
+   A channel is a identified group of one or more clients which will all
+   receive messages addressed to that channel.  The channel is created
+   implicitly when the first client joins it, and the channel ceases to
+   exist when the last client leaves it.  While channel exists, any
+   client can reference the channel using the CID of the channel.
+
+   Channels identifiers (CIDs) are strings (beginning with a '#'
+   character and is alphanumeric only) of length up to 200 characters,
+   shaped as #chan@server, where 'server' is the FQDN of the server that
+   the channel is hosted on.
+
+   To create a new channel or become part of an existing channel, a user
+   is required to JOIN the channel.  If the channel doesn't exist prior
+   to joining, the channel is created and the creating user becomes a
+   channel operator.  If the channel already exists, whether or not your
+   request to JOIN that channel is honoured depends on the current modes
+   of the channel.  For example, if the channel is invite-only,
+   (+invite-only), then you may only join if invited.  As part of the
+   protocol, a user may be a part of several channels at once, but a
+   limit of one hundred (100) channels is recommended as being ample for
+   both experienced and novice users.  See section 8.13 for more
+   information on this.
+
+1.5.  Channel Operators
+
+   The channel operator (also referred to as a "chop" or "chanop") on a
+   given channel is considered to 'own' that channel.  In recognition of
+   tper status, channel operators are endowed with certain powers which
+   enable them to keep control and some sort of sanity in their channel.
+   As an owner of a channel, a channel operator is not required to have
+   reasons for their actions, although if their actions are generally
+   antisocial or otherwise abusive, it might be reasonable to ask the
+   server administrator for where the channel is hosted to intervene, or
+   for the users to just leave and go elsewhere and form their own
+   channel.
+
+   The commands which may only be used by channel operators are:
+
+    KICK    - Eject a client from the channel
+    MODE    - Change the channel's mode
+    INVITE  - Invite a client to an invite-only channel (mode +i)
+    TOPIC   - Change the channel topic in a mode +t channel
+
+2.  The IDC Specification
+
+2.1.  Overview
+
+   The protocol as described herein is for use both with server to
+   server and client to server connections.  There are similiar
+   restrictions on server connections as for client connections as this
+   is a federated protocol.
+
+2.2.  Character codes
+
+   The charactar encoding for IDC is UTF-8.
+
+2.3.  Messages
+
+   Servers and clients send eachother messages which may or may not
+   generate a reply.  If the message contains a valid command, as
+   described in later sections, the client should expect a reply as
+   specified but it is not advised to wait forever for the reply; client
+   to server and server to server communication is essentially
+   asynchronous in nature.
+
+   Each IDC message may consist of up to three main parts: the prefix
+   (optional), the command, and the command parameters (of which there
+   may be up to 30).  The prefix, command, and all parameters are
+   separated by one (or more) ASCII space character(s) (0x20).
+
+   The presence of a prefix is indicated with a single leading ASCII
+   colon character (':', 0x3b), which must be the first character of the
+   message itself.  There must be no gap (whitespace) between the colon
+   and the prefix.  The prefix is used by servers to indicate the true
+   origin of the message.  If the prefix is missing from the message, it
+   is assumed to have originated from the connection from which it was
+   received.  Clients should not use prefix when sending a message from
+   themselves; if they use a prefix, the only valid prefix is the
+   registered nickname associated with the client.  If the source
+   identified by the prefix cannot be found from the server's internal
+   database, or if the source is registered from a different link than
+   from which the message arrived, the server must ignore the message
+   with an error message.
+
+   The command must be a valid IDC command.
+
+   IDC messages are always lines of characters terminated with a CR-LF
+   (Carriage Return - Line Feed) pair, and these messages shall not
+   exceed 65536 characters in length, counting all characters including
+   the trailing CR-LF.  Thus, there are 65534 characters maximum allowed
+   for the command and its parameters.  There is no provision for
+   continuation message lines.  See section <++> for more details about
+   current implementations.
+
+   The protocol messages must be extracted from the contiguous stream of
+   data.  The current solution is to designate two characters, CR and
+   LF, as message separators.  Empty messages are silently ignored,
+   which permits use of the sequence CR-LF between messages without
+   extra problems.
+
+   The extracted message is parsed into the components <prefix>,
+   <command> and list of parameters matched either by <middle> or
+   <trailing> components.
+
+   The BNF representation for this is:
+
+ <message>  ::= [':' <prefix> <SPACE> ] <command> <params> <crlf>
+ <prefix>   ::= <servername> | <nick> [ '!' <user> ] [ '@' <host> ]
+ <command>  ::= <letter> { <letter> } | <number> <number> <number>
+ <SPACE>    ::= ' ' { ' ' }
+ <params>   ::= <SPACE> [ ':' <trailing> | <middle> <params> ]
+
+ <middle>   ::= <Any *non-empty* sequence of octets not including SPACE
+                or NUL or CR or LF, the first of which may not be ':'>
+ <trailing> ::= <Any, possibly *empty*, sequence of octets not including
+                  NUL or CR or LF>
+
+ <crlf>     ::= CR LF
+
+   NOTES:
+
+   1.  <SPACE> is consists only of SPACE character(s) (0x20).  Specially
+       notice that TABULATION, and all other control characters are
+       considered NON-WHITE-SPACE.
+   2.  After extracting the parameter list, all parameters are equal,
+       whether matched by <middle> or <trailing>. <Trailing> is just a
+       syntactic trick to allow SPACE within parameter.
+   3.  The fact that CR and LF cannot appear in parameter strings is
+       just artifact of the message framing.
+   4.  The NUL character is not special in message framing, and
+       basically could end up inside a parameter, but as it would cause
+       extra complexities in normal C string handling.  Therefore NUL is
+       not allowed within messages.
+   5.  The last parameter may be an empty string.
+   6.  Use of the extended prefix (['!' <user> ] ['@' <host> ]) must not
+       be used in server to server communications and is only intended
+       for server to client messages in order to provide clients with
+       more useful information about who a message is from without the
+       need for additional queries.
+
+   Most protocol messages specify additional semantics and syntax for
+   the extracted parameter strings dictated by their position in the
+   list.  For example, many server commands will assume that the first
+   parameter after the command is the list of targets, which can be
+   described with:
+
+   <target>     ::= <to> [ "," <target> ]
+   <to>         ::= <channel> | <user> '@' <server> | <mask>
+   <channel>    ::= ('#') <chstring>
+   <servername> ::= <host>
+   <host>       ::= see RFC 952 [DNS:4] for details on allowed hostnames
+   <uid>       ::= <letter> { <letter> | <number> }
+   <mask>       ::= ('#' | '$') <chstring>
+   <chstring>   ::= <any 8bit code except SPACE, BELL, NUL, CR, LF and
+                     comma (',')>
+
+   Other parameter syntaxes are:
+
+   <user>       ::= <nonwhite> { <nonwhite> }
+   <letter>     ::= 'a' ... 'z' | 'A' ... 'Z'
+   <number>     ::= '0' ... '9'
+   <special>    ::= '-' | '[' | ']' | '\' | '`' | '^' | '{' | '}'
+
+   <nonwhite>   ::= <any 8bit code except SPACE (0x20), NUL (0x0), CR
+                     (0xd), and LF (0xa)>
 
 Appendix A.  Acknowledgements
 

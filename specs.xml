@@ -35,7 +35,107 @@
 </section>
 
 <section anchor="clients"><name>Clients</name>
-<t>A client is anything connecting to a server that is not another server.  Each client is distinguished from other clients by a unique CID having a length of 9 characters, private to each server.  In addition to the nickname, the server must have the following information about the client: the real name of the host that the client is running on, the username of the client on that host, and the server to which the client is connected.</t>
+<t>A client is anything connecting to a server that is not another server.  Each client is distinguished from other clients by a unique CID having a length of 9 characters, private to each server.</t>
+</section>
+
+<section anchor="users"><name>Users</name>
+<t>Each client is associated with a user.  Users are identified by a UID, in the form of user@host, where host is the server's FQDN, each unique in the Internet.  Messages are directed at users, which are then sent to all connected clients of the said user.  If the user has no connected clients, i.e. the user is offline, the message should be kept until the user reconnects.</t>
+
+<section anchor="administrators"><name>Administrators</name>
+<t>To allow a reasonable amount of order to be kept within a server, a special class of users (administrators) is allowed to perform general maintenance functions on the server.  Although the powers granted to an administrator can be considered as 'dangerous', they are nonetheless required.  Administrators should be able to perform basic network tasks such as disconnecting and reconnecting servers as needed to prevent long-term use of bad network routing.  In recognition of this need, the protocol discussed herein provides for operators only to be able to perform such functions.</t>
+</section>
+</section>
+
+<section anchor="channels"><name>Channels</name>
+<t>A channel is a identified group of one or more clients which will all receive messages addressed to that channel.  The channel is created implicitly when the first client joins it, and the channel ceases to exist when the last client leaves it.  While channel exists, any client can reference the channel using the CID of the channel.</t>
+<t>Channels identifiers (CIDs) are strings (beginning with a '#' character and is alphanumeric only) of length up to 200 characters, shaped as #chan@server, where 'server' is the FQDN of the server that the channel is hosted on.</t>
+<t>To create a new channel or become part of an existing channel, a user is required to JOIN the channel.  If the channel doesn't exist prior to joining, the channel is created and the creating user becomes a channel operator.  If the channel already exists, whether or not your request to JOIN that channel is honoured depends on the current modes of the channel. For example, if the channel is invite-only, (+invite-only), then you may only join if invited.  As part of the protocol, a user may be a part of several channels at once, but a limit of one hundred (100) channels is recommended as being ample for both experienced and novice users.  See section 8.13 for more information on this.</t>
+</section>
+
+<section anchor="channel-operators"><name>Channel Operators</name>
+<t>The channel operator (also referred to as a &quot;chop&quot; or &quot;chanop&quot;) on a given channel is considered to 'own' that channel.  In recognition of tper status, channel operators are endowed with certain powers which enable them to keep control and some sort of sanity in their channel.  As an owner of a channel, a channel operator is not required to have reasons for their actions, although if their actions are generally antisocial or otherwise abusive, it might be reasonable to ask the server administrator for where the channel is hosted to intervene, or for the users to just leave and go elsewhere and form their own channel.</t>
+<t>The commands which may only be used by channel operators are:</t>
+
+<artwork> KICK    - Eject a client from the channel
+ MODE    - Change the channel's mode
+ INVITE  - Invite a client to an invite-only channel (mode +i)
+ TOPIC   - Change the channel topic in a mode +t channel
+</artwork>
+</section>
+</section>
+
+<section anchor="the-idc-specification"><name>The IDC Specification</name>
+
+<section anchor="overview"><name>Overview</name>
+<t>The protocol as described herein is for use both with server to server and client to server connections.  There are similiar restrictions on server connections as for client connections as this is a federated protocol.</t>
+</section>
+
+<section anchor="character-codes"><name>Character codes</name>
+<t>The charactar encoding for IDC is UTF-8.</t>
+</section>
+
+<section anchor="messages"><name>Messages</name>
+<t>Servers and clients send eachother messages which may or may not generate a reply.  If the message contains a valid command, as described in later sections, the client should expect a reply as specified but it is not advised to wait forever for the reply; client to server and server to server communication is essentially asynchronous in nature.</t>
+<t>Each IDC message may consist of up to three main parts: the prefix (optional), the command, and the command parameters (of which there may be up to 30).  The prefix, command, and all parameters are separated by one (or more) ASCII space character(s) (0x20).</t>
+<t>The presence of a prefix is indicated with a single leading ASCII colon character (':', 0x3b), which must be the first character of the message itself.  There must be no gap (whitespace) between the colon and the prefix.  The prefix is used by servers to indicate the true origin of the message.  If the prefix is missing from the message, it is assumed to have originated from the connection from which it was received.  Clients should not use prefix when sending a message from themselves; if they use a prefix, the only valid prefix is the registered nickname associated with the client.  If the source identified by the prefix cannot be found from the server's internal database, or if the source is registered from a different link than from which the message arrived, the server must ignore the message with an error message.</t>
+<t>The command must be a valid IDC command.</t>
+<t>IDC messages are always lines of characters terminated with a CR-LF (Carriage Return - Line Feed) pair, and these messages shall not exceed 65536 characters in length, counting all characters including the trailing CR-LF. Thus, there are 65534 characters maximum allowed for the command and its parameters.  There is no provision for continuation message lines.  See section &lt;++&gt; for more details about current implementations.</t>
+<t>The protocol messages must be extracted from the contiguous stream of data.  The current solution is to designate two characters, CR and LF, as message separators.   Empty  messages  are  silently  ignored, which permits  use  of  the  sequence  CR-LF  between  messages without extra problems.</t>
+<t>The extracted message is parsed into the components &lt;prefix&gt;,
+&lt;command&gt; and list of parameters matched either by &lt;middle&gt; or
+&lt;trailing&gt; components.</t>
+<t>The BNF representation for this is:</t>
+
+<artwork>&lt;message&gt;  ::= [':' &lt;prefix&gt; &lt;SPACE&gt; ] &lt;command&gt; &lt;params&gt; &lt;crlf&gt;
+&lt;prefix&gt;   ::= &lt;servername&gt; | &lt;nick&gt; [ '!' &lt;user&gt; ] [ '@' &lt;host&gt; ]
+&lt;command&gt;  ::= &lt;letter&gt; { &lt;letter&gt; } | &lt;number&gt; &lt;number&gt; &lt;number&gt;
+&lt;SPACE&gt;    ::= ' ' { ' ' }
+&lt;params&gt;   ::= &lt;SPACE&gt; [ ':' &lt;trailing&gt; | &lt;middle&gt; &lt;params&gt; ]
+
+&lt;middle&gt;   ::= &lt;Any *non-empty* sequence of octets not including SPACE
+               or NUL or CR or LF, the first of which may not be ':'&gt;
+&lt;trailing&gt; ::= &lt;Any, possibly *empty*, sequence of octets not including
+                 NUL or CR or LF&gt;
+
+&lt;crlf&gt;     ::= CR LF
+</artwork>
+<t>NOTES:</t>
+
+<ol spacing="compact">
+<li>&lt;SPACE&gt; is consists only of SPACE character(s) (0x20).  Specially notice that TABULATION, and all other control characters are considered NON-WHITE-SPACE.</li>
+<li>After extracting the parameter list, all parameters are equal, whether matched by &lt;middle&gt; or &lt;trailing&gt;. &lt;Trailing&gt; is just a syntactic trick to allow SPACE within parameter.</li>
+<li>The fact that CR and LF cannot appear in parameter strings is just artifact of the message framing.</li>
+<li>The NUL character is not special in message framing, and basically could end up inside a parameter, but as it would cause extra complexities in normal C string handling. Therefore NUL is not allowed within messages.</li>
+<li>The last parameter may be an empty string.</li>
+<li>Use of the extended prefix (['!' &lt;user&gt; ] ['@' &lt;host&gt; ]) must not be used in server to server communications and is only intended for server to client messages in order to provide clients with more useful information about who a message is from without the need for additional queries.</li>
+</ol>
+<t>Most protocol messages specify additional semantics and syntax for
+the extracted parameter strings dictated by their position in the
+list.  For example, many server commands will assume that the first
+parameter after the command is the list of targets, which can be
+described with:</t>
+
+<artwork>&lt;target&gt;     ::= &lt;to&gt; [ &quot;,&quot; &lt;target&gt; ]
+&lt;to&gt;         ::= &lt;channel&gt; | &lt;user&gt; '@' &lt;server&gt; | &lt;mask&gt;
+&lt;channel&gt;    ::= ('#') &lt;chstring&gt;
+&lt;servername&gt; ::= &lt;host&gt;
+&lt;host&gt;       ::= see RFC 952 [DNS:4] for details on allowed hostnames
+&lt;uid&gt;       ::= &lt;letter&gt; { &lt;letter&gt; | &lt;number&gt; }
+&lt;mask&gt;       ::= ('#' | '$') &lt;chstring&gt;
+&lt;chstring&gt;   ::= &lt;any 8bit code except SPACE, BELL, NUL, CR, LF and
+                  comma (',')&gt;
+</artwork>
+<t>Other parameter syntaxes are:</t>
+
+<artwork>&lt;user&gt;       ::= &lt;nonwhite&gt; { &lt;nonwhite&gt; }
+&lt;letter&gt;     ::= 'a' ... 'z' | 'A' ... 'Z'
+&lt;number&gt;     ::= '0' ... '9'
+&lt;special&gt;    ::= '-' | '[' | ']' | '\' | '`' | '^' | '{' | '}'
+</artwork>
+
+<artwork>&lt;nonwhite&gt;   ::= &lt;any 8bit code except SPACE (0x20), NUL (0x0), CR
+                  (0xd), and LF (0xa)&gt;
+</artwork>
 </section>
 </section>
 

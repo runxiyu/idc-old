@@ -1275,7 +1275,7 @@ li > p:last-of-type {
         </h2>
 <nav class="toc"><ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
-            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="xref">1</a>.  <a href="#name-introduction-2" class="xref">Introduction</a></p>
+            <p id="section-toc.1-1.1.1"><a href="#section-1" class="xref">1</a>.  <a href="#name-introduction-2" class="xref">Introduction</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1">
                 <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1" class="xref">1.1</a>.  <a href="#name-servers-2" class="xref">Servers</a></p>
@@ -1283,13 +1283,41 @@ li > p:last-of-type {
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2">
                 <p id="section-toc.1-1.1.2.2.1" class="keepWithNext"><a href="#section-1.2" class="xref">1.2</a>.  <a href="#name-clients-2" class="xref">Clients</a></p>
 </li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.3">
+                <p id="section-toc.1-1.1.2.3.1"><a href="#section-1.3" class="xref">1.3</a>.  <a href="#name-users-2" class="xref">Users</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.3.2.1">
+                    <p id="section-toc.1-1.1.2.3.2.1.1" class="keepWithNext"><a href="#section-1.3.1" class="xref">1.3.1</a>.  <a href="#name-administrators-2" class="xref">Administrators</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.4">
+                <p id="section-toc.1-1.1.2.4.1"><a href="#section-1.4" class="xref">1.4</a>.  <a href="#name-channels-2" class="xref">Channels</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.5">
+                <p id="section-toc.1-1.1.2.5.1"><a href="#section-1.5" class="xref">1.5</a>.  <a href="#name-channel-operators-2" class="xref">Channel Operators</a></p>
+</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
-            <p id="section-toc.1-1.2.1"><a href="#appendix-A" class="xref">Appendix A</a>.  <a href="#name-acknowledgements-2" class="xref">Acknowledgements</a></p>
+            <p id="section-toc.1-1.2.1"><a href="#section-2" class="xref">2</a>.  <a href="#name-the-idc-specification-2" class="xref">The IDC Specification</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.1">
+                <p id="section-toc.1-1.2.2.1.1"><a href="#section-2.1" class="xref">2.1</a>.  <a href="#name-overview-2" class="xref">Overview</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.2">
+                <p id="section-toc.1-1.2.2.2.1"><a href="#section-2.2" class="xref">2.2</a>.  <a href="#name-character-codes-2" class="xref">Character codes</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.3">
+                <p id="section-toc.1-1.2.2.3.1"><a href="#section-2.3" class="xref">2.3</a>.  <a href="#name-messages-2" class="xref">Messages</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
-            <p id="section-toc.1-1.3.1"><a href="#appendix-B" class="xref"></a><a href="#name-authors-address-2" class="xref">Author's Address</a></p>
+            <p id="section-toc.1-1.3.1"><a href="#appendix-A" class="xref">Appendix A</a>.  <a href="#name-acknowledgements-2" class="xref">Acknowledgements</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#appendix-B" class="xref"></a><a href="#name-authors-address-2" class="xref">Author's Address</a></p>
 </li>
         </ul>
 </nav>
@@ -1321,7 +1349,149 @@ li > p:last-of-type {
         <h3 id="name-clients-2">
 <a href="#section-1.2" class="section-number selfRef">1.2. </a><a href="#name-clients-2" class="section-name selfRef">Clients</a>
         </h3>
-<p id="section-1.2-1">A client is anything connecting to a server that is not another server.  Each client is distinguished from other clients by a unique CID having a length of 9 characters, private to each server.  In addition to the nickname, the server must have the following information about the client: the real name of the host that the client is running on, the username of the client on that host, and the server to which the client is connected.<a href="#section-1.2-1" class="pilcrow">¶</a></p>
+<p id="section-1.2-1">A client is anything connecting to a server that is not another server.  Each client is distinguished from other clients by a unique CID having a length of 9 characters, private to each server.<a href="#section-1.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="users">
+<section id="section-1.3">
+        <h3 id="name-users-2">
+<a href="#section-1.3" class="section-number selfRef">1.3. </a><a href="#name-users-2" class="section-name selfRef">Users</a>
+        </h3>
+<p id="section-1.3-1">Each client is associated with a user.  Users are identified by a UID, in the form of user@host, where host is the server's FQDN, each unique in the Internet.  Messages are directed at users, which are then sent to all connected clients of the said user.  If the user has no connected clients, i.e. the user is offline, the message should be kept until the user reconnects.<a href="#section-1.3-1" class="pilcrow">¶</a></p>
+<div id="administrators">
+<section id="section-1.3.1">
+          <h4 id="name-administrators-2">
+<a href="#section-1.3.1" class="section-number selfRef">1.3.1. </a><a href="#name-administrators-2" class="section-name selfRef">Administrators</a>
+          </h4>
+<p id="section-1.3.1-1">To allow a reasonable amount of order to be kept within a server, a special class of users (administrators) is allowed to perform general maintenance functions on the server.  Although the powers granted to an administrator can be considered as 'dangerous', they are nonetheless required.  Administrators should be able to perform basic network tasks such as disconnecting and reconnecting servers as needed to prevent long-term use of bad network routing.  In recognition of this need, the protocol discussed herein provides for operators only to be able to perform such functions.<a href="#section-1.3.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="channels">
+<section id="section-1.4">
+        <h3 id="name-channels-2">
+<a href="#section-1.4" class="section-number selfRef">1.4. </a><a href="#name-channels-2" class="section-name selfRef">Channels</a>
+        </h3>
+<p id="section-1.4-1">A channel is a identified group of one or more clients which will all receive messages addressed to that channel.  The channel is created implicitly when the first client joins it, and the channel ceases to exist when the last client leaves it.  While channel exists, any client can reference the channel using the CID of the channel.<a href="#section-1.4-1" class="pilcrow">¶</a></p>
+<p id="section-1.4-2">Channels identifiers (CIDs) are strings (beginning with a '#' character and is alphanumeric only) of length up to 200 characters, shaped as #chan@server, where 'server' is the FQDN of the server that the channel is hosted on.<a href="#section-1.4-2" class="pilcrow">¶</a></p>
+<p id="section-1.4-3">To create a new channel or become part of an existing channel, a user is required to JOIN the channel.  If the channel doesn't exist prior to joining, the channel is created and the creating user becomes a channel operator.  If the channel already exists, whether or not your request to JOIN that channel is honoured depends on the current modes of the channel. For example, if the channel is invite-only, (+invite-only), then you may only join if invited.  As part of the protocol, a user may be a part of several channels at once, but a limit of one hundred (100) channels is recommended as being ample for both experienced and novice users.  See section 8.13 for more information on this.<a href="#section-1.4-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="channel-operators">
+<section id="section-1.5">
+        <h3 id="name-channel-operators-2">
+<a href="#section-1.5" class="section-number selfRef">1.5. </a><a href="#name-channel-operators-2" class="section-name selfRef">Channel Operators</a>
+        </h3>
+<p id="section-1.5-1">The channel operator (also referred to as a "chop" or "chanop") on a given channel is considered to 'own' that channel.  In recognition of tper status, channel operators are endowed with certain powers which enable them to keep control and some sort of sanity in their channel.  As an owner of a channel, a channel operator is not required to have reasons for their actions, although if their actions are generally antisocial or otherwise abusive, it might be reasonable to ask the server administrator for where the channel is hosted to intervene, or for the users to just leave and go elsewhere and form their own channel.<a href="#section-1.5-1" class="pilcrow">¶</a></p>
+<p id="section-1.5-2">The commands which may only be used by channel operators are:<a href="#section-1.5-2" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-1.5-3">
+<pre> KICK    - Eject a client from the channel
+ MODE    - Change the channel's mode
+ INVITE  - Invite a client to an invite-only channel (mode +i)
+ TOPIC   - Change the channel topic in a mode +t channel
+</pre><a href="#section-1.5-3" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="the-idc-specification">
+<section id="section-2">
+      <h2 id="name-the-idc-specification-2">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-the-idc-specification-2" class="section-name selfRef">The IDC Specification</a>
+      </h2>
+<div id="overview">
+<section id="section-2.1">
+        <h3 id="name-overview-2">
+<a href="#section-2.1" class="section-number selfRef">2.1. </a><a href="#name-overview-2" class="section-name selfRef">Overview</a>
+        </h3>
+<p id="section-2.1-1">The protocol as described herein is for use both with server to server and client to server connections.  There are similiar restrictions on server connections as for client connections as this is a federated protocol.<a href="#section-2.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="character-codes">
+<section id="section-2.2">
+        <h3 id="name-character-codes-2">
+<a href="#section-2.2" class="section-number selfRef">2.2. </a><a href="#name-character-codes-2" class="section-name selfRef">Character codes</a>
+        </h3>
+<p id="section-2.2-1">The charactar encoding for IDC is UTF-8.<a href="#section-2.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="messages">
+<section id="section-2.3">
+        <h3 id="name-messages-2">
+<a href="#section-2.3" class="section-number selfRef">2.3. </a><a href="#name-messages-2" class="section-name selfRef">Messages</a>
+        </h3>
+<p id="section-2.3-1">Servers and clients send eachother messages which may or may not generate a reply.  If the message contains a valid command, as described in later sections, the client should expect a reply as specified but it is not advised to wait forever for the reply; client to server and server to server communication is essentially asynchronous in nature.<a href="#section-2.3-1" class="pilcrow">¶</a></p>
+<p id="section-2.3-2">Each IDC message may consist of up to three main parts: the prefix (optional), the command, and the command parameters (of which there may be up to 30).  The prefix, command, and all parameters are separated by one (or more) ASCII space character(s) (0x20).<a href="#section-2.3-2" class="pilcrow">¶</a></p>
+<p id="section-2.3-3">The presence of a prefix is indicated with a single leading ASCII colon character (':', 0x3b), which must be the first character of the message itself.  There must be no gap (whitespace) between the colon and the prefix.  The prefix is used by servers to indicate the true origin of the message.  If the prefix is missing from the message, it is assumed to have originated from the connection from which it was received.  Clients should not use prefix when sending a message from themselves; if they use a prefix, the only valid prefix is the registered nickname associated with the client.  If the source identified by the prefix cannot be found from the server's internal database, or if the source is registered from a different link than from which the message arrived, the server must ignore the message with an error message.<a href="#section-2.3-3" class="pilcrow">¶</a></p>
+<p id="section-2.3-4">The command must be a valid IDC command.<a href="#section-2.3-4" class="pilcrow">¶</a></p>
+<p id="section-2.3-5">IDC messages are always lines of characters terminated with a CR-LF (Carriage Return - Line Feed) pair, and these messages shall not exceed 65536 characters in length, counting all characters including the trailing CR-LF. Thus, there are 65534 characters maximum allowed for the command and its parameters.  There is no provision for continuation message lines.  See section &lt;++&gt; for more details about current implementations.<a href="#section-2.3-5" class="pilcrow">¶</a></p>
+<p id="section-2.3-6">The protocol messages must be extracted from the contiguous stream of data.  The current solution is to designate two characters, CR and LF, as message separators.   Empty  messages  are  silently  ignored, which permits  use  of  the  sequence  CR-LF  between  messages without extra problems.<a href="#section-2.3-6" class="pilcrow">¶</a></p>
+<p id="section-2.3-7">The extracted message is parsed into the components &lt;prefix&gt;,
+&lt;command&gt; and list of parameters matched either by &lt;middle&gt; or
+&lt;trailing&gt; components.<a href="#section-2.3-7" class="pilcrow">¶</a></p>
+<p id="section-2.3-8">The BNF representation for this is:<a href="#section-2.3-8" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-2.3-9">
+<pre>&lt;message&gt;  ::= [':' &lt;prefix&gt; &lt;SPACE&gt; ] &lt;command&gt; &lt;params&gt; &lt;crlf&gt;
+&lt;prefix&gt;   ::= &lt;servername&gt; | &lt;nick&gt; [ '!' &lt;user&gt; ] [ '@' &lt;host&gt; ]
+&lt;command&gt;  ::= &lt;letter&gt; { &lt;letter&gt; } | &lt;number&gt; &lt;number&gt; &lt;number&gt;
+&lt;SPACE&gt;    ::= ' ' { ' ' }
+&lt;params&gt;   ::= &lt;SPACE&gt; [ ':' &lt;trailing&gt; | &lt;middle&gt; &lt;params&gt; ]
+
+&lt;middle&gt;   ::= &lt;Any *non-empty* sequence of octets not including SPACE
+               or NUL or CR or LF, the first of which may not be ':'&gt;
+&lt;trailing&gt; ::= &lt;Any, possibly *empty*, sequence of octets not including
+                 NUL or CR or LF&gt;
+
+&lt;crlf&gt;     ::= CR LF
+</pre><a href="#section-2.3-9" class="pilcrow">¶</a>
+</div>
+<p id="section-2.3-10">NOTES:<a href="#section-2.3-10" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="compact type-1" id="section-2.3-11">
+<li id="section-2.3-11.1">&lt;SPACE&gt; is consists only of SPACE character(s) (0x20).  Specially notice that TABULATION, and all other control characters are considered NON-WHITE-SPACE.<a href="#section-2.3-11.1" class="pilcrow">¶</a>
+</li>
+          <li id="section-2.3-11.2">After extracting the parameter list, all parameters are equal, whether matched by &lt;middle&gt; or &lt;trailing&gt;. &lt;Trailing&gt; is just a syntactic trick to allow SPACE within parameter.<a href="#section-2.3-11.2" class="pilcrow">¶</a>
+</li>
+          <li id="section-2.3-11.3">The fact that CR and LF cannot appear in parameter strings is just artifact of the message framing.<a href="#section-2.3-11.3" class="pilcrow">¶</a>
+</li>
+          <li id="section-2.3-11.4">The NUL character is not special in message framing, and basically could end up inside a parameter, but as it would cause extra complexities in normal C string handling. Therefore NUL is not allowed within messages.<a href="#section-2.3-11.4" class="pilcrow">¶</a>
+</li>
+          <li id="section-2.3-11.5">The last parameter may be an empty string.<a href="#section-2.3-11.5" class="pilcrow">¶</a>
+</li>
+          <li id="section-2.3-11.6">Use of the extended prefix (['!' &lt;user&gt; ] ['@' &lt;host&gt; ]) must not be used in server to server communications and is only intended for server to client messages in order to provide clients with more useful information about who a message is from without the need for additional queries.<a href="#section-2.3-11.6" class="pilcrow">¶</a>
+</li>
+        </ol>
+<p id="section-2.3-12">Most protocol messages specify additional semantics and syntax for
+the extracted parameter strings dictated by their position in the
+list.  For example, many server commands will assume that the first
+parameter after the command is the list of targets, which can be
+described with:<a href="#section-2.3-12" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-2.3-13">
+<pre>&lt;target&gt;     ::= &lt;to&gt; [ "," &lt;target&gt; ]
+&lt;to&gt;         ::= &lt;channel&gt; | &lt;user&gt; '@' &lt;server&gt; | &lt;mask&gt;
+&lt;channel&gt;    ::= ('#') &lt;chstring&gt;
+&lt;servername&gt; ::= &lt;host&gt;
+&lt;host&gt;       ::= see RFC 952 [DNS:4] for details on allowed hostnames
+&lt;uid&gt;       ::= &lt;letter&gt; { &lt;letter&gt; | &lt;number&gt; }
+&lt;mask&gt;       ::= ('#' | '$') &lt;chstring&gt;
+&lt;chstring&gt;   ::= &lt;any 8bit code except SPACE, BELL, NUL, CR, LF and
+                  comma (',')&gt;
+</pre><a href="#section-2.3-13" class="pilcrow">¶</a>
+</div>
+<p id="section-2.3-14">Other parameter syntaxes are:<a href="#section-2.3-14" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-2.3-15">
+<pre>&lt;user&gt;       ::= &lt;nonwhite&gt; { &lt;nonwhite&gt; }
+&lt;letter&gt;     ::= 'a' ... 'z' | 'A' ... 'Z'
+&lt;number&gt;     ::= '0' ... '9'
+&lt;special&gt;    ::= '-' | '[' | ']' | '\' | '`' | '^' | '{' | '}'
+</pre><a href="#section-2.3-15" class="pilcrow">¶</a>
+</div>
+<div class="alignLeft art-text artwork" id="section-2.3-16">
+<pre>&lt;nonwhite&gt;   ::= &lt;any 8bit code except SPACE (0x20), NUL (0x0), CR
+                  (0xd), and LF (0xa)&gt;
+</pre><a href="#section-2.3-16" class="pilcrow">¶</a>
+</div>
 </section>
 </div>
 </section>
