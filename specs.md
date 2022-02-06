@@ -76,7 +76,7 @@ A channel is a identified group of one or more clients which will all receive me
 
 Channels identifiers (CIDs) are strings (beginning with a '#' character and is alphanumeric only) of length up to 200 characters, shaped as #chan@server, where 'server' is the FQDN of the server that the channel is hosted on.
 
-To create a new channel or become part of an existing channel, a user is required to JOIN the channel.  If the channel doesn't exist prior to joining, the channel is created and the creating user becomes a channel operator.  If the channel already exists, whether or not your request to JOIN that channel is honoured depends on the current modes of the channel. For example, if the channel is invite-only, (+invite-only), then you may only join if invited.  As part of the protocol, a user may be a part of several channels at once, but a limit of one hundred (100) channels is recommended as being ample for both experienced and novice users.  See section 8.13 for more information on this.
+To create a new channel or become part of an existing channel, a user is required to JOIN the channel.  If the channel doesn't exist prior to joining, the channel is created and the creating user becomes a channel operator.  If the channel already exists, whether or not your request to JOIN that channel is honoured depends on the current modes of the channel. For example, if the channel is invite-only, (`+INVITE_ONLY`), then you may only join if invited.  As part of the protocol, a user may be a part of several channels at once.
 
 ## Channel Operators
 
@@ -179,9 +179,155 @@ Other parameter syntaxes are:
 
 This section is devoted to describing the actual concepts behind  the organization of  the IDC protocol and how the current implementations deliver different classes of messages.
 
+## One-to-one communication
+
+Communication on a one-to-one basis is usually only performed by clients, since most server-server traffic is not a result of servers talking only to each other.  To provide a secure means for clients to talk to each other, it is required that all servers be able to send a message to any other server.
+
+## One-to-many
+
+The main goal of IRC is to provide a  forum  which  allows  easy  and
+efficient  conferencing (one to many conversations).  IRC offers
+several means to achieve this, each serving its own purpose.
+
+### To a list
+
+The least efficient style of one-to-many conversation is through clients talking to a 'list' of users.  How this is done is almost self explanatory: the client gives a list of destinations to which the message is to be delivered and the server breaks it up and dispatches a separate copy of the message to each given destination.  This isn't as efficient as using a group since the destination list is broken up and the dispatch sent without checking to make sure duplicates aren't sent down each path.
+
+### To a channel
+
+In IRC the channel has a role equivalent to that of the multicast group; their existence is dynamic (coming and going as people join and leave channels) and the actual conversation carried out on a channel is only sent to servers which are supporting users on a given channel.  If there are multiple users on a server in the same channel, the message text is sent only once to that server and then sent to each client on the channel.  This action is then repeated for each client-server combination until the original message has fanned out and reached each member of the channel.
+
+# Message details
+
+On the following pages are descriptions of each message recognized by the IRC server and client.  All commands described in this section must be implemented by any server for this protocol.
+
+Where the reply ERR_NOSUCHSERVER is listed, it means that the <server> parameter could not be found.  The server must not send any other replies after this for that command.
+
+The server to which a client is connected is required to parse the complete message, returning any appropriate errors.  If the server encounters a fatal error while parsing a message, an error must be sent back to the client and the parsing terminated.  A fatal error may be considered to be incorrect command, a destination which is otherwise unknown (server, user or channel names fit this category), not enough parameters or incorrect privileges.
+
+If a full set of parameters is presented, then each must be checked for validity and appropriate responses sent back to the client.  In the case of messages which use parameter lists using the comma as an item separator, a reply must be sent for each item.
+
+In the examples below, some messages appear using the full format:
+
+```
+:Name COMMAND parameter list
+```
+
+Such examples represent a message from "Name" in transit between servers, where it is essential to include the name of the original sender of the message so remote servers may send back a reply along the correct path.
+
+## Connection Registration
+
+The commands described here are used to register a connection with an IRC server as either a user or a server as well as correctly disconnect.
+
+A "PASS" command is not required for either client or server connection to be registered, but it must precede the server message or the latter of the NICK/USER combination.  It is strongly recommended that all server connections have a password in order to give some level of security to the actual connections.  The recommended order for a client to register is as follows:
+
+1. Pass message
+2. Nick message
+3. User message
+
+### Password message
+
+      Command: PASS
+   Parameters: <password>
+
+The PASS command is used to set a 'connection password'.  The password can and must be set before any attempt to register the connection is made.  Currently this requires that clients send a PASS command before sending the NICK/USER combination and servers *must* send a PASS command before any SERVER command.  The password supplied must match the one contained in the C/N lines (for servers) or I lines (for clients).  It is possible to send multiple PASS commands before registering but only the last one sent is used for verification and it may not be changed once registered.
+
+   Replies:
+
+           ERR_NEEDMOREPARAMS              ERR_ALREADYREGISTRED
+
+   Example:
+
+           PASS secretpasswordhere
+
+### Nick message
+
+      Command: NICK
+   Parameters: <nickname>
+
+NICK message is used to give user a nickname or change the previous one.
+
+Numeric Replies:
+
+         ERR_NONICKNAMEGIVEN             ERR_ERRONEUSNICKNAME
+
+### User message
+
+      Command: USER
+   Parameters: <UID> <realname>
+
+The USER message is used at the beginning of connection to specify the username, hostname, servername and realname of s new user.  It is also used in communication between servers to indicate new user arriving on IDC, since only after both USER and NICK have been received from a client does a user become registered.
+
+Between servers USER must to be prefixed with client's UID.  Note that hostname and servername are normally ignored by the IRC server when the USER command comes from a directly connected client for security reasons, but they are used in server to server communication.
+
+It must be noted that realname parameter must be the last parameter, because it may contain space characters and must be prefixed with a colon (':') to make sure this is recognised as such.
+
+Replies:
+
+        ERR_NEEDMOREPARAMS              ERR_ALREADYREGISTRED
+
+Examples:
+
+```
+USER andrew@andrewyu.org :Andrew Yu
+```
+
+### Server message
+
+      Command: SERVER
+   Parameters: <servername> <server description>
+
+The SERVER message must only be accepted from a connection which is yet to be registered and is attempting to register as a server.
+
+Most errors that occur with the receipt of a SERVER command result in the connection being terminated by the destination host (target SERVER).  Error replies are usually sent using the "ERROR" command rather than the numeric since the ERROR command has several useful properties which make it useful here.
+
+### Quit
+
+      Command: QUIT
+   Parameters: [<Quit message>]
+
+A client session is ended with a quit message.  The server must close the connection to a client which sends a QUIT message. If a "Quit Message" is given, this will be sent instead of the default message, the nickname.
+
+If, for some other reason, a client connection is closed without  the client  issuing  a  QUIT  command  (e.g.  client  dies and EOF occurs on socket), the server is required to fill in the quit  message  with some sort  of  message  reflecting the nature of the event which caused it to happen.
+
+### Server quit message
+
+      Command: SQUIT
+   Parameters: <server> <comment>
+
+The SQUIT message is needed to tell about quitting servers.  If a server wishes to break the connection to another server it must send a SQUIT message to the other server, using the the name of the other server as the server parameter, which then closes its connection to the quitting server.
+
+This command is also available operators to help keep a network of IRC servers connected in an orderly fashion.  Administrators may also issue an SQUIT message for a remote server connection.
+
+The <comment> should be supplied by all administrator who execute a SQUIT for a remote server (that is not connected to the server they are currently on) so that other administrators are aware for the reason of this action.  The <comment> is also filled in by servers which may place an error or similar message here.
+
+Replies:
+
+        ERR_NOPRIVILEGES                ERR_NOSUCHSERVER
+
+## Channel operations
+
+This group of messages is concerned with manipulating channels, their properties (channel modes), and their contents (typically users).  In implementing these, a number of race conditions are inevitable when users send commands which will ultimately clash.
+
+### Join message
+
+   Command: JOIN
+   Parameters: <channel>{,<channel>} [<key>{,<key>}]
+
+The JOIN command is used by user to start listening a specific
+channel. Whether or not a user is allowed to join a channel is
+checked by the server hosting the channel.
+
+The conditions of joining are as follows:
+
+1.  the user must be invited if the channel is invite-only;
+2.  the user's UID and per server must not match any active bans;
+3.  the correct key (password) must be correct if it is set.
 
 
-{backmatter}
+
+
+
 
 # Acknowledgements
 

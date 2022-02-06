@@ -49,7 +49,7 @@
 <section anchor="channels"><name>Channels</name>
 <t>A channel is a identified group of one or more clients which will all receive messages addressed to that channel.  The channel is created implicitly when the first client joins it, and the channel ceases to exist when the last client leaves it.  While channel exists, any client can reference the channel using the CID of the channel.</t>
 <t>Channels identifiers (CIDs) are strings (beginning with a '#' character and is alphanumeric only) of length up to 200 characters, shaped as #chan@server, where 'server' is the FQDN of the server that the channel is hosted on.</t>
-<t>To create a new channel or become part of an existing channel, a user is required to JOIN the channel.  If the channel doesn't exist prior to joining, the channel is created and the creating user becomes a channel operator.  If the channel already exists, whether or not your request to JOIN that channel is honoured depends on the current modes of the channel. For example, if the channel is invite-only, (+invite-only), then you may only join if invited.  As part of the protocol, a user may be a part of several channels at once, but a limit of one hundred (100) channels is recommended as being ample for both experienced and novice users.  See section 8.13 for more information on this.</t>
+<t>To create a new channel or become part of an existing channel, a user is required to JOIN the channel.  If the channel doesn't exist prior to joining, the channel is created and the creating user becomes a channel operator.  If the channel already exists, whether or not your request to JOIN that channel is honoured depends on the current modes of the channel. For example, if the channel is invite-only, (<tt>+INVITE_ONLY</tt>), then you may only join if invited.  As part of the protocol, a user may be a part of several channels at once.</t>
 </section>
 
 <section anchor="channel-operators"><name>Channel Operators</name>
@@ -139,14 +139,137 @@ described with:</t>
 </section>
 </section>
 
-</middle>
+<section anchor="idc-concepts"><name>IDC Concepts.</name>
+<t>This section is devoted to describing the actual concepts behind  the organization of  the IDC protocol and how the current implementations deliver different classes of messages.</t>
 
-<back>
+<section anchor="one-to-one-communication"><name>One-to-one communication</name>
+<t>Communication on a one-to-one basis is usually only performed by clients, since most server-server traffic is not a result of servers talking only to each other.  To provide a secure means for clients to talk to each other, it is required that all servers be able to send a message to any other server.</t>
+</section>
+
+<section anchor="one-to-many"><name>One-to-many</name>
+<t>The main goal of IRC is to provide a  forum  which  allows  easy  and
+efficient  conferencing (one to many conversations).  IRC offers
+several means to achieve this, each serving its own purpose.</t>
+
+<section anchor="to-a-list"><name>To a list</name>
+<t>The least efficient style of one-to-many conversation is through clients talking to a 'list' of users.  How this is done is almost self explanatory: the client gives a list of destinations to which the message is to be delivered and the server breaks it up and dispatches a separate copy of the message to each given destination.  This isn't as efficient as using a group since the destination list is broken up and the dispatch sent without checking to make sure duplicates aren't sent down each path.</t>
+</section>
+
+<section anchor="to-a-channel"><name>To a channel</name>
+<t>In IRC the channel has a role equivalent to that of the multicast group; their existence is dynamic (coming and going as people join and leave channels) and the actual conversation carried out on a channel is only sent to servers which are supporting users on a given channel.  If there are multiple users on a server in the same channel, the message text is sent only once to that server and then sent to each client on the channel.  This action is then repeated for each client-server combination until the original message has fanned out and reached each member of the channel.</t>
+</section>
+</section>
+</section>
+
+<section anchor="message-details"><name>Message details</name>
+<t>On the following pages are descriptions of each message recognized by the IRC server and client.  All commands described in this section must be implemented by any server for this protocol.</t>
+<t>Where the reply ERR_NOSUCHSERVER is listed, it means that the &lt;server&gt; parameter could not be found.  The server must not send any other replies after this for that command.</t>
+<t>The server to which a client is connected is required to parse the complete message, returning any appropriate errors.  If the server encounters a fatal error while parsing a message, an error must be sent back to the client and the parsing terminated.  A fatal error may be considered to be incorrect command, a destination which is otherwise unknown (server, user or channel names fit this category), not enough parameters or incorrect privileges.</t>
+<t>If a full set of parameters is presented, then each must be checked for validity and appropriate responses sent back to the client.  In the case of messages which use parameter lists using the comma as an item separator, a reply must be sent for each item.</t>
+<t>In the examples below, some messages appear using the full format:</t>
+
+<artwork>:Name COMMAND parameter list
+</artwork>
+<t>Such examples represent a message from &quot;Name&quot; in transit between servers, where it is essential to include the name of the original sender of the message so remote servers may send back a reply along the correct path.</t>
+
+<section anchor="connection-registration"><name>Connection Registration</name>
+<t>The commands described here are used to register a connection with an IRC server as either a user or a server as well as correctly disconnect.</t>
+<t>A &quot;PASS&quot; command is not required for either client or server connection to be registered, but it must precede the server message or the latter of the NICK/USER combination.  It is strongly recommended that all server connections have a password in order to give some level of security to the actual connections.  The recommended order for a client to register is as follows:</t>
+
+<ol spacing="compact">
+<li>Pass message</li>
+<li>Nick message</li>
+<li>User message</li>
+</ol>
+
+<section anchor="password-message"><name>Password message</name>
+
+<artwork>  Command: PASS
+</artwork>
+<t>Parameters: &lt;password&gt;</t>
+<t>The PASS command is used to set a 'connection password'.  The password can and must be set before any attempt to register the connection is made.  Currently this requires that clients send a PASS command before sending the NICK/USER combination and servers <em>must</em> send a PASS command before any SERVER command.  The password supplied must match the one contained in the C/N lines (for servers) or I lines (for clients).  It is possible to send multiple PASS commands before registering but only the last one sent is used for verification and it may not be changed once registered.</t>
+<t>Replies:</t>
+
+<artwork>       ERR_NEEDMOREPARAMS              ERR_ALREADYREGISTRED
+</artwork>
+<t>Example:</t>
+
+<artwork>       PASS secretpasswordhere
+</artwork>
+</section>
+
+<section anchor="nick-message"><name>Nick message</name>
+
+<artwork>  Command: NICK
+</artwork>
+<t>Parameters: &lt;nickname&gt;</t>
+<t>NICK message is used to give user a nickname or change the previous one.</t>
+<t>Numeric Replies:</t>
+
+<artwork>     ERR_NONICKNAMEGIVEN             ERR_ERRONEUSNICKNAME
+</artwork>
+</section>
+
+<section anchor="user-message"><name>User message</name>
+
+<artwork>  Command: USER
+</artwork>
+<t>Parameters: &lt;UID&gt; &lt;realname&gt;</t>
+<t>The USER message is used at the beginning of connection to specify the username, hostname, servername and realname of s new user.  It is also used in communication between servers to indicate new user arriving on IDC, since only after both USER and NICK have been received from a client does a user become registered.</t>
+<t>Between servers USER must to be prefixed with client's UID.  Note that hostname and servername are normally ignored by the IRC server when the USER command comes from a directly connected client for security reasons, but they are used in server to server communication.</t>
+<t>It must be noted that realname parameter must be the last parameter, because it may contain space characters and must be prefixed with a colon (':') to make sure this is recognised as such.</t>
+<t>Replies:</t>
+
+<artwork>    ERR_NEEDMOREPARAMS              ERR_ALREADYREGISTRED
+</artwork>
+<t>Examples:</t>
+
+<artwork>USER andrew@andrewyu.org :Andrew Yu
+</artwork>
+</section>
+
+<section anchor="server-message"><name>Server message</name>
+
+<artwork>  Command: SERVER
+</artwork>
+<t>Parameters: &lt;servername&gt; &lt;server description&gt;</t>
+<t>The SERVER message must only be accepted from a connection which is yet to be registered and is attempting to register as a server.</t>
+<t>Most errors that occur with the receipt of a SERVER command result in the connection being terminated by the destination host (target SERVER).  Error replies are usually sent using the &quot;ERROR&quot; command rather than the numeric since the ERROR command has several useful properties which make it useful here.</t>
+</section>
+
+<section anchor="quit"><name>Quit</name>
+
+<artwork>  Command: QUIT
+</artwork>
+<t>Parameters: [&lt;Quit message&gt;]</t>
+<t>A client session is ended with a quit message.  The server must close the connection to a client which sends a QUIT message. If a &quot;Quit Message&quot; is given, this will be sent instead of the default message, the nickname.</t>
+<t>If, for some other reason, a client connection is closed without  the client  issuing  a  QUIT  command  (e.g.  client  dies and EOF occurs on socket), the server is required to fill in the quit  message  with some sort  of  message  reflecting the nature of the event which caused it to happen.</t>
+</section>
+
+<section anchor="server-quit-message"><name>Server quit message</name>
+
+<artwork>  Command: SQUIT
+</artwork>
+<t>Parameters: &lt;server&gt; &lt;comment&gt;</t>
+<t>The SQUIT message is needed to tell about quitting servers.  If a server wishes to break the connection to another server it must send a SQUIT message to the other server, using the the name of the other server as the server parameter, which then closes its connection to the quitting server.</t>
+<t>This command is also available operators to help keep a network of IRC servers connected in an orderly fashion.  Administrators may also issue an SQUIT message for a remote server connection.</t>
+<t>The &lt;comment&gt; should be supplied by all administrator who execute a SQUIT for a remote server (that is not connected to the server they are currently on) so that other administrators are aware for the reason of this action.  The &lt;comment&gt; is also filled in by servers which may place an error or similar message here.</t>
+<t>Replies:</t>
+
+<artwork>    ERR_NOPRIVILEGES                ERR_NOSUCHSERVER
+</artwork>
+</section>
+
+<section anchor="channel-operations"><name>Channel operations</name>
+<t>Hi</t>
+</section>
+</section>
+</section>
 
 <section anchor="acknowledgements"><name>Acknowledgements</name>
 <t>This document has multiple ideas suggested by Test_User &lt;hax@andrewyu.org&gt; and luk3yx.</t>
 </section>
 
-</back>
+</middle>
 
 </rfc>
