@@ -66,14 +66,18 @@ class MyChat(basic.LineReceiver):
                     pass
                 self.trying_password = args[1]
             elif cmd == b"USER":
-                trying_user = config.users(args[1])
+                trying_user = config.users[args[1]]
                 try:
-                    if self.trying_password == trying_user[password]:
+                    if self.trying_password == trying_user["password"]:
                         self.username = args[1]
                         self.ready = True
                         self.send(
-                            b"REPLY_LOGGED_IN", b"You are now logged in as " + args[1]
+                            b"REPLY_LOGGED_IN", b"You are now logged in as " + args[1] + "."
                         )
+                        if args[1] not in self.factory.users.keys():
+                            self.factory.users[args[1]] = [self]
+                        else:
+                            self.factory.users[args[1]].append(self)
                     else:
                         self.send(
                             b"ERR_INVALID_CREDENTIALS",
@@ -87,6 +91,14 @@ class MyChat(basic.LineReceiver):
                     b"ERR_NOT_LOGGED_IN",
                     b"You may not use this command before logging in.",
                 )
+        else:
+            if cmd == "MESSAGE":
+                pass
+            else:
+                self.send(
+                        b"ERR_INVALID_COMMAND",
+                        b"The command you sent, " + cmd + ", is invalid."
+                        )
 
     def quote(self, bytestring):
         try:
@@ -109,8 +121,9 @@ from twisted.application import service, internet
 
 factory = protocol.ServerFactory()
 factory.protocol = MyChat
-factory.clients = {}
-factory.channels = {}
+factory.clients = {} # cid: MyChat()
+factory.channels = {} # name: Channel()
+factory.users = {} # username: [MyChat()]
 
 application = service.Application("chatserver")
 internet.TCPServer(1025, factory).setServiceParent(application)
