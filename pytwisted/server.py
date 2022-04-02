@@ -6,13 +6,14 @@ clients to port 1025
 
 from twisted.protocols import basic
 import random
-import config
 
+with open("config.py", "r") as c:
+    exec(c.read())
 
 class MyChat(basic.LineReceiver):
     delimiter = b"\n"
     def connectionMade(self):
-        r = lambda: random.randchoice(list("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+        r = lambda: random.choice(list("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
         while True:
             _ = r() + r() + r() + r() + r() + r()
             if _ not in self.factory.clients.keys():
@@ -33,7 +34,9 @@ class MyChat(basic.LineReceiver):
         escaped = False
         args = []
         current = b""
-        for b in line:
+        for b in [line[i:i+1] for i in range(len(line))]:
+            print(b)
+            print(type(b))
             if escaped:
                 if b == b"\\":
                     current += b"\\"
@@ -49,11 +52,14 @@ class MyChat(basic.LineReceiver):
                 current = b""
             else:
                 current += b
-        self.send(bytes(repr(args)))
+        args.append(current)
+        self.send(repr(args).encode("utf-8"))
 
     def send(self, bytestring):
         try:
             self.transport.write(bytestring + b"\r\n")
+        except:
+            pass
 
 
 from twisted.internet import protocol
