@@ -66,3 +66,10 @@
 2022-04-01T23:39:05+0800 [stdout#info] received b'a'
 2022-04-01T23:39:44+0800 [stdout#info] Got new client!
 2022-04-01T23:39:49+0800 [stdout#info] received b'you look very async'
+2022-04-02T00:36:21+0800 [-] Received SIGTERM, shutting down.
+2022-04-02T00:36:21+0800 [-] (TCP Port 1025 Closed)
+2022-04-02T00:36:21+0800 [twisted.internet.protocol.ServerFactory#info] Stopping factory <twisted.internet.protocol.ServerFactory object at 0x7f9237ea3910>
+2022-04-02T00:36:21+0800 [stdout#info] Lost a client!
+2022-04-02T00:36:21+0800 [stdout#info] Lost a client!
+2022-04-02T00:36:21+0800 [-] Main loop terminated.
+2022-04-02T00:36:21+0800 [twisted.scripts._twistd_unix.UnixAppLogger#info] Server Shut Down.
