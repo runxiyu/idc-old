@@ -10,8 +10,10 @@ import random
 with open("config.py", "r") as c:
     exec(c.read())
 
+
 class MyChat(basic.LineReceiver):
     delimiter = b"\n"
+
     def connectionMade(self):
         r = lambda: random.choice(list("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
         while True:
@@ -34,9 +36,7 @@ class MyChat(basic.LineReceiver):
         escaped = False
         args = []
         current = b""
-        for b in [line[i:i+1] for i in range(len(line))]:
-            print(b)
-            print(type(b))
+        for b in [line[i : i + 1] for i in range(len(line))]:
             if escaped:
                 if b == b"\\":
                     current += b"\\"
@@ -53,13 +53,55 @@ class MyChat(basic.LineReceiver):
             else:
                 current += b
         args.append(current)
-        self.send(repr(args).encode("utf-8"))
 
-    def send(self, bytestring):
+        if not args[0]:
+            return
+        cmd = args[0].upper()
+
+        print(cmd)
+
+        if not self.ready:
+            if cmd == b"PASSWORD":
+                if len(args) < 2:
+                    pass
+                self.trying_password = args[1]
+            elif cmd == b"USER":
+                trying_user = config.users(args[1])
+                try:
+                    if self.trying_password == trying_user[password]:
+                        self.username = args[1]
+                        self.ready = True
+                        self.send(
+                            b"REPLY_LOGGED_IN", b"You are now logged in as " + args[1]
+                        )
+                    else:
+                        self.send(
+                            b"ERR_INVALID_CREDENTIALS",
+                            b"The credentials you've entered are invalid.",
+                        )
+                except AttributeError:
+                    self.send(b"ERR_NO_PASSWORD", b"You haven't provided a password.")
+                    pass
+            else:
+                self.send(
+                    b"ERR_NOT_LOGGED_IN",
+                    b"You may not use this command before logging in.",
+                )
+
+    def quote(self, bytestring):
         try:
             self.transport.write(bytestring + b"\r\n")
         except:
-            pass
+            raise
+
+    def send(self, *args):
+        buf = b""
+        for i in args:
+            i = i.replace(b"\\", b"\\\\")
+            i = i.replace(b"\t", b"\\\t")
+            buf += i
+            buf += b"\t"
+        self.quote(buf[:-1])
 
 
 from twisted.internet import protocol

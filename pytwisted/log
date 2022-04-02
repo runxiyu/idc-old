@@ -1,87 +1,35 @@
-2022-04-03T01:24:43+0800 [-] Loading server.py...
-2022-04-03T01:24:43+0800 [-] Loaded.
-2022-04-03T01:24:43+0800 [twisted.scripts._twistd_unix.UnixAppLogger#info] twistd 22.2.0 (/usr/bin/python3.9 3.9.9) starting up.
-2022-04-03T01:24:43+0800 [twisted.scripts._twistd_unix.UnixAppLogger#info] reactor class: twisted.internet.epollreactor.EPollReactor.
-2022-04-03T01:24:43+0800 [-] ServerFactory starting on 1025
-2022-04-03T01:24:43+0800 [twisted.internet.protocol.ServerFactory#info] Starting factory <twisted.internet.protocol.ServerFactory object at 0x7f81bbadbac0>
-2022-04-03T01:24:49+0800 [stdout#info] '8Y8WMH' b'gnu'
-2022-04-03T01:24:49+0800 [stdout#info] b'g'
-2022-04-03T01:24:49+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:24:49+0800 [stdout#info] b'n'
-2022-04-03T01:24:49+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:24:49+0800 [stdout#info] b'u'
-2022-04-03T01:24:49+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:24:52+0800 [stdout#info] '8Y8WMH' b'gnu\tlinux'
-2022-04-03T01:24:52+0800 [stdout#info] b'g'
-2022-04-03T01:24:52+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:24:52+0800 [stdout#info] b'n'
-2022-04-03T01:24:52+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:24:52+0800 [stdout#info] b'u'
-2022-04-03T01:24:52+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:24:52+0800 [stdout#info] b'\t'
-2022-04-03T01:24:52+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:24:52+0800 [stdout#info] b'l'
-2022-04-03T01:24:52+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:24:52+0800 [stdout#info] b'i'
-2022-04-03T01:24:52+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:24:52+0800 [stdout#info] b'n'
-2022-04-03T01:24:52+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:24:52+0800 [stdout#info] b'u'
-2022-04-03T01:24:52+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:24:52+0800 [stdout#info] b'x'
-2022-04-03T01:24:52+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:24:53+0800 [stdout#info] '8Y8WMH' b'\t'
-2022-04-03T01:24:53+0800 [stdout#info] b'\t'
-2022-04-03T01:24:53+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:24:55+0800 [stdout#info] '8Y8WMH' b''
-2022-04-03T01:25:02+0800 [stdout#info] '8Y8WMH' b'gnu linu'
-2022-04-03T01:25:02+0800 [stdout#info] b'g'
-2022-04-03T01:25:02+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:25:02+0800 [stdout#info] b'n'
-2022-04-03T01:25:02+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:25:02+0800 [stdout#info] b'u'
-2022-04-03T01:25:02+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:25:02+0800 [stdout#info] b' '
-2022-04-03T01:25:02+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:25:02+0800 [stdout#info] b'l'
-2022-04-03T01:25:02+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:25:02+0800 [stdout#info] b'i'
-2022-04-03T01:25:02+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:25:02+0800 [stdout#info] b'n'
-2022-04-03T01:25:02+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:25:02+0800 [stdout#info] b'u'
-2022-04-03T01:25:02+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:25:10+0800 [stdout#info] '8Y8WMH' b'gnu\tgnu\\\tlinux'
-2022-04-03T01:25:10+0800 [stdout#info] b'g'
-2022-04-03T01:25:10+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:25:10+0800 [stdout#info] b'n'
-2022-04-03T01:25:10+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:25:10+0800 [stdout#info] b'u'
-2022-04-03T01:25:10+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:25:10+0800 [stdout#info] b'\t'
-2022-04-03T01:25:10+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:25:10+0800 [stdout#info] b'g'
-2022-04-03T01:25:10+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:25:10+0800 [stdout#info] b'n'
-2022-04-03T01:25:10+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:25:10+0800 [stdout#info] b'u'
-2022-04-03T01:25:10+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:25:10+0800 [stdout#info] b'\\'
-2022-04-03T01:25:10+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:25:10+0800 [stdout#info] b'\t'
-2022-04-03T01:25:10+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:25:10+0800 [stdout#info] b'l'
-2022-04-03T01:25:10+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:25:10+0800 [stdout#info] b'i'
-2022-04-03T01:25:10+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:25:10+0800 [stdout#info] b'n'
-2022-04-03T01:25:10+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:25:10+0800 [stdout#info] b'u'
-2022-04-03T01:25:10+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:25:10+0800 [stdout#info] b'x'
-2022-04-03T01:25:10+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:25:14+0800 [stdout#info] '8Y8WMH' b'\\\\'
-2022-04-03T01:25:14+0800 [stdout#info] b'\\'
-2022-04-03T01:25:14+0800 [stdout#info] <class 'bytes'>
-2022-04-03T01:25:14+0800 [stdout#info] b'\\'
-2022-04-03T01:25:14+0800 [stdout#info] <class 'bytes'>
+2022-04-03T02:05:41+0800 [-] Loading server.py...
+2022-04-03T02:05:41+0800 [-] Loaded.
+2022-04-03T02:05:42+0800 [twisted.scripts._twistd_unix.UnixAppLogger#info] twistd 22.2.0 (/usr/bin/python3.9 3.9.9) starting up.
+2022-04-03T02:05:42+0800 [twisted.scripts._twistd_unix.UnixAppLogger#info] reactor class: twisted.internet.epollreactor.EPollReactor.
+2022-04-03T02:05:42+0800 [-] ServerFactory starting on 1025
+2022-04-03T02:05:42+0800 [twisted.internet.protocol.ServerFactory#info] Starting factory <twisted.internet.protocol.ServerFactory object at 0x7fc34c037be0>
+2022-04-03T02:05:47+0800 [stdout#info] 'GE42LM' b'pass hi'
+2022-04-03T02:05:47+0800 [stdout#info] b'PASS HI'
+2022-04-03T02:05:57+0800 [stdout#info] 'GE42LM' b'pass\thi'
+2022-04-03T02:05:57+0800 [stdout#info] b'PASS'
+2022-04-03T02:06:07+0800 [stdout#info] 'GE42LM' b'password\thunter2'
+2022-04-03T02:06:07+0800 [stdout#info] b'PASSWORD'
+2022-04-03T02:06:07+0800 [MyChat,0,127.0.0.1] Unhandled Error
+	Traceback (most recent call last):
+	  File "/home/andrew/.local/lib/python3.9/site-packages/twisted/python/log.py", line 96, in callWithLogger
+	    return callWithContext({"system": lp}, func, *args, **kw)
+	  File "/home/andrew/.local/lib/python3.9/site-packages/twisted/python/log.py", line 80, in callWithContext
+	    return context.call({ILogContext: newCtx}, func, *args, **kw)
+	  File "/home/andrew/.local/lib/python3.9/site-packages/twisted/python/context.py", line 117, in callWithContext
+	    return self.currentContext().callWithContext(ctx, func, *args, **kw)
+	  File "/home/andrew/.local/lib/python3.9/site-packages/twisted/python/context.py", line 82, in callWithContext
+	    return func(*args, **kw)
+	--- <exception caught here> ---
+	  File "/home/andrew/.local/lib/python3.9/site-packages/twisted/internet/posixbase.py", line 683, in _doReadOrWrite
+	    why = selectable.doRead()
+	  File "/home/andrew/.local/lib/python3.9/site-packages/twisted/internet/tcp.py", line 248, in doRead
+	    return self._dataReceived(data)
+	  File "/home/andrew/.local/lib/python3.9/site-packages/twisted/internet/tcp.py", line 253, in _dataReceived
+	    rval = self.protocol.dataReceived(data)
+	  File "/home/andrew/.local/lib/python3.9/site-packages/twisted/protocols/basic.py", line 549, in dataReceived
+	    why = self.lineReceived(line)
+	  File "server.py", line 64, in lineReceived
+	    self.trying_password == args[1]
+	builtins.AttributeError: 'MyChat' object has no attribute 'trying_password'
+	
