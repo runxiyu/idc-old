@@ -1,0 +1,471 @@
+%%%
+Title = "Internet Delay Chat Protocol"
+abbrev = "Internet Delay Chat Protocol"
+#ipr= "trust200902"
+area = "Internet"
+workgroup = "Network Working Group"
+submissiontype = "IETF"
+keyword = [""]
+date = 2022-04-03T00:00:00Z
+
+[seriesInfo]
+name = "RFC"
+value = "TBD"
+stream = "IETF"
+status = "informational"
+
+[[author]]
+initials="A."
+surname="Yu"
+fullname="Andrew Yu"
+ [author.address]
+ email = "andrew@andrewyu.org"
+  [author.address.postal]
+  city = "Shanghai"
+  country = "China"
+%%%
+
+{mainmatter}
+
+.# Abstract
+
+THIS DOCUMENT IS STILL A DRAFT.  THE "STATUS OF THIS MEMO" PART OF THE DOCUMENT IS FALSE.  Distribution of this memo is unlimited.
+
+This document specifies a new Internet Protocol for messaging over the Internet.
+
+{mainmatter}
+
+#  Introduction
+
+The IDC (Internet Delay Chat) protocol has been designed over a number of months for use with federated multimedia conferencing.  This document describes the current IDC protocol.
+
+IDC itself is a messaging system, which (through the use of the client-server and server-to-server model) is well-suited to running on many machines in a distributed fashion.  A typical setup involves multiple servers each with multiple clients, that connect to each other in order to exchange messages, in a multi-centered fashion.
+
+Existing protocols are limited.  Internet Relay Chat as in RFC 1459 has been in use since May 1993, a very simple protocol for teleconferencing system.  Later updates such as RFC 2812 have been badly accepted.  It was not designed for personal instant messaging.
+
+IRC is real time.  When a client disconnects, the server no longer recognizes the client, and messages during the client's downtime are not saved.  This renders IRC unfit for instant messaging, where clients are forced to disconnect but messages are to be read later.  IRC is not federated, causing most people to be on the few large networks, imparing user freedom.
+
+ost modern IRC networks use dedicated "services" servers for user, channel, group, etc. management and dedicated client bots for extensible channel management.  Compared with these features built into the server, this is ineffective and redundent.
+
+The Extensible Messaging and Presence Protocol was designed for presense, instant messaging, and conferences.  However, it is based on XML, and implementations are large and buggy.  IRC is a simple text-oriented protocol, where implementing is more straightforward and is harder to bug.
+
+Blah blah blah.
+
+SMS does not work over the Internet, and is generally expensive.
+
+## Servers
+
+The server forms the backbone of IDC, providing a point to which clients may connect to to talk to each other, and a point for other servers to connect to, forming the global IDC network.  The only network configuration allowed for IDC servers is that of a mesh where each server connects to other servers directly.
+
+## Clients
+
+A client is anything connecting to a server that is not another server.  Each client is distinguished from other clients by a unique CID having a length of 9 characters, private to each server.
+
+## Users
+
+Each client is associated with a user.  Users are identified by a UID, in the form of user@host, where host is the server's FQDN, each unique in the Internet.  Messages are directed at users, which are then sent to all connected clients of the said user.  If the user has no connected clients, i.e. the user is offline, the message should be kept until the user reconnects.
+
+
+### Administrators
+
+To allow a reasonable amount of order to be kept within a server, a special class of users (administrators) is allowed to perform general maintenance functions on the server.  Although the powers granted to an administrator can be considered as 'dangerous', they are nonetheless required.  Administrators should be able to perform basic network tasks such as disconnecting and reconnecting servers as needed to prevent long-term use of bad network routing.  In recognition of this need, the protocol discussed herein provides for operators only to be able to perform such functions.
+
+## Channels
+
+A channel is a identified group of one or more clients which will all receive messages addressed to that channel.  The channel is created implicitly when the first client joins it, and the channel ceases to exist when the last client leaves it.  While channel exists, any client can reference the channel using the CID of the channel.
+
+Channels identifiers (CIDs) are strings (beginning with a '#' character and is alphanumeric only) of length up to 200 characters, shaped as #chan@server, where 'server' is the FQDN of the server that the channel is hosted on.
+
+To create a new channel or become part of an existing channel, a user is required to JOIN the channel.  If the channel doesn't exist prior to joining, the channel is created and the creating user becomes a channel operator.  If the channel already exists, whether or not your request to JOIN that channel is honoured depends on the current modes of the channel. For example, if the channel is invite-only, (`+INVITE_ONLY`), then you may only join if invited.  As part of the protocol, a user may be a part of several channels at once.
+
+## Channel Operators
+
+The channel operator (also referred to as a "chop" or "chanop") on a given channel is considered to 'own' that channel.  In recognition of tper status, channel operators are endowed with certain powers which enable them to keep control and some sort of sanity in their channel.  As an owner of a channel, a channel operator is not required to have reasons for their actions, although if their actions are generally antisocial or otherwise abusive, it might be reasonable to ask the server administrator for where the channel is hosted to intervene, or for the users to just leave and go elsewhere and form their own channel.
+
+The commands which may only be used by channel operators are:
+
+     KICK    - Eject a client from the channel
+     MODE    - Change the channel's mode
+     INVITE  - Invite a client to an invite-only channel (mode +i)
+     TOPIC   - Change the channel topic in a mode +t channel
+
+# The IDC Specification
+
+## Overview
+
+The protocol as described herein is for use both with server to server and client to server connections.  There are similiar restrictions on server connections as for client connections as this is a federated protocol.
+
+## Character codes
+
+The charactar encoding for IDC is UTF-8.
+
+## Messages
+
+Servers and clients send eachother messages which may or may not generate a reply.  If the message contains a valid command, as described in later sections, the client should expect a reply as specified but it is not advised to wait forever for the reply; client to server and server to server communication is essentially asynchronous in nature.
+
+Each IDC message may consist of up to three main parts: the prefix (optional), the command, and the command parameters (of which there may be up to 30).  The prefix, command, and all parameters are separated by one (or more) ASCII space character(s) (0x20).
+
+The presence of a prefix is indicated with a single leading ASCII colon character (':', 0x3b), which must be the first character of the message itself.  There must be no gap (whitespace) between the colon and the prefix.  The prefix is used by servers to indicate the true origin of the message.  If the prefix is missing from the message, it is assumed to have originated from the connection from which it was received.  Clients should not use prefix when sending a message from themselves; if they use a prefix, the only valid prefix is the registered nickname associated with the client.  If the source identified by the prefix cannot be found from the server's internal database, or if the source is registered from a different link than from which the message arrived, the server must ignore the message with an error message.
+
+The command must be a valid IDC command.
+
+IDC messages are always lines of characters terminated with a CR-LF (Carriage Return - Line Feed) pair, and these messages shall not exceed 65536 characters in length, counting all characters including the trailing CR-LF. Thus, there are 65534 characters maximum allowed for the command and its parameters.  There is no provision for continuation message lines.  See section <++> for more details about current implementations.
+
+The protocol messages must be extracted from the contiguous stream of data.  The current solution is to designate two characters, CR and LF, as message separators.   Empty  messages  are  silently  ignored, which permits  use  of  the  sequence  CR-LF  between  messages without extra problems.
+
+The extracted message is parsed into the components <prefix>,
+<command> and list of parameters matched either by <middle> or
+<trailing> components.
+
+The BNF representation for this is:
+
+```
+<message>  ::= [':' <prefix> <SPACE> ] <command> <params> <crlf>
+<prefix>   ::= <servername> | <nick> [ '!' <user> ] [ '@' <host> ]
+<command>  ::= <letter> { <letter> } | <number> <number> <number>
+<SPACE>    ::= ' ' { ' ' }
+<params>   ::= <SPACE> [ ':' <trailing> | <middle> <params> ]
+
+<middle>   ::= <Any *non-empty* sequence of octets not including SPACE
+               or NUL or CR or LF, the first of which may not be ':'>
+<trailing> ::= <Any, possibly *empty*, sequence of octets not including
+                 NUL or CR or LF>
+
+<crlf>     ::= CR LF
+```
+
+NOTES:
+
+1. <SPACE> is consists only of SPACE character(s) (0x20).  Specially notice that TABULATION, and all other control characters are considered NON-WHITE-SPACE.
+2. After extracting the parameter list, all parameters are equal, whether matched by <middle> or <trailing>. <Trailing> is just a syntactic trick to allow SPACE within parameter.
+3. The fact that CR and LF cannot appear in parameter strings is just artifact of the message framing.
+4. The NUL character is not special in message framing, and basically could end up inside a parameter, but as it would cause extra complexities in normal C string handling. Therefore NUL is not allowed within messages.
+5. The last parameter may be an empty string.
+6. Use of the extended prefix (['!' <user> ] ['@' <host> ]) must not be used in server to server communications and is only intended for server to client messages in order to provide clients with more useful information about who a message is from without the need for additional queries.
+
+Most protocol messages specify additional semantics and syntax for
+the extracted parameter strings dictated by their position in the
+list.  For example, many server commands will assume that the first
+parameter after the command is the list of targets, which can be
+described with:
+
+```
+<target>     ::= <to> [ "," <target> ]
+<to>         ::= <channel> | <user> '@' <server> | <mask>
+<channel>    ::= ('#') <chstring>
+<servername> ::= <host>
+<host>       ::= see RFC 952 [DNS:4] for details on allowed hostnames
+<uid>       ::= <letter> { <letter> | <number> }
+<mask>       ::= ('#' | '$') <chstring>
+<chstring>   ::= <any 8bit code except SPACE, BELL, NUL, CR, LF and
+                  comma (',')>
+```
+
+Other parameter syntaxes are:
+
+```
+<user>       ::= <nonwhite> { <nonwhite> }
+<letter>     ::= 'a' ... 'z' | 'A' ... 'Z'
+<number>     ::= '0' ... '9'
+<special>    ::= '-' | '[' | ']' | '\' | '`' | '^' | '{' | '}'
+```
+
+```
+<nonwhite>   ::= <any 8bit code except SPACE (0x20), NUL (0x0), CR
+                  (0xd), and LF (0xa)>
+```
+
+# IDC Concepts.
+
+This section is devoted to describing the actual concepts behind  the organization of  the IDC protocol and how the current implementations deliver different classes of messages.
+
+## One-to-one communication
+
+Communication on a one-to-one basis is usually only performed by clients, since most server-server traffic is not a result of servers talking only to each other.  To provide a secure means for clients to talk to each other, it is required that all servers be able to send a message to any other server.
+
+## One-to-many
+
+The main goal of IRC is to provide a  forum  which  allows  easy  and
+efficient  conferencing (one to many conversations).  IRC offers
+several means to achieve this, each serving its own purpose.
+
+### To a list
+
+The least efficient style of one-to-many conversation is through clients talking to a 'list' of users.  How this is done is almost self explanatory: the client gives a list of destinations to which the message is to be delivered and the server breaks it up and dispatches a separate copy of the message to each given destination.  This isn't as efficient as using a group since the destination list is broken up and the dispatch sent without checking to make sure duplicates aren't sent down each path.
+
+### To a channel
+
+In IRC the channel has a role equivalent to that of the multicast group; their existence is dynamic (coming and going as people join and leave channels) and the actual conversation carried out on a channel is only sent to servers which are supporting users on a given channel.  If there are multiple users on a server in the same channel, the message text is sent only once to that server and then sent to each client on the channel.  This action is then repeated for each client-server combination until the original message has fanned out and reached each member of the channel.
+
+# Message details
+
+On the following pages are descriptions of each message recognized by the IRC server and client.  All commands described in this section must be implemented by any server for this protocol.
+
+Where the reply ERR_NOSUCHSERVER is listed, it means that the <server> parameter could not be found.  The server must not send any other replies after this for that command.
+
+The server to which a client is connected is required to parse the complete message, returning any appropriate errors.  If the server encounters a fatal error while parsing a message, an error must be sent back to the client and the parsing terminated.  A fatal error may be considered to be incorrect command, a destination which is otherwise unknown (server, user or channel names fit this category), not enough parameters or incorrect privileges.
+
+If a full set of parameters is presented, then each must be checked for validity and appropriate responses sent back to the client.  In the case of messages which use parameter lists using the comma as an item separator, a reply must be sent for each item.
+
+In the examples below, some messages appear using the full format:
+
+```
+:Name COMMAND parameter list
+```
+
+Such examples represent a message from "Name" in transit between servers, where it is essential to include the name of the original sender of the message so remote servers may send back a reply along the correct path.
+
+## Connection Registration
+
+The commands described here are used to register a connection with an IRC server as either a user or a server as well as correctly disconnect.
+
+A "PASS" command is not required for either client or server connection to be registered, but it must precede the server message or the latter of the NICK/USER combination.  It is strongly recommended that all server connections have a password in order to give some level of security to the actual connections.  The recommended order for a client to register is as follows:
+
+1. Pass message
+2. Nick message
+3. User message
+
+### Password message
+
+      Command: PASS
+   Parameters: <password>
+
+The PASS command is used to set a 'connection password'.  The password can and must be set before any attempt to register the connection is made.  Currently this requires that clients send a PASS command before sending the NICK/USER combination and servers *must* send a PASS command before any SERVER command.  The password supplied must match the one contained in the C/N lines (for servers) or I lines (for clients).  It is possible to send multiple PASS commands before registering but only the last one sent is used for verification and it may not be changed once registered.
+
+   Replies:
+
+           ERR_NEEDMOREPARAMS              ERR_ALREADYREGISTRED
+
+   Example:
+
+           PASS secretpasswordhere
+
+### Nick message
+
+      Command: NICK
+   Parameters: <nickname>
+
+NICK message is used to give user a nickname or change the previous one.
+
+Numeric Replies:
+
+         ERR_NONICKNAMEGIVEN             ERR_ERRONEUSNICKNAME
+
+### User message
+
+      Command: USER
+   Parameters: <UID> <realname>
+
+The USER message is used at the beginning of connection to specify the username, hostname, servername and realname of s new user.  It is also used in communication between servers to indicate new user arriving on IDC, since only after both USER and NICK have been received from a client does a user become registered.
+
+Between servers USER must to be prefixed with client's UID.  Note that hostname and servername are normally ignored by the IRC server when the USER command comes from a directly connected client for security reasons, but they are used in server to server communication.
+
+It must be noted that realname parameter must be the last parameter, because it may contain space characters and must be prefixed with a colon (':') to make sure this is recognised as such.
+
+Replies:
+
+        ERR_NEEDMOREPARAMS              ERR_ALREADYREGISTRED
+
+Examples:
+
+```
+USER andrew@andrewyu.org :Andrew Yu
+```
+
+### Server message
+
+      Command: SERVER
+   Parameters: <servername> <server description>
+
+The SERVER message must only be accepted from a connection which is yet to be registered and is attempting to register as a server.
+
+Most errors that occur with the receipt of a SERVER command result in the connection being terminated by the destination host (target SERVER).  Error replies are usually sent using the "ERROR" command rather than the numeric since the ERROR command has several useful properties which make it useful here.
+
+### Quit
+
+      Command: QUIT
+   Parameters: [<Quit message>]
+
+A client session is ended with a quit message.  The server must close the connection to a client which sends a QUIT message. If a "Quit Message" is given, this will be sent instead of the default message, the nickname.
+
+If, for some other reason, a client connection is closed without  the client  issuing  a  QUIT  command  (e.g.  client  dies and EOF occurs on socket), the server is required to fill in the quit  message  with some sort  of  message  reflecting the nature of the event which caused it to happen.
+
+### Server quit message
+
+      Command: SQUIT
+   Parameters: <server> <comment>
+
+The SQUIT message is needed to tell about quitting servers.  If a server wishes to break the connection to another server it must send a SQUIT message to the other server, using the the name of the other server as the server parameter, which then closes its connection to the quitting server.
+
+This command is also available operators to help keep a network of IRC servers connected in an orderly fashion.  Administrators may also issue an SQUIT message for a remote server connection.
+
+The <comment> should be supplied by all administrator who execute a SQUIT for a remote server (that is not connected to the server they are currently on) so that other administrators are aware for the reason of this action.  The <comment> is also filled in by servers which may place an error or similar message here.
+
+Replies:
+
+        ERR_NOPRIVILEGES                ERR_NOSUCHSERVER
+
+## Channel operations
+
+This group of messages is concerned with manipulating channels, their properties (channel modes), and their contents (typically users).  In implementing these, a number of race conditions are inevitable when users send commands which will ultimately clash.
+
+### Join message
+
+   Command: JOIN
+   Parameters: <channel>{,<channel>} [<key>{,<key>}]
+
+The JOIN command is used by user to start listening a specific
+channel. Whether or not a user is allowed to join a channel is
+checked by the server hosting the channel.
+
+The conditions of joining are as follows:
+
+1.  the user must be invited if the channel is invite-only;
+2.  the user's UID and per server must not match any active bans;
+3.  the correct key (password) must be correct if it is set.
+
+These are discussed in more detail under the MODE command (see
+section 4.2.3 for more details).
+
+Once a user has joined a channel, they receive notice about all commands their server receives which affect the channel.  This includes MODE, KICK, PART, QUIT and of course PRIVMSG/NOTICE.  The JOIN command needs to be broadcast to all servers where a user thereof is on the said channel so that each server knows where to find the users who are on the channel.  This allows optimal delivery of PRIVMSG/NOTICE messages to the channel.
+
+If a JOIN is successful, the user is then sent the channel's topic (using RPL_TOPIC) and the list of users who are on the channel (using RPL_NAMREPLY), which must include the user joining.
+
+Replies:
+
+        ERR_NEEDMOREPARAMS              ERR_BANNEDFROMCHAN
+        ERR_INVITEONLYCHAN              ERR_BADCHANNELKEY
+        ERR_CHANNELISFULL               ERR_BADCHANMASK
+        ERR_NOSUCHCHANNEL               ERR_TOOMANYCHANNELS
+        RPL_TOPIC
+
+### Part message
+
+   Command: PART
+   Parameters: <channel>{,<channel>}
+
+The PART message causes the client sending the message to be removed from the list of active users for all given channels listed in the parameter string.
+
+Replies:
+
+        ERR_NEEDMOREPARAMS              ERR_NOSUCHCHANNEL
+        ERR_NOTONCHANNEL
+
+### Mode message
+
+   Command: MODE
+
+The MODE command is a dual-purpose command in IDC.  It allows both usernames and channels to have their mode changed.
+
+When parsing MODE messages, it is recommended that the entire message be parsed first and then the changes which resulted then passed on.
+
+#### Channel modes
+
+   Parameters: <channel> {[+|-]|<modes>} [<param>]
+
+The MODE command is provided so that channel operators may change the characteristics of `their' channel.  It is also required that servers be able to change channel modes so that channel operators may be created.
+
+The various modes available for channels are as follows:
+
+   OPERATOR - give/take channel operator privileges;
+   SECRET - secret channel flag;
+   INVITE_ONLY - invite-only channel flag;
+   TOPIC_OPERATOR_ONLY - topic settable by channel operator only flag;
+   NO_EXTERNAL_MESSAGES - no messages to channel from clients on the outside;
+   MODERATED - moderated channel;
+   BAN - set a ban mask to keep users out;
+   QUIET - set a quiet mask to keep users silent;
+   VOICE - give/take the ability to speak on a moderated channel;
+   KEY - set a channel key (password).
+
+#### User modes
+
+   Parameters: <nickname> {[+|-]|<modes>} [<param>]
+
+The user MODEs are typically changes which affect either how the
+client is seen by others or what 'extra' messages the client is sent.
+A user MODE command may only be accepted if both the sender of the
+message and the nickname given as a parameter are both the same.
+
+The available modes are as follows:
+
+        SERVER_NOTICES - marks a user for receipt of server notices;
+        ADMINISTRATOR - operator flag.
+
+If a user attempts to make themselves an administrator using the "+ADMINISTRATOR" flag, the attempt should return ERR_NOPRIVILEGES.  There is no restriction, however, on anyone `deadministratoring' themselves (using "-ADMINISTRATOR").
+
+Replies:
+
+        ERR_NEEDMOREPARAMS              RPL_CHANNELMODEIS
+        ERR_CHANOPRIVSNEEDED            ERR_NOSUCHNICK
+        ERR_NOTONCHANNEL                ERR_KEYSET
+        RPL_BANLIST                     RPL_ENDOFBANLIST
+        ERR_UNKNOWNMODE                 ERR_NOSUCHCHANNEL
+        ERR_USERSDONTMATCH              RPL_UMODEIS
+        ERR_UMODEUNKNOWNFLAG
+
+#### Topic message
+
+   Command: TOPIC
+   Parameters: <channel> [<topic>]
+
+The TOPIC message is used to change or view the topic of a channel. The topic for channel <channel> is returned if there is no <topic> given.  If the <topic> parameter is present, the topic for that channel will be changed, if the channel modes permit this action.
+
+Replies:
+
+        ERR_NEEDMOREPARAMS              ERR_NOTONCHANNEL
+        RPL_NOTOPIC                     RPL_TOPIC
+        ERR_CHANOPRIVSNEEDED
+
+#### Names message
+
+   Command: NAMES
+   Parameters: [<channel>{,<channel>}]
+
+By using the NAMES command, a user can list all nicknames that are visible to them on any channel that they can see.  Channel names which they can see are those which aren't secret (+s) or those which they are actually on.  The <channel> parameter specifies which channel(s) to return information about if valid. There is no error reply for bad channel names.
+
+If no <channel> parameter is given, a list of all channels and their occupants is returned.  At the end of this list, a list of users who are visible but either not on any channel or not on a visible channel are listed as being on `channel' "*".
+
+Numerics:
+
+        RPL_NAMREPLY                    RPL_ENDOFNAMES
+
+#### Invite message
+
+   Command: INVITE
+   Parameters: <nickname> <channel>
+
+The INVITE message is used to invite users to a channel.  The parameter <nickname> is the nickname of the person to be invited to the target channel <channel>.  The target user is being invited to must exist or be a valid channel.  To invite a user to a channel which is invite only (MODE +i), the client sending the invite must be recognised as being a channel operator on the given channel.
+
+Replies:
+
+           ERR_NEEDMOREPARAMS              ERR_NOSUCHNICK
+           ERR_NOTONCHANNEL                ERR_USERONCHANNEL
+           ERR_CHANOPRIVSNEEDED
+           RPL_INVITING                    RPL_AWAY
+
+#### Kick command
+
+   Command: KICK
+   Parameters: <channel> <user> [<comment>]
+
+The KICK command can be  used  to  forcibly  remove  a  user  from  a
+channel.   It  'kicks  them  out'  of the channel (forced PART).
+
+Only a channel operator may kick another user out of a  channel.
+Each  server that  receives  a KICK message checks that it is valid
+(ie the sender is actually a  channel  operator)  before  removing
+the  victim  from  the channel.
+
+Replies:
+
+        ERR_NEEDMOREPARAMS              ERR_NOSUCHCHANNEL
+        ERR_BADCHANMASK                 ERR_CHANOPRIVSNEEDED
+        ERR_NOTONCHANNEL
+
+## Server queries and commands
+
+
+# Acknowledgements
+
+This document has multiple ideas suggested by Test_User \<hax@andrewyu.org\> and luk3yx.
