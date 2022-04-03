@@ -65,13 +65,15 @@ Table of Contents
      1.2.  Clients . . . . . . . . . . . . . . . . . . . . . . . . .   3
      1.3.  Users . . . . . . . . . . . . . . . . . . . . . . . . . .   4
        1.3.1.  Administrators  . . . . . . . . . . . . . . . . . . .   4
-     1.4.  Channels  . . . . . . . . . . . . . . . . . . . . . . . .   4
-     1.5.  Channel Operators . . . . . . . . . . . . . . . . . . . .   5
+     1.4.  Spaces  . . . . . . . . . . . . . . . . . . . . . . . . .   4
+     1.5.  Channels  . . . . . . . . . . . . . . . . . . . . . . . .   5
+     1.6.  Space Roles . . . . . . . . . . . . . . . . . . . . . . .   5
+     1.7.  Space Permissions . . . . . . . . . . . . . . . . . . . .   5
    2.  The IDC Specification . . . . . . . . . . . . . . . . . . . .   5
      2.1.  Overview  . . . . . . . . . . . . . . . . . . . . . . . .   5
      2.2.  Character codes . . . . . . . . . . . . . . . . . . . . .   5
      2.3.  Messages  . . . . . . . . . . . . . . . . . . . . . . . .   5
-   3.  IDC Concepts. . . . . . . . . . . . . . . . . . . . . . . . .   8
+   3.  IDC Concepts. . . . . . . . . . . . . . . . . . . . . . . . .   7
      3.1.  One-to-one communication  . . . . . . . . . . . . . . . .   8
      3.2.  One-to-many . . . . . . . . . . . . . . . . . . . . . . .   8
        3.2.1.  To a list . . . . . . . . . . . . . . . . . . . . . .   8
@@ -102,8 +104,6 @@ Table of Contents
    on many machines in a distributed fashion.  A typical setup involves
    multiple servers each with multiple clients, that connect to each
    other in order to exchange messages, in a multi-centered fashion.
-
-
 
 
 
@@ -147,17 +147,17 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
    The server forms the backbone of IDC, providing a point to which
    clients may connect to to talk to each other, and a point for other
-   servers to connect to, forming the global IDC network.  The only
-   network configuration allowed for IDC servers is that of a mesh where
-   each server connects to other servers directly.
+   servers to connect to, forming the global IDC network.  The typical
+   network configuration for IDC servers MUST BE that of a mesh where
+   each server connects to other servers directly, except in cases where
+   a server is unable to connect to another server, where then servers
+   SHOULD utilize servers in between as routing.
 
 1.2.  Clients
 
    A client is anything connecting to a server that is not another
    server.  Each client is distinguished from other clients by a unique
    CID having a length of 9 characters, private to each server.
-
-
 
 
 
@@ -173,11 +173,13 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 1.3.  Users
 
    Each client is associated with a user.  Users are identified by a
-   UID, in the form of user@host, where host is the server's FQDN, each
-   unique in the Internet.  Messages are directed at users, which are
-   then sent to all connected clients of the said user.  If the user has
-   no connected clients, i.e. the user is offline, the message should be
-   kept until the user reconnects.
+   UID, in the form of user@host, where host is either (1) the FQDN of
+   the server the user resides on or (2) a domain with a TXT record
+   "IDC_SERVER <domain>" where <domain> is the FQDN of the server.  The
+   UID is unique in the Internet.  Messages are directed at users, which
+   are then sent to all connected clients of the said user.  If the user
+   has no connected clients, i.e. the user is offline, the message
+   SHOULD be kept until the user reconnects.
 
 1.3.1.  Administrators
 
@@ -191,32 +193,30 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
    recognition of this need, the protocol discussed herein provides for
    operators only to be able to perform such functions.
 
-1.4.  Channels
+   A system where independent users vote to decide on server actions MAY
+   be implemented.
 
-   A channel is a identified group of one or more clients which will all
-   receive messages addressed to that channel.  The channel is created
-   implicitly when the first client joins it, and the channel ceases to
-   exist when the last client leaves it.  While channel exists, any
-   client can reference the channel using the CID of the channel.
+1.4.  Spaces
 
-   Channels identifiers (CIDs) are strings (beginning with a '#'
-   character and is alphanumeric only) of length up to 200 characters,
-   shaped as #chan@server, where 'server' is the FQDN of the server that
-   the channel is hosted on.
+   A space is a identified group of one of more users.  The space is
+   created explicitly by a user on a server, and ceases to exist when
+   the last user leaves it.  While the space exists, any user can
+   reference the space using the identifier of the space.
 
-   To create a new channel or become part of an existing channel, a user
-   is required to JOIN the channel.  If the channel doesn't exist prior
-   to joining, the channel is created and the creating user becomes a
-   channel operator.  If the channel already exists, whether or not your
-   request to JOIN that channel is honoured depends on the current modes
-   of the channel.  For example, if the channel is invite-only,
-   (+INVITE_ONLY), then you may only join if invited.  As part of the
-   protocol, a user may be a part of several channels at once.
+   Space identifiers are strings with the form "&name@server", where
+   _name_ is an alphanumeric string of length up to 128 characters and
+   _server_ is the server name of which the founder of the space resides
+   on.
 
-
-
-
-
+   To create a new space or become part of an existing space, a user is
+   required to JOIN the space.  If the space doesn't exist prior to
+   joining, the space is created under the server the user is on and the
+   creating user becomes the space operstor.  If the space already
+   exists, whether or not the request to JOIN that space is honoured
+   depends on the current options of the space.  For example, if the
+   space is invite-only, (+INVITE_ONLY), then the user may only join if
+   invited.  As part of the protocol, a user may be a part of several
+   spaces at once.
 
 
 
@@ -226,25 +226,20 @@ Yu                       Expires 5 October 2022                 [Page 4]
 RFC TBD               Internet Delay Chat Protocol            April 2022
 
 
-1.5.  Channel Operators
+1.5.  Channels
 
-   The channel operator (also referred to as a "chop" or "chanop") on a
-   given channel is considered to 'own' that channel.  In recognition of
-   tper status, channel operators are endowed with certain powers which
-   enable them to keep control and some sort of sanity in their channel.
-   As an owner of a channel, a channel operator is not required to have
-   reasons for their actions, although if their actions are generally
-   antisocial or otherwise abusive, it might be reasonable to ask the
-   server administrator for where the channel is hosted to intervene, or
-   for the users to just leave and go elsewhere and form their own
-   channel.
+   Channels are a group of users in a space who have permissions for
+   reading the channel.  Channel identifiers are strings, appending a
+   '#' character and a name, where the name is an alphanumeric string of
+   up to 128 characters, to the space that the channel is in.
 
-   The commands which may only be used by channel operators are:
+1.6.  Space Roles
 
-    KICK    - Eject a client from the channel
-    MODE    - Change the channel's mode
-    INVITE  - Invite a client to an invite-only channel (mode +i)
-    TOPIC   - Change the channel topic in a mode +t channel
+1.7.  Space Permissions
+
+   Permissions designate what actions a role may perform in a space.
+
+   In addition, each channel
 
 2.  The IDC Specification
 
@@ -273,7 +268,12 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
    may be up to 30).  The prefix, command, and all parameters are
    separated by one (or more) ASCII space character(s) (0x20).
 
-
+   The presence of a prefix is indicated with a single leading ASCII
+   colon character (':', 0x3b), which must be the first character of the
+   message itself.  There must be no gap (whitespace) between the colon
+   and the prefix.  The prefix is used by servers to indicate the true
+   origin of the message.  If the prefix is missing from the message, it
+   is assumed to have originated from the connection from which it was
 
 
 
@@ -282,12 +282,6 @@ Yu                       Expires 5 October 2022                 [Page 5]
 RFC TBD               Internet Delay Chat Protocol            April 2022
 
 
-   The presence of a prefix is indicated with a single leading ASCII
-   colon character (':', 0x3b), which must be the first character of the
-   message itself.  There must be no gap (whitespace) between the colon
-   and the prefix.  The prefix is used by servers to indicate the true
-   origin of the message.  If the prefix is missing from the message, it
-   is assumed to have originated from the connection from which it was
    received.  Clients should not use prefix when sending a message from
    themselves; if they use a prefix, the only valid prefix is the
    registered nickname associated with the client.  If the source
@@ -331,6 +325,12 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
  <crlf>     ::= CR LF
 
+   NOTES:
+
+   1.  <SPACE> is consists only of SPACE character(s) (0x20).  Specially
+       notice that TABULATION, and all other control characters are
+       considered NON-WHITE-SPACE.
+
 
 
 Yu                       Expires 5 October 2022                 [Page 6]
@@ -338,11 +338,6 @@ Yu                       Expires 5 October 2022                 [Page 6]
 RFC TBD               Internet Delay Chat Protocol            April 2022
 
 
-   NOTES:
-
-   1.  <SPACE> is consists only of SPACE character(s) (0x20).  Specially
-       notice that TABULATION, and all other control characters are
-       considered NON-WHITE-SPACE.
    2.  After extracting the parameter list, all parameters are equal,
        whether matched by <middle> or <trailing>. <Trailing> is just a
        syntactic trick to allow SPACE within parameter.
@@ -385,6 +380,11 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
    <nonwhite>   ::= <any 8bit code except SPACE (0x20), NUL (0x0), CR
                      (0xd), and LF (0xa)>
 
+3.  IDC Concepts.
+
+   This section is devoted to describing the actual concepts behind the
+   organization of the IDC protocol and how the current implementations
+   deliver different classes of messages.
 
 
 
@@ -393,12 +393,6 @@ Yu                       Expires 5 October 2022                 [Page 7]
 
 RFC TBD               Internet Delay Chat Protocol            April 2022
 
-
-3.  IDC Concepts.
-
-   This section is devoted to describing the actual concepts behind the
-   organization of the IDC protocol and how the current implementations
-   deliver different classes of messages.
 
 3.1.  One-to-one communication
 
@@ -443,16 +437,18 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
    the IRC server and client.  All commands described in this section
    must be implemented by any server for this protocol.
 
+   Where the reply ERR_NOSUCHSERVER is listed, it means that the
+   <server> parameter could not be found.  The server must not send any
+   other replies after this for that command.
+
+
+
 
 
 Yu                       Expires 5 October 2022                 [Page 8]
 
 RFC TBD               Internet Delay Chat Protocol            April 2022
 
-
-   Where the reply ERR_NOSUCHSERVER is listed, it means that the
-   <server> parameter could not be found.  The server must not send any
-   other replies after this for that command.
 
    The server to which a client is connected is required to parse the
    complete message, returning any appropriate errors.  If the server
@@ -499,6 +495,10 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
    Parameters: <password>
 
+   The PASS command is used to set a 'connection password'.  The
+   password can and must be set before any attempt to register the
+   connection is made.  Currently this requires that clients send a PASS
+
 
 
 Yu                       Expires 5 October 2022                 [Page 9]
@@ -506,9 +506,6 @@ Yu                       Expires 5 October 2022                 [Page 9]
 RFC TBD               Internet Delay Chat Protocol            April 2022
 
 
-   The PASS command is used to set a 'connection password'.  The
-   password can and must be set before any attempt to register the
-   connection is made.  Currently this requires that clients send a PASS
    command before sending the NICK/USER combination and servers _must_
    send a PASS command before any SERVER command.  The password supplied
    must match the one contained in the C/N lines (for servers) or I
@@ -554,6 +551,9 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
    when the USER command comes from a directly connected client for
    security reasons, but they are used in server to server
    communication.
+
+
+
 
 
 

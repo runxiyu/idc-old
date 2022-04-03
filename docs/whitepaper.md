@@ -53,7 +53,7 @@ SMS does not work over the Internet, and is generally expensive.
 
 ## Servers
 
-The server forms the backbone of IDC, providing a point to which clients may connect to to talk to each other, and a point for other servers to connect to, forming the global IDC network.  The only network configuration allowed for IDC servers is that of a mesh where each server connects to other servers directly.
+The server forms the backbone of IDC, providing a point to which clients may connect to to talk to each other, and a point for other servers to connect to, forming the global IDC network.  The typical network configuration for IDC servers MUST BE that of a mesh where each server connects to other servers directly, except in cases where a server is unable to connect to another server, where then servers SHOULD utilize servers in between as routing.
 
 ## Clients
 
@@ -61,31 +61,34 @@ A client is anything connecting to a server that is not another server.  Each cl
 
 ## Users
 
-Each client is associated with a user.  Users are identified by a UID, in the form of user@host, where host is the server's FQDN, each unique in the Internet.  Messages are directed at users, which are then sent to all connected clients of the said user.  If the user has no connected clients, i.e. the user is offline, the message should be kept until the user reconnects.
+Each client is associated with a user.  Users are identified by a UID, in the form of user@host, where host is either (1) the FQDN of the server the user resides on or (2) a domain with a TXT record "IDC_SERVER <domain>" where <domain> is the FQDN of the server.  The UID is unique in the Internet.  Messages are directed at users, which are then sent to all connected clients of the said user.  If the user has no connected clients, i.e. the user is offline, the message SHOULD be kept until the user reconnects.
 
 
 ### Administrators
 
 To allow a reasonable amount of order to be kept within a server, a special class of users (administrators) is allowed to perform general maintenance functions on the server.  Although the powers granted to an administrator can be considered as 'dangerous', they are nonetheless required.  Administrators should be able to perform basic network tasks such as disconnecting and reconnecting servers as needed to prevent long-term use of bad network routing.  In recognition of this need, the protocol discussed herein provides for operators only to be able to perform such functions.
 
+A system where independent users vote to decide on server actions MAY be implemented.
+
+## Spaces
+
+A space is a identified group of one of more users.  The space is created explicitly by a user on a server, and ceases to exist when the last user leaves it.  While the space exists, any user can reference the space using the identifier of the space.
+
+Space identifiers are strings with the form "&name@server", where *name* is an alphanumeric string of length up to 128 characters and *server* is the server name of which the founder of the space resides on.
+
+To create a new space or become part of an existing space, a user is required to JOIN the space.  If the space doesn't exist prior to joining, the space is created under the server the user is on and the creating user becomes the space operstor.  If the space already exists, whether or not the request to JOIN that space is honoured depends on the current options of the space. For example, if the space is invite-only, (`+INVITE_ONLY`), then the user may only join if invited.  As part of the protocol, a user may be a part of several spaces at once.
+
 ## Channels
 
-A channel is a identified group of one or more clients which will all receive messages addressed to that channel.  The channel is created implicitly when the first client joins it, and the channel ceases to exist when the last client leaves it.  While channel exists, any client can reference the channel using the CID of the channel.
+Channels are a group of users in a space who have permissions for reading the channel.  Channel identifiers are strings, appending a '#' character and a name, where the name is an alphanumeric string of up to 128 characters, to the space that the channel is in.
 
-Channels identifiers (CIDs) are strings (beginning with a '#' character and is alphanumeric only) of length up to 200 characters, shaped as #chan@server, where 'server' is the FQDN of the server that the channel is hosted on.
+## Space Roles
 
-To create a new channel or become part of an existing channel, a user is required to JOIN the channel.  If the channel doesn't exist prior to joining, the channel is created and the creating user becomes a channel operator.  If the channel already exists, whether or not your request to JOIN that channel is honoured depends on the current modes of the channel. For example, if the channel is invite-only, (`+INVITE_ONLY`), then you may only join if invited.  As part of the protocol, a user may be a part of several channels at once.
+## Space Permissions
 
-## Channel Operators
+Permissions designate what actions a role may perform in a space.
 
-The channel operator (also referred to as a "chop" or "chanop") on a given channel is considered to 'own' that channel.  In recognition of tper status, channel operators are endowed with certain powers which enable them to keep control and some sort of sanity in their channel.  As an owner of a channel, a channel operator is not required to have reasons for their actions, although if their actions are generally antisocial or otherwise abusive, it might be reasonable to ask the server administrator for where the channel is hosted to intervene, or for the users to just leave and go elsewhere and form their own channel.
-
-The commands which may only be used by channel operators are:
-
-     KICK    - Eject a client from the channel
-     MODE    - Change the channel's mode
-     INVITE  - Invite a client to an invite-only channel (mode +i)
-     TOPIC   - Change the channel topic in a mode +t channel
+In addition, each channel
 
 # The IDC Specification
 
