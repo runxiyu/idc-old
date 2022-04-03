@@ -97,18 +97,38 @@ Roles have a set of permissions both within the scope of the whole space and spe
 Permissions designate what actions a role may perform in a space and its respective channels.  Permissions are granted by roles containing the permission.  Permissions are identified by a uppercase string that begins with +.
 
 Space permissions are include:
-- +READ - Be in the space;
-- +INTERACT - Affect the space;
-- +MUTE - Render a user unable to speak or otherwise interact in the space;
-- +KICK - Removes a user from the space;
-- +BAN - Removes a user from the space, and prohibit them from re-joining;
-- +ROLES - Manage roles of users with lower ranks, may only promote to the same rank as themself and demote users of lower ranks.
++READ
+:	Be in the space;
+
++INTERACT
+:	Affect the space;
+
++MUTE
+:	Render a user unable to speak or otherwise interact in the space;
+
++KICK
+:	Removes a user from the space;
+
++BAN
+:	Removes a user from the space, and prohibit them from re-joining;
+
++ROLES
+:	Manage roles of users with lower ranks, may only promote to the same rank as themself and demote users of lower ranks.
+
 
 Channel permissions include:
-- +READ - Read messages from the channel; Users without this permission is not considered to be in the channel;
-- +INTERACT - Affect the channel;
-- +MUTE - Give the user the -MESSAGE anti-permission.
-- +BAN - Give the user the -READ anti-permission.
++READ
+:	Read messages from the channel; Users without this permission is not considered to be in the channel;
+
++INTERACT
+:	Affect the channel;
+
++MUTE
+:	Give the user the -MESSAGE anti-permission.
+
++BAN
+:	Give the user the -READ anti-permission.
+
 
 ## Anti-permissions
 
