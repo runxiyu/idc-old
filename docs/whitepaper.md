@@ -27,7 +27,7 @@ fullname="Andrew Yu"
 
 .# Abstract
 
-THIS DOCUMENT IS STILL A DRAFT.  THE "STATUS OF THIS MEMO" PART OF THE DOCUMENT IS FALSE.  Distribution of this memo is unlimited.
+THIS DOCUMENT IS STILL A DRAFT.  THE "STATUS OF THIS MEMO" PART OF THE DOCUMENT IS FALSE.  Distribution of this memo is unlimited.  No other copying message in this file is accurate.
 
 This document specifies a new Internet Protocol for messaging over the Internet.
 
@@ -41,11 +41,11 @@ IDC itself is a messaging system, which (through the use of the client-server an
 
 Existing protocols are limited.  Internet Relay Chat as in RFC 1459 has been in use since May 1993, a very simple protocol for teleconferencing system.  Later updates such as RFC 2812 have been badly accepted.  It was not designed for personal instant messaging.
 
-IRC is real time.  When a client disconnects, the server no longer recognizes the client, and messages during the client's downtime are not saved.  This renders IRC unfit for instant messaging, where clients are forced to disconnect but messages are to be read later.  IRC is not federated, causing most people to be on the few large networks, imparing user freedom.
+IRC is real time.  When a client disconnects, the network no longer recognizes the client, and messages during the client's downtime are not saved.  This renders IRC unfit for instant messaging, where clients are forced to disconnect but messages are to be read later.  IRC is not federated, causing most people to be on the few large networks.  Though IRC is technically multi-centered, it is not pokitically.
 
-Most modern IRC networks use dedicated "services" servers for user, channel, group, etc. management and dedicated client bots for extensible channel management.  Compared with these features built into the server, this is ineffective and redundent.
+Most modern IRC networks use dedicated "services" servers for user, channel, and group management and dedicated client bots for extensible channel management.  Compared with these features built into the server, this is ineffective and redundent.  Temperory limitations on users such as timed bans must be handled server-side.
 
-The Extensible Messaging and Presence Protocol was designed for presense, instant messaging, and conferences.  However, it is based on XML, and implementations are large and buggy.  IRC is a simple text-oriented protocol, where implementing is more straightforward and is harder to bug.
+TheExtensible Messaging and Presence Protocol, also known as XMPP, was designed for presense, instant messaging, and conferences.  However, it is based on XML, and implementations are large and buggy.  IRC is a simple text-oriented protocol, where implementing is more straightforward and is harder to bug.
 
 Blah blah blah.
 
