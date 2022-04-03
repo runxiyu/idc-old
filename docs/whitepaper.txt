@@ -68,30 +68,31 @@ Table of Contents
      1.4.  Spaces  . . . . . . . . . . . . . . . . . . . . . . . . .   4
      1.5.  Channels  . . . . . . . . . . . . . . . . . . . . . . . .   5
      1.6.  Space Roles . . . . . . . . . . . . . . . . . . . . . . .   5
-     1.7.  Space Permissions . . . . . . . . . . . . . . . . . . . .   5
-   2.  The IDC Specification . . . . . . . . . . . . . . . . . . . .   5
-     2.1.  Overview  . . . . . . . . . . . . . . . . . . . . . . . .   5
-     2.2.  Character codes . . . . . . . . . . . . . . . . . . . . .   5
-     2.3.  Messages  . . . . . . . . . . . . . . . . . . . . . . . .   5
-   3.  IDC Concepts. . . . . . . . . . . . . . . . . . . . . . . . .   7
-     3.1.  One-to-one communication  . . . . . . . . . . . . . . . .   8
-     3.2.  One-to-many . . . . . . . . . . . . . . . . . . . . . . .   8
-       3.2.1.  To a list . . . . . . . . . . . . . . . . . . . . . .   8
-       3.2.2.  To a channel  . . . . . . . . . . . . . . . . . . . .   8
-   4.  Message details . . . . . . . . . . . . . . . . . . . . . . .   8
-     4.1.  Connection Registration . . . . . . . . . . . . . . . . .   9
-       4.1.1.  Password message  . . . . . . . . . . . . . . . . . .   9
-       4.1.2.  Nick message  . . . . . . . . . . . . . . . . . . . .  10
-       4.1.3.  User message  . . . . . . . . . . . . . . . . . . . .  10
-       4.1.4.  Server message  . . . . . . . . . . . . . . . . . . .  11
-       4.1.5.  Quit  . . . . . . . . . . . . . . . . . . . . . . . .  11
-       4.1.6.  Server quit message . . . . . . . . . . . . . . . . .  11
-     4.2.  Channel operations  . . . . . . . . . . . . . . . . . . .  12
-       4.2.1.  Join message  . . . . . . . . . . . . . . . . . . . .  12
-       4.2.2.  Part message  . . . . . . . . . . . . . . . . . . . .  13
-       4.2.3.  Mode message  . . . . . . . . . . . . . . . . . . . .  13
-     4.3.  Server queries and commands . . . . . . . . . . . . . . .  16
-   5.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  16
+     1.7.  Permissions . . . . . . . . . . . . . . . . . . . . . . .   5
+     1.8.  Anti-permissions  . . . . . . . . . . . . . . . . . . . .   6
+   2.  The IDC Specification . . . . . . . . . . . . . . . . . . . .   6
+     2.1.  Overview  . . . . . . . . . . . . . . . . . . . . . . . .   6
+     2.2.  Character codes . . . . . . . . . . . . . . . . . . . . .   6
+     2.3.  Messages  . . . . . . . . . . . . . . . . . . . . . . . .   6
+   3.  IDC Concepts. . . . . . . . . . . . . . . . . . . . . . . . .   8
+     3.1.  One-to-one communication  . . . . . . . . . . . . . . . .   9
+     3.2.  One-to-many . . . . . . . . . . . . . . . . . . . . . . .   9
+       3.2.1.  To a list . . . . . . . . . . . . . . . . . . . . . .   9
+       3.2.2.  To a channel  . . . . . . . . . . . . . . . . . . . .   9
+   4.  Message details . . . . . . . . . . . . . . . . . . . . . . .   9
+     4.1.  Connection Registration . . . . . . . . . . . . . . . . .  10
+       4.1.1.  Password message  . . . . . . . . . . . . . . . . . .  10
+       4.1.2.  Nick message  . . . . . . . . . . . . . . . . . . . .  11
+       4.1.3.  User message  . . . . . . . . . . . . . . . . . . . .  11
+       4.1.4.  Server message  . . . . . . . . . . . . . . . . . . .  12
+       4.1.5.  Quit  . . . . . . . . . . . . . . . . . . . . . . . .  12
+       4.1.6.  Server quit message . . . . . . . . . . . . . . . . .  12
+     4.2.  Channel operations  . . . . . . . . . . . . . . . . . . .  13
+       4.2.1.  Join message  . . . . . . . . . . . . . . . . . . . .  13
+       4.2.2.  Part message  . . . . . . . . . . . . . . . . . . . .  14
+       4.2.3.  Mode message  . . . . . . . . . . . . . . . . . . . .  14
+     4.3.  Server queries and commands . . . . . . . . . . . . . . .  17
+   5.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  17
 
 1.  Introduction
 
@@ -104,7 +105,6 @@ Table of Contents
    on many machines in a distributed fashion.  A typical setup involves
    multiple servers each with multiple clients, that connect to each
    other in order to exchange messages, in a multi-centered fashion.
-
 
 
 
@@ -226,6 +226,19 @@ Yu                       Expires 5 October 2022                 [Page 4]
 RFC TBD               Internet Delay Chat Protocol            April 2022
 
 
+   A user may have a nickname for use within the space, independent of
+   their nickname when used outside of spaces, which is an alphanumeric
+   of length up to 128 characters.  A space may not have two users with
+   the same nickname.  In these cases, the user joined later (according
+   to packet receiving order by the space's hosting server) will have a
+   underscore appended to per nickname until it no longer collides with
+   any other nickname in the space.  If during this process the nickname
+   exceeds 128 characters, the user is required to choose another
+   nickname.
+
+   Note: We'd need to define what "packet" is, since they're not lines
+   in TCP, or datagrams in UDP, but something custom.
+
 1.5.  Channels
 
    Channels are a group of users in a space who have permissions for
@@ -235,11 +248,52 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
 1.6.  Space Roles
 
-1.7.  Space Permissions
+   Roles designate the power of a given user in a space.  Each space
+   must have a FOUNDER and a MEMBER role, where FOUNDER is a special
+   role with all possible permissions within a space.  MEMBER is a
+   special role given to all users who JOIN the space by default.  Roles
+   are ordered, with FOUNDER always being the highest.
 
-   Permissions designate what actions a role may perform in a space.
+   Roles have a set of permissions both within the scope of the whole
+   space and specific channels in the space.  Roles may only utilize
+   their permissions on users below their role.
 
-   In addition, each channel
+1.7.  Permissions
+
+   Permissions designate what actions a role may perform in a space and
+   its respective channels.  Permissions are granted by roles containing
+   the permission.  Permissions are identified by a uppercase string
+   that begins with +.
+
+   Space permissions are include: - +READ - Be in the space; - +INTERACT
+   - Affect the space; - +MUTE - Render a user unable to speak or
+   otherwise interact in the space; - +KICK - Removes a user from the
+   space; - +BAN - Removes a user from the space, and prohibit them from
+   re-joining; - +ROLES - Manage roles of users with lower ranks, may
+   only promote to the same rank as themself and demote users of lower
+   ranks.
+
+
+
+
+
+Yu                       Expires 5 October 2022                 [Page 5]
+
+RFC TBD               Internet Delay Chat Protocol            April 2022
+
+
+   Channel permissions include: - +READ - Read messages from the
+   channel; Users without this permission is not considered to be in the
+   channel; - +INTERACT - Affect the channel; - +MUTE - Give the user
+   the -MESSAGE anti-permission. - +BAN - Give the user the -READ anti-
+   permission.
+
+1.8.  Anti-permissions
+
+   Each permission has a corresponding anti-permission, named after the
+   permission but replacing '+' with '-'.  When a user has an anti-
+   permission, per ability to utilize the permission is lost even if
+   perse has a role with the permission.
 
 2.  The IDC Specification
 
@@ -274,16 +328,16 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
    and the prefix.  The prefix is used by servers to indicate the true
    origin of the message.  If the prefix is missing from the message, it
    is assumed to have originated from the connection from which it was
+   received.  Clients should not use prefix when sending a message from
+   themselves; if they use a prefix, the only valid prefix is the
 
 
 
-Yu                       Expires 5 October 2022                 [Page 5]
+Yu                       Expires 5 October 2022                 [Page 6]
 
 RFC TBD               Internet Delay Chat Protocol            April 2022
 
 
-   received.  Clients should not use prefix when sending a message from
-   themselves; if they use a prefix, the only valid prefix is the
    registered nickname associated with the client.  If the source
    identified by the prefix cannot be found from the server's internal
    database, or if the source is registered from a different link than
@@ -333,7 +387,9 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
 
 
-Yu                       Expires 5 October 2022                 [Page 6]
+
+
+Yu                       Expires 5 October 2022                 [Page 7]
 
 RFC TBD               Internet Delay Chat Protocol            April 2022
 
@@ -389,7 +445,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
 
 
-Yu                       Expires 5 October 2022                 [Page 7]
+Yu                       Expires 5 October 2022                 [Page 8]
 
 RFC TBD               Internet Delay Chat Protocol            April 2022
 
@@ -445,7 +501,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
 
 
-Yu                       Expires 5 October 2022                 [Page 8]
+Yu                       Expires 5 October 2022                 [Page 9]
 
 RFC TBD               Internet Delay Chat Protocol            April 2022
 
@@ -501,7 +557,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
 
 
-Yu                       Expires 5 October 2022                 [Page 9]
+Yu                       Expires 5 October 2022                [Page 10]
 
 RFC TBD               Internet Delay Chat Protocol            April 2022
 
@@ -557,7 +613,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
 
 
-Yu                       Expires 5 October 2022                [Page 10]
+Yu                       Expires 5 October 2022                [Page 11]
 
 RFC TBD               Internet Delay Chat Protocol            April 2022
 
@@ -613,7 +669,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
 
 
-Yu                       Expires 5 October 2022                [Page 11]
+Yu                       Expires 5 October 2022                [Page 12]
 
 RFC TBD               Internet Delay Chat Protocol            April 2022
 
@@ -669,7 +725,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
 
 
-Yu                       Expires 5 October 2022                [Page 12]
+Yu                       Expires 5 October 2022                [Page 13]
 
 RFC TBD               Internet Delay Chat Protocol            April 2022
 
@@ -725,7 +781,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
 
 
-Yu                       Expires 5 October 2022                [Page 13]
+Yu                       Expires 5 October 2022                [Page 14]
 
 RFC TBD               Internet Delay Chat Protocol            April 2022
 
@@ -781,7 +837,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
 
 
-Yu                       Expires 5 October 2022                [Page 14]
+Yu                       Expires 5 October 2022                [Page 15]
 
 RFC TBD               Internet Delay Chat Protocol            April 2022
 
@@ -837,7 +893,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
 
 
-Yu                       Expires 5 October 2022                [Page 15]
+Yu                       Expires 5 October 2022                [Page 16]
 
 RFC TBD               Internet Delay Chat Protocol            April 2022
 
@@ -893,4 +949,4 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
 
 
-Yu                       Expires 5 October 2022                [Page 16]
+Yu                       Expires 5 October 2022                [Page 17]

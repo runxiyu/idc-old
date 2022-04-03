@@ -78,19 +78,44 @@ Space identifiers are strings with the form "&name@server", where *name* is an a
 
 To create a new space or become part of an existing space, a user is required to JOIN the space.  If the space doesn't exist prior to joining, the space is created under the server the user is on and the creating user becomes the space operstor.  If the space already exists, whether or not the request to JOIN that space is honoured depends on the current options of the space. For example, if the space is invite-only, (`+INVITE_ONLY`), then the user may only join if invited.  As part of the protocol, a user may be a part of several spaces at once.
 
+A user may have a nickname for use within the space, independent of their nickname when used outside of spaces, which is an alphanumeric of length up to 128 characters.  A space may not have two users with the same nickname.  In these cases, the user joined later (according to packet receiving order by the space's hosting server) will have a underscore appended to per nickname until it no longer collides with any other nickname in the space.  If during this process the nickname exceeds 128 characters, the user is required to choose another nickname.
+
+  Note: We'd need to define what "packet" is, since they're not lines in TCP, or datagrams in UDP, but something custom.
+
 ## Channels
 
 Channels are a group of users in a space who have permissions for reading the channel.  Channel identifiers are strings, appending a '#' character and a name, where the name is an alphanumeric string of up to 128 characters, to the space that the channel is in.
 
 ## Space Roles
 
-## Space Permissions
+Roles designate the power of a given user in a space.  Each space must have a FOUNDER and a MEMBER role, where FOUNDER is a special role with all possible permissions within a space.  MEMBER is a special role given to all users who JOIN the space by default.  Roles are ordered, with FOUNDER always being the highest.
 
-Permissions designate what actions a role may perform in a space.
+Roles have a set of permissions both within the scope of the whole space and specific channels in the space.  Roles may only utilize their permissions on users below their role.
 
-In addition, each channel
+## Permissions
+
+Permissions designate what actions a role may perform in a space and its respective channels.  Permissions are granted by roles containing the permission.  Permissions are identified by a uppercase string that begins with +.
+
+Space permissions are include:
+- +READ - Be in the space;
+- +INTERACT - Affect the space;
+- +MUTE - Render a user unable to speak or otherwise interact in the space;
+- +KICK - Removes a user from the space;
+- +BAN - Removes a user from the space, and prohibit them from re-joining;
+- +ROLES - Manage roles of users with lower ranks, may only promote to the same rank as themself and demote users of lower ranks.
+
+Channel permissions include:
+- +READ - Read messages from the channel; Users without this permission is not considered to be in the channel;
+- +INTERACT - Affect the channel;
+- +MUTE - Give the user the -MESSAGE anti-permission.
+- +BAN - Give the user the -READ anti-permission.
+
+## Anti-permissions
+
+Each permission has a corresponding anti-permission, named after the permission but replacing '+' with '-'.  When a user has an anti-permission, per ability to utilize the permission is lost even if perse has a role with the permission.
 
 # The IDC Specification
+
 
 ## Overview
 
