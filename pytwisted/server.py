@@ -10,8 +10,51 @@ import random
 with open("config.py", "r") as c:
     exec(c.read())
 
+class User:
+    def __init__(self, username):
+        self.clients = [] # Client()
+        self.in_channels = [] # Channel()
 
-class MyChat(basic.LineReceiver):
+    def add_client(self, client):
+        self.clients.append(client)
+
+    def del_client(self, client):
+        self.clients.remove(client)
+
+    def send(self, *args):
+        for client in self.clients:
+            client.send(*args)
+
+    def join(self, channel):
+        channel.broadcast_join(self)
+        self.channels.append(channel)
+
+    def part(self, channel, reason=""):
+        channel.broadcast_part(self, reason)
+        self.channels.remove(channel)
+
+    def message(self, target, message):
+        
+
+class Channel:
+    def __init__(self, name):
+        self.name = name
+        self.users = [] # User()
+        self.modes = [] # ("ban", "hax@andrewyu.org")
+
+    def broadcast_join(self, user): # must be called with User().join
+        self.users.append(user)
+        for u in self.users:
+            u.send("JOIN", user.get_id(), seld.name)
+
+    def broadcast_part(self, user, reason=""): # must be called with User().part
+        self.users.append(user)
+        for u in self.users:
+            u.send("PART", user.get_id(), seld.name, reason)
+        
+
+
+class Client(basic.LineReceiver):
     delimiter = b"\n"
 
     def connectionMade(self):
@@ -120,10 +163,10 @@ from twisted.internet import protocol
 from twisted.application import service, internet
 
 factory = protocol.ServerFactory()
-factory.protocol = MyChat
-factory.clients = {} # cid: MyChat()
+factory.protocol = Client
+factory.clients = {} # cid: Client()
 factory.channels = {} # name: Channel()
-factory.users = {} # username: [MyChat()]
+factory.users = {} # username: [Client()]
 
 application = service.Application("chatserver")
 internet.TCPServer(1025, factory).setServiceParent(application)
