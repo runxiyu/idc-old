@@ -47,9 +47,7 @@ Most modern IRC networks use dedicated "services" servers for user, channel, and
 
 The Extensible Messaging and Presence Protocol, also known as XMPP, was designed for presense, instant messaging, and conferences.  However, it is based on XML, and implementations are large and buggy.  IRC is a simple text-oriented protocol, where implementing is more straightforward and is harder to bug.
 
-Blah blah blah.
-
-SMS does not work over the Internet, and is generally expensive.
+XML is inherently bloated and causes unnecessary spam in the network.  XMPP is not multicast either, messages are slow and especially inefficent with multi user chats.
 
 ## Servers
 
@@ -76,7 +74,7 @@ A space is a identified group of one of more users.  The space is created explic
 
 Space identifiers are strings with the form "&name@server", where *name* is an alphanumeric string of length up to 128 characters and *server* is the server name of which the founder of the space resides on.
 
-To create a new space or become part of an existing space, a user is required to JOIN the space.  If the space doesn't exist prior to joining, the space is created under the server the user is on and the creating user becomes the space operstor.  If the space already exists, whether or not the request to JOIN that space is honoured depends on the current options of the space. For example, if the space is invite-only, (`+INVITE_ONLY`), then the user may only join if invited.  As part of the protocol, a user may be a part of several spaces at once.
+To create a new space or become part of an existing space, a user is required to JOIN the space.  If the space doesn't exist prior to joining, the space is created under the server the user is on and the creating user becomes the space operator.  If the space already exists, whether or not the request to JOIN that space is honoured depends on the current options of the space. For example, if the space is invite-only, (`+INVITE_ONLY`), then the user may only join if invited.  As part of the protocol, a user may be a part of several spaces at once.
 
 A user may have a nickname for use within the space, independent of their nickname when used outside of spaces, which is an alphanumeric of length up to 128 characters.  A space may not have two users with the same nickname.  In these cases, the user joined later (according to packet receiving order by the space's hosting server) will have a underscore appended to per nickname until it no longer collides with any other nickname in the space.  If during this process the nickname exceeds 128 characters, the user is required to choose another nickname.
 

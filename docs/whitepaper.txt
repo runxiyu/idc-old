@@ -139,9 +139,9 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
    IRC is a simple text-oriented protocol, where implementing is more
    straightforward and is harder to bug.
 
-   Blah blah blah.
-
-   SMS does not work over the Internet, and is generally expensive.
+   XML is inherently bloated and causes unnecessary spam in the network.
+   XMPP is not multicast either, messages are slow and especially
+   inefficent with multi user chats.
 
 1.1.  Servers
 
@@ -211,7 +211,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
    To create a new space or become part of an existing space, a user is
    required to JOIN the space.  If the space doesn't exist prior to
    joining, the space is created under the server the user is on and the
-   creating user becomes the space operstor.  If the space already
+   creating user becomes the space operator.  If the space already
    exists, whether or not the request to JOIN that space is honoured
    depends on the current options of the space.  For example, if the
    space is invite-only, (+INVITE_ONLY), then the user may only join if
