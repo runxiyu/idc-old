@@ -74,7 +74,7 @@ Table of Contents
      2.1.  Overview  . . . . . . . . . . . . . . . . . . . . . . . .   6
      2.2.  Character codes . . . . . . . . . . . . . . . . . . . . .   6
      2.3.  Messages  . . . . . . . . . . . . . . . . . . . . . . . .   6
-   3.  IDC Concepts. . . . . . . . . . . . . . . . . . . . . . . . .   8
+   3.  IDC Concepts. . . . . . . . . . . . . . . . . . . . . . . . .   9
      3.1.  One-to-one communication  . . . . . . . . . . . . . . . .   9
      3.2.  One-to-many . . . . . . . . . . . . . . . . . . . . . . .   9
        3.2.1.  To a list . . . . . . . . . . . . . . . . . . . . . .   9
@@ -133,7 +133,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
    into the server, this is ineffective and redundent.  Temperory
    limitations on users such as timed bans must be handled server-side.
 
-   TheExtensible Messaging and Presence Protocol, also known as XMPP,
+   The Extensible Messaging and Presence Protocol, also known as XMPP,
    was designed for presense, instant messaging, and conferences.
    However, it is based on XML, and implementations are large and buggy.
    IRC is a simple text-oriented protocol, where implementing is more
@@ -265,15 +265,15 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
    the permission.  Permissions are identified by a uppercase string
    that begins with +.
 
-   +READ  Be in the space;
-   +INTERACT  Affect the space;
-   +MUTE  Render a user unable to speak or otherwise interact in the
-      space;
-   +KICK  Removes a user from the space;
-   +BAN  Removes a user from the space, and prohibit them from re-
+   Space permissions are include:
+
+   *  +READ Be in the space;
+   *  +INTERACT Affect the space;
+   *  +MUTE Give a user with lower roles the -READ anti-permission.
+   *  +KICK Removes a user from the space;
+   *  +BAN Removes a user from the space, and prohibit them from re-
       joining;
-   +ROLES  Manage roles of users with lower ranks, may only promote to
-      the same rank as themself and demote users of lower ranks.
+
 
 
 
@@ -282,12 +282,16 @@ Yu                       Expires 5 October 2022                 [Page 5]
 RFC TBD               Internet Delay Chat Protocol            April 2022
 
 
-   Channel permissions include: +READ  Read messages from the channel;
-      Users without this permission is not considered to be in the
-      channel;
-   +INTERACT  Affect the channel;
-   +MUTE  Give the user the -MESSAGE anti-permission.
-   +BAN  Give the user the -READ anti-permission.
+   *  +ROLES Manage roles of users with lower ranks, may only promote to
+      the same rank as themself and demote users of lower ranks.
+
+   Channel permissions include:
+
+   *  +READ Read messages from the channel; Users without this
+      permission is not considered to be in the channel;
+   *  +INTERACT Affect the channel;
+   *  +MUTE Give a user with lower roles the -MESSAGE anti-permission.
+   *  +BAN Give a user with lower roles the -READ anti-permission.
 
 1.8.  Anti-permissions
 
@@ -326,10 +330,6 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
    The presence of a prefix is indicated with a single leading ASCII
    colon character (':', 0x3b), which must be the first character of the
    message itself.  There must be no gap (whitespace) between the colon
-   and the prefix.  The prefix is used by servers to indicate the true
-   origin of the message.  If the prefix is missing from the message, it
-   is assumed to have originated from the connection from which it was
-   received.  Clients should not use prefix when sending a message from
 
 
 
@@ -338,6 +338,10 @@ Yu                       Expires 5 October 2022                 [Page 6]
 RFC TBD               Internet Delay Chat Protocol            April 2022
 
 
+   and the prefix.  The prefix is used by servers to indicate the true
+   origin of the message.  If the prefix is missing from the message, it
+   is assumed to have originated from the connection from which it was
+   received.  Clients should not use prefix when sending a message from
    themselves; if they use a prefix, the only valid prefix is the
    registered nickname associated with the client.  If the source
    identified by the prefix cannot be found from the server's internal
@@ -382,10 +386,6 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
    NOTES:
 
-   1.  <SPACE> is consists only of SPACE character(s) (0x20).  Specially
-       notice that TABULATION, and all other control characters are
-       considered NON-WHITE-SPACE.
-
 
 
 
@@ -394,6 +394,9 @@ Yu                       Expires 5 October 2022                 [Page 7]
 RFC TBD               Internet Delay Chat Protocol            April 2022
 
 
+   1.  <SPACE> is consists only of SPACE character(s) (0x20).  Specially
+       notice that TABULATION, and all other control characters are
+       considered NON-WHITE-SPACE.
    2.  After extracting the parameter list, all parameters are equal,
        whether matched by <middle> or <trailing>. <Trailing> is just a
        syntactic trick to allow SPACE within parameter.
@@ -436,11 +439,8 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
    <nonwhite>   ::= <any 8bit code except SPACE (0x20), NUL (0x0), CR
                      (0xd), and LF (0xa)>
 
-3.  IDC Concepts.
 
-   This section is devoted to describing the actual concepts behind the
-   organization of the IDC protocol and how the current implementations
-   deliver different classes of messages.
+
 
 
 
@@ -449,6 +449,12 @@ Yu                       Expires 5 October 2022                 [Page 8]
 
 RFC TBD               Internet Delay Chat Protocol            April 2022
 
+
+3.  IDC Concepts.
+
+   This section is devoted to describing the actual concepts behind the
+   organization of the IDC protocol and how the current implementations
+   deliver different classes of messages.
 
 3.1.  One-to-one communication
 
@@ -493,18 +499,16 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
    the IRC server and client.  All commands described in this section
    must be implemented by any server for this protocol.
 
-   Where the reply ERR_NOSUCHSERVER is listed, it means that the
-   <server> parameter could not be found.  The server must not send any
-   other replies after this for that command.
-
-
-
 
 
 Yu                       Expires 5 October 2022                 [Page 9]
 
 RFC TBD               Internet Delay Chat Protocol            April 2022
 
+
+   Where the reply ERR_NOSUCHSERVER is listed, it means that the
+   <server> parameter could not be found.  The server must not send any
+   other replies after this for that command.
 
    The server to which a client is connected is required to parse the
    complete message, returning any appropriate errors.  If the server
@@ -551,10 +555,6 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
    Parameters: <password>
 
-   The PASS command is used to set a 'connection password'.  The
-   password can and must be set before any attempt to register the
-   connection is made.  Currently this requires that clients send a PASS
-
 
 
 Yu                       Expires 5 October 2022                [Page 10]
@@ -562,6 +562,9 @@ Yu                       Expires 5 October 2022                [Page 10]
 RFC TBD               Internet Delay Chat Protocol            April 2022
 
 
+   The PASS command is used to set a 'connection password'.  The
+   password can and must be set before any attempt to register the
+   connection is made.  Currently this requires that clients send a PASS
    command before sending the NICK/USER combination and servers _must_
    send a PASS command before any SERVER command.  The password supplied
    must match the one contained in the C/N lines (for servers) or I
@@ -607,9 +610,6 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
    when the USER command comes from a directly connected client for
    security reasons, but they are used in server to server
    communication.
-
-
-
 
 
 

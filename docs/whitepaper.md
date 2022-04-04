@@ -45,7 +45,7 @@ IRC is real time.  When a client disconnects, the network no longer recognizes t
 
 Most modern IRC networks use dedicated "services" servers for user, channel, and group management and dedicated client bots for extensible channel management.  Compared with these features built into the server, this is ineffective and redundent.  Temperory limitations on users such as timed bans must be handled server-side.
 
-TheExtensible Messaging and Presence Protocol, also known as XMPP, was designed for presense, instant messaging, and conferences.  However, it is based on XML, and implementations are large and buggy.  IRC is a simple text-oriented protocol, where implementing is more straightforward and is harder to bug.
+The Extensible Messaging and Presence Protocol, also known as XMPP, was designed for presense, instant messaging, and conferences.  However, it is based on XML, and implementations are large and buggy.  IRC is a simple text-oriented protocol, where implementing is more straightforward and is harder to bug.
 
 Blah blah blah.
 
@@ -97,29 +97,21 @@ Roles have a set of permissions both within the scope of the whole space and spe
 Permissions designate what actions a role may perform in a space and its respective channels.  Permissions are granted by roles containing the permission.  Permissions are identified by a uppercase string that begins with +.
 
 Space permissions are include:
-+READ
-:	Be in the space;
-+INTERACT
-:	Affect the space;
-+MUTE
-:	Give a user with lower roles the -READ anti-permission.
-+KICK
-:	Removes a user from the space;
-+BAN
-:	Removes a user from the space, and prohibit them from re-joining;
-+ROLES
-:	Manage roles of users with lower ranks, may only promote to the same rank as themself and demote users of lower ranks.
+
+  * +READ Be in the space;
+  * +INTERACT Affect the space;
+  * +MUTE Give a user with lower roles the -READ anti-permission.
+  * +KICK Removes a user from the space;
+  * +BAN Removes a user from the space, and prohibit them from re-joining;
+  * +ROLES Manage roles of users with lower ranks, may only promote to the same rank as themself and demote users of lower ranks.
 
 
 Channel permissions include:
-+READ
-:	Read messages from the channel; Users without this permission is not considered to be in the channel;
-+INTERACT
-:	Affect the channel;
-+MUTE
-:	Give a user with lower roles the -MESSAGE anti-permission.
-+BAN
-:	Give a user with lower roles the -READ anti-permission.
+
+  * +READ Read messages from the channel; Users without this permission is not considered to be in the channel;
+  * +INTERACT Affect the channel;
+  * +MUTE Give a user with lower roles the -MESSAGE anti-permission.
+  * +BAN Give a user with lower roles the -READ anti-permission.
 
 
 ## Anti-permissions
