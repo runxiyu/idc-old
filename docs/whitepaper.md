@@ -127,7 +127,7 @@ The protocol as described herein is for use both with server to server and clien
 
 ## Character codes
 
-The charactar encoding for IDC is UTF-8.
+The character encoding for IDC is UTF-8.
 
 ## Messages
 
