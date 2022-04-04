@@ -61,7 +61,7 @@ A client is anything connecting to a server that is not another server.  Each cl
 
 ## Users
 
-Each client is associated with a user.  Users are identified by a UID, in the form of user@host, where host is either (1) the FQDN of the server the user resides on or (2) a domain with a TXT record "IDC_SERVER <domain>" where <domain> is the FQDN of the server.  The UID is unique in the Internet.  Messages are directed at users, which are then sent to all connected clients of the said user.  If the user has no connected clients, i.e. the user is offline, the message SHOULD be kept until the user reconnects.
+Each client is associated with a user.  Users are identified by a UID, in the form of user@host, where host is either (1) the FQDN of the server the user resides on or (2) a domain with a SRV record "IDC <domain>" where <domain> is the FQDN of the server.  The UID is unique in the Internet.  Messages are directed at users, which are then sent to all connected clients of the said user.  If the user has no connected clients, i.e. the user is offline, the message SHOULD be kept until the user reconnects.
 
 
 ### Administrators
