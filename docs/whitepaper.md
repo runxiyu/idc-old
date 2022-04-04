@@ -102,7 +102,7 @@ Space permissions are include:
 +INTERACT
 :	Affect the space;
 +MUTE
-:	Render a user unable to speak or otherwise interact in the space;
+:	Give a user with lower roles the -READ anti-permission.
 +KICK
 :	Removes a user from the space;
 +BAN
@@ -117,9 +117,9 @@ Channel permissions include:
 +INTERACT
 :	Affect the channel;
 +MUTE
-:	Give the user the -MESSAGE anti-permission.
+:	Give a user with lower roles the -MESSAGE anti-permission.
 +BAN
-:	Give the user the -READ anti-permission.
+:	Give a user with lower roles the -READ anti-permission.
 
 
 ## Anti-permissions
