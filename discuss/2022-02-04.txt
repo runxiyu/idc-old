@@ -1,0 +1,171 @@
+[02:25:36] <Andrew> hax: Mute = being able to give the -interact anti-privilege to people
+[02:25:45] <Andrew> hax: Interact = can talk
+[02:25:51] <Andrew> hax: Mute = can mute others
+[02:26:25] <hax> ahh
+[02:26:27] <hax> I see
+[02:27:14] <hax> needs better phrasing, should be "can revoke other's interact permission"
+[02:27:26] <hax> or grant
+[02:27:36] <hax> "modify"
+[03:08:22] <Andrew> hax: Commit and push
+[03:08:43] <Andrew> hax: chgrp -R idc /srv/git/internet-delay-chat.git
+[03:08:55] <Andrew> hax: usermod -a -G idc hax
+[03:08:56] <Andrew> hax: usermod -a -G idc andrew
+[03:09:43] <Andrew> hax: chmod -R g+w /srv/git/internet-delay-chat
+[03:12:35] <hax> s/-chat/-chat.git/
+[03:12:45] <Andrew> yup
+[03:12:48] <Andrew> it's my birthday today
+[03:12:52] <hax> nice
+[03:12:57] <hax> happy birthday
+[03:13:02] <Andrew> thx :)
+[03:13:21] <hax> ~~now you're one year closer to suffering from old age~~
+[03:13:38] <Andrew> hax: Birthdays don't make a difference
+[03:13:43] <hax> yeah ik
+[03:13:45] <Andrew> I was around 13.9999 before, now 14
+[03:13:46] <hax> it's a joke
+[03:13:59] <Andrew> * technically I'm still 13.9999, because I was born around 6:00 UTC
+[03:14:03] <hax> lol
+[03:14:11] <hax> .t utc
+[03:14:18] *** Joins: lurk (lurk@144.172.70.127)
+[03:14:18] *** ChanServ sets mode: +o lurk
+[03:14:20] <hax> .t
+[03:14:25] -lurk- 4Error running command! timeout: The read operation timed out
+[03:14:26] <hax> .t utc
+[03:14:31] -lurk- 4Error running command! timeout: The read operation timed out
+[03:14:49] <hax> .t
+[03:14:54] -lurk- 4Error running command! timeout: The read operation timed out
+[03:14:57] <hax> .py
+[03:15:01] <hax> bleh
+[03:15:02] -lurk- 4Error running command! timeout: The read operation timed out
+[03:15:26] *** lurk was kicked by Andrew (lurk)
+[03:15:29] <Andrew> !tztime UTC
+[03:15:29] <LibreBot> Andrew: 2022-04-04T01:15:29+0000
+[03:15:39] <hax> !time
+[03:15:39] <LibreBot> hax: 2022-04-04T03:15:39+0200
+[03:15:47] <hax> !help time
+[03:15:47] <LibreBot> hax: (time [<channel>] [<format>] [<seconds since epoch>]) -- Returns the current time in <format> format, or, if <format> is not given, uses the configurable format for the current channel. If no <seconds since epoch> time is given, the current time is used. If <channel> is given without <format>, uses the format for <channel>. 
+[03:15:51] <Andrew> it's the server's timezone
+[03:15:56] <hax> ah
+[03:16:04] <Andrew> !time 1
+[03:16:04] <LibreBot> Andrew: 1970-01-01T01:00:01+0100
+[03:16:20] <hax> !time 0
+[03:16:20] <LibreBot> hax: 1970-01-01T01:00:00+0100
+[03:16:24] <hax> !time 99999999999999999999
+[03:16:24] <LibreBot> hax: An error has occurred and has been logged. Please contact this bot's administrator for more information.
+[03:16:27] <hax> lol
+[03:16:30] <hax> !time 999999999
+[03:16:30] <LibreBot> hax: 2001-09-09T03:46:39+0200
+[03:16:33] <hax> !time 9999999999
+[03:16:33] <LibreBot> hax: 2286-11-20T18:46:39+0100
+[03:16:33] <Andrew> !time -1
+[03:16:35] <LibreBot> Andrew: 1970-01-01T00:59:59+0100
+[03:16:36] <hax> !time 99999999999
+[03:16:38] <LibreBot> hax: 5138-11-16T10:46:39+0100
+[03:16:42] <Andrew> Bugs
+[03:16:47] <hax> !time -1
+[03:16:47] <LibreBot> hax: 1970-01-01T00:59:59+0100
+[03:16:51] <Andrew> Buggy buggy
+[03:16:52] <hax> !time -999999999
+[03:16:52] <LibreBot> hax: 1938-04-24T23:13:21+0100
+[03:16:53] <Andrew> time -60
+[03:16:55] <hax> !time -999999999999
+[03:16:55] <LibreBot> hax: -29719-04-05T23:06:49+0053
+[03:17:05] <Andrew> time -65535
+[03:17:07] <hax> negative on the year is painful
+[03:17:11] <Andrew> yup
+[03:17:23] <hax> !time -9999999999999
+[03:17:23] <LibreBot> hax: -314918-08-13T07:06:49+0053
+[03:17:25] <hax> !time -999999999999999
+[03:17:25] <LibreBot> hax: -31686769-06-29T23:06:49+0053
+[03:17:28] <hax> !time 999999999999999
+[03:17:28] <LibreBot> hax: 31690708-07-05T02:46:39+0100
+[03:17:31] <hax> !time 9999999999999999
+[03:17:31] <LibreBot> hax: 316889355-01-25T18:46:40+0100
+[03:17:33] <hax> !time 99999999999999999
+[03:17:33] <LibreBot> hax: An error has occurred and has been logged. Please contact this bot's administrator for more information.
+[03:17:43] *** Joins: lurk (lurk@144.172.70.127)
+[03:17:43] *** ChanServ sets mode: +o lurk
+[03:17:45] <hax> .c
+[03:17:47] <hax> .c 1+1
+[03:17:48] <lurk> hax: ()
+[03:17:48] <lurk> hax: 2
+[03:17:54] <hax> .c 1<<64
+[03:17:55] <lurk> hax: 18446744073709551616
+[03:18:01] <hax> hmm
+[03:18:08] <hax> !time 18446744073709551616
+[03:18:08] <LibreBot> hax: An error has occurred and has been logged. Please contact this bot's administrator for more information.
+[03:18:10] <hax> !time 18446744073709551615
+[03:18:10] <LibreBot> hax: An error has occurred and has been logged. Please contact this bot's administrator for more information.
+[03:18:13] <hax> .c 1<<63
+[03:18:14] <lurk> hax: 9223372036854775808
+[03:18:16] <hax> ah
+[03:18:20] <hax> signed, yes
+[03:18:26] <hax> !time 9223372036854775808
+[03:18:26] <LibreBot> hax: An error has occurred and has been logged. Please contact this bot's administrator for more information.
+[03:18:28] <hax> !time 9223372036854775807
+[03:18:28] <LibreBot> hax: An error has occurred and has been logged. Please contact this bot's administrator for more information.
+[03:18:31] <Andrew> Just say "BC"
+[03:18:32] <hax> !time -9223372036854775807
+[03:18:32] <LibreBot> hax: An error has occurred and has been logged. Please contact this bot's administrator for more information.
+[03:18:36] <hax> lol
+[03:18:50] <hax> !time 2022-04-03 BC
+[03:18:50] <LibreBot> hax: Error: 'BC' is not a valid floating point number.
+[03:18:53] <hax> :(
+[03:19:06] <hax> !time -9223372036854775800
+[03:19:06] <LibreBot> hax: An error has occurred and has been logged. Please contact this bot's administrator for more information.
+[03:19:08] <hax> !time -922337203685477580
+[03:19:08] <LibreBot> hax: An error has occurred and has been logged. Please contact this bot's administrator for more information.
+[03:19:10] <hax> !time -92233720368547758
+[03:19:12] <LibreBot> hax: An error has occurred and has been logged. Please contact this bot's administrator for more information.
+[03:19:14] <hax> !time -9223372036854775
+[03:19:15] <LibreBot> hax: -292275055-05-16T17:40:32+0053
+[03:19:22] <hax> .c 1<<60
+[03:19:22] <lurk> hax: 1152921504606846976
+[03:19:26] <Andrew> !kill time
+[03:19:26] <LibreBot> Andrew: Error: "kill" is not a valid command.
+[03:19:30] <hax> .c 1<<56
+[03:19:30] <lurk> hax: 72057594037927936
+[03:19:42] <hax> .c 1<<57
+[03:19:42] <lurk> hax: 144115188075855872
+[03:19:44] <hax> .c 1<<58
+[03:19:45] <lurk> hax: 288230376151711744
+[03:19:52] <hax> !time 288230376151711744
+[03:19:52] <LibreBot> hax: An error has occurred and has been logged. Please contact this bot's administrator for more information.
+[03:20:00] <hax> !time 144115188075855872
+[03:20:00] <LibreBot> hax: An error has occurred and has been logged. Please contact this bot's administrator for more information.
+[03:20:06] <hax> !time 72057594037927936
+[03:20:06] <LibreBot> hax: An error has occurred and has been logged. Please contact this bot's administrator for more information.
+[03:20:08] <hax> !time 72057594037927935
+[03:20:08] <LibreBot> hax: An error has occurred and has been logged. Please contact this bot's administrator for more information.
+[03:20:14] <hax> .c 1<<55
+[03:20:14] <lurk> hax: 36028797018963968
+[03:20:21] <hax> !time 36028797018963968
+[03:20:21] <LibreBot> hax: 1141709097-06-13T07:26:08+0100
+[03:20:25] <hax> !time 36028797018963969
+[03:20:25] <LibreBot> hax: 1141709097-06-13T07:26:08+0100
+[03:20:34] <hax> hmmm
+[03:20:36] <hax> ah
+[03:20:42] <hax> no...
+[03:20:50] <hax> anyways
+[03:22:10] <Andrew> Yes?
+[03:22:22] *** Joins: Guard (andrew@andrewyu.org)
+[03:22:22] *** ChanServ sets mode: +o Guard
+[03:22:25] <hax> nothing
+[03:22:47] <hax> :1HC SQUI Guard :Totally possible to squit a client
+[03:22:53] <hax> s/SQUI/SQUIT/
+[03:23:23] <Andrew> -:1HC SQUIT Guard :Breaks the server?
+[03:23:35] <Andrew> Solanum doesn't even log protocol violations to snomasks
+[03:23:53] <Andrew> luk3yx: Also, why is glowing bear so silly thinking that snomasks need notification?
+[03:24:04] <Andrew> Maybe they didn't design it with operators in mind?
+[03:25:47] <hax> lol
+[03:33:25] <Andrew> hax: Anyways, you pushed?
+[03:34:33] <hax> I didn't actually write anything
+[03:34:39] <hax> so nothing to push
+[03:34:45] <Andrew> lol
+[03:34:57] <Andrew> what wording do you want to adjust specifically
+[03:35:09] <hax> on what the MUTE permission is for
+[03:35:34] <hax> "Give the user the -MESSAGE anti-permission." sounds like that person *is* muted, not "can mute others"
+[03:36:06] <Andrew> true
+[03:37:43] <Andrew> pushed
+[03:38:14] <Andrew> We should start planning on the networking side of stuff
+[03:38:19] <Andrew> which will be inevitably hard
+[03:38:22] <hax> ye

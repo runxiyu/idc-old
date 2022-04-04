@@ -1,0 +1,701 @@
+[02:21:41] <hax> alright maybe that was more than "a little"
+[02:21:48] <hax> gn
+[02:21:55] <hax> and good morning for whenever you read this :P
+[04:19:46] <Andrew> Hi
+[04:21:30] <luk3yx> .wild Andrew
+[04:21:30] <lurk> A wild A​ndrew appeared! Your options: 1. flee, 2. eat them, 3. do nothing
+[04:21:32] <luk3yx> .wild 1
+[04:21:32] <lurk> You trip over a wild van door, and the wild A​ndrew wins!
+[04:22:20] <Andrew> .wild luk3yx 
+[04:22:20] <lurk> A wild l​uk3yx appeared! Your options: 1. flee, 2. TNT, 3. meep
+[04:22:21] <Andrew> .wild 2
+[04:22:21] <lurk> You blow up the wild l​uk3yx! Yay! You win!
+[04:22:24] <Andrew> Yay
+[04:22:24] <lurk> ​Yay!
+[04:42:41] <Andrew> hax: anyways, any special ideas?
+[05:38:00] <Andrew> hax: also, howdo we split packets
+[05:40:03] <Andrew> And, what ife we use hamming codwes instead of checksums
+[05:42:18] <Andrew> and how should rmemote servers confirmr they recv'ed the msg
+[05:42:59] <Andrew> Anyways
+[05:58:43] <Andrew> hax: Also, what are you doing now?
+[09:54:26] <werdnA> -sanick luk3yx sus
+[09:56:43] <luk3yx> No
+[09:56:46] <luk3yx> .r
+[09:56:46] <lurk> luk3yx: Click!
+[10:03:37] <werdnA> Sus
+[10:03:43] <werdnA> Anyways
+[10:03:58] <werdnA> luk3yx: Since we're gonna use UDP>..
+[10:04:42] <werdnA> local server sends rmt srv a few datagrams
+[10:05:18] <werdnA> then the remote sends the checksum?
+[10:05:19] <werdnA> ???
+[10:05:21] <werdnA> ...
+[10:05:23] <werdnA> :(
+[10:05:25] <werdnA> :(
+[10:05:27] <werdnA> :(
+[10:05:29] <luk3yx> Random code issue
+[10:05:31] <luk3yx> https://git.andrewyu.org/internet-delay-chat/file/pytwisted/server.py.html#l18
+[10:05:34] <luk3yx> Why are you making it a list
+[10:05:40] <luk3yx> random.choice() works on strings
+[10:05:50] <luk3yx> >>> random.choice('yay')
+[10:05:52] <luk3yx> 'y'
+[10:06:05] <luk3yx> Andrew: Why not just use TCP
+[10:06:12] <luk3yx> Which has done all of this
+[10:06:47] <luk3yx> Anyway I don't think MT does its own checksums on top of the ones UDP/IP/whatever does
+[10:07:13] <werdnA> k
+[10:07:25] <werdnA> luk3yx: Connections cost time
+[10:07:30] <werdnA> The handshake is slow
+[10:07:38] <werdnA> And connections take up precious ports
+[10:07:44] * werdnA pings hax
+[10:07:46] <luk3yx> Won't you need to do handshaking anyway for TLS?
+[10:08:53] <werdnA> No, we don't use TLS
+[10:08:58] <luk3yx> No TLS?
+[10:09:36] <werdnA> We use BrainExplodesSecurityLayer
+[10:09:43] <werdnA> (ll you later)
+[10:09:59] <luk3yx> 💥
+[10:39:02] <Andrew> lol
+[10:45:10] <Andrew> 05/!\
+[10:47:28] <Andrew> luk3yx: Be nice to LibreBot 
+[10:50:19] <luk3yx> Andrew: Was I not being nice
+[10:50:23] <luk3yx> .t
+[10:50:29] -lurk- 4Error running command! timeout: The read operation timed out
+[10:50:30] <Andrew> lol
+[10:50:33] <luk3yx> But will it wake up
+[10:50:40] <luk3yx> .t
+[10:50:45] -lurk- 4Error running command! timeout: The read operation timed out
+[10:50:56] <luk3yx> .t
+[10:50:56] <lurk> luk3yx: 2022-04-03 08:50:56 UTC
+[10:51:02] <luk3yx> Yay it did wake up
+[10:51:02] <lurk> ​Yay!
+[10:51:27] <luk3yx> Maybe I should add back the cron job to keep polling the API soon
+[10:51:28] <luk3yx> .t
+[10:51:28] <lurk> luk3yx: 2022-04-03 08:51:28 UTC
+[10:52:06] <luk3yx> .ek 🤯🤖
+[10:52:07] <lurk> luk3yx: 🤯 + 🤖 → https://www.gstatic.com/android/keyboard/emojikitchen/20201001/u1f92f/u1f92f_u1f916.png
+[10:52:37] <luk3yx> .ek 🐟🤯
+[10:52:38] <lurk> luk3yx: 🐟 + 🤯 → https://www.gstatic.com/android/keyboard/emojikitchen/20210831/u1f41f/u1f41f_u1f92f.png
+[10:53:10] <Andrew> luk3yx: The catgirl irc client is so nice
+[10:53:27] <Andrew> luk3yx, lurk: two tab complete in a row results like this
+[10:53:33] <Andrew> Andrew: I am lurk luk3yx 
+[10:53:34] <Andrew> hmm
+[10:53:38] <luk3yx> Smart
+[10:53:44] <luk3yx> Andrew: AndrewHi
+[10:53:54] <luk3yx> lurk: lurk
+[11:56:59] <werdnA> ?
+[11:57:06] <werdnA> luk3yx: try using the catgirl client
+[11:57:16] <werdnA> luk3yx: note that you'd need 'libtls' by the same person
+[12:27:03] <Andrew> luk3yx must be asleep
+[12:27:33] <Andrew> hax: Also, please tell me when you're usually up, because then I could (1) sleep, then (2) wake up and talk, and then (3) sleep until morning
+[12:47:12] <Andrew> ahhhh
+[12:47:20] <Andrew> black text on a blakc background
+[14:29:45] *** Quits: James (thelounge@school/James) (Quit: Leaving)
+[14:29:45] *** Quits: Hawk (thelounge@andrewyu.org) (Quit: I died from Cringe)
+[16:01:01] <hax> Andrew: good morning
+[16:01:12] <Andrew> hax: answer my question, thx :)
+[16:01:16] <hax> "now"
+[16:01:36] <hax> note my sleep schedule recently changed to a more normal one for my time
+[16:03:29] <Andrew> That's nice
+[16:03:30] <Andrew> .t est
+[16:03:36] -lurk- 4Error running command! timeout: The read operation timed out
+[16:03:37] <Andrew> Can you elaborate on what specifically it is?
+[16:03:42] <Andrew> !tztime est
+[16:03:43] <LibreBot> Andrew: Error: Unknown timezone
+[16:03:48] <Andrew> !tztime America/New York
+[16:03:48] <LibreBot> Andrew: Error: Unknown timezone
+[16:03:50] <Andrew> !tztime America/NewYork
+[16:03:50] <LibreBot> Andrew: Error: Unknown timezone
+[16:03:56] <Andrew> !kill
+[16:03:56] <LibreBot> Andrew: Error: "kill" is not a valid command.
+[16:04:11] <Andrew> Test_User: what's your timezone
+[16:04:16] <Andrew> !tztime UTC-5
+[16:04:16] <LibreBot> Andrew: Error: Unknown timezone
+[16:04:29] <Andrew> hax: it's 7:04 there?
+[16:04:34] <hax> 10:04
+[16:04:40] <hax> EDT rn
+[16:05:13] <Andrew> oh
+[16:06:17] <hax> might get up a few hours earler at times
+[16:06:59] <hax> .t
+[16:06:59] <lurk> hax: 2022-04-03 14:06:59 UTC
+[16:07:02] <hax> .t edt
+[16:07:03] <lurk> hax: UnknownTimeZoneError: 'edt'
+[16:07:15] <hax> .t us/new york
+[16:07:15] <lurk> hax: Invalid syntax! This command takes from 0 to 1 positional arguments but 2 were given.
+[16:07:19] <hax> blah
+[16:07:21] <hax> .t us/newyork
+[16:07:22] <lurk> hax: UnknownTimeZoneError: 'us/newyork'
+[16:07:39] <hax> alright apparently that place doesnt work
+[16:07:47] <hax> .t america/newyork
+[16:07:48] <lurk> hax: UnknownTimeZoneError: 'america/newyork'
+[16:07:57] <hax> .t us/edt
+[16:07:58] <lurk> hax: UnknownTimeZoneError: 'us/edt'
+[16:08:14] <hax> .help t
+[16:08:14] <lurk> hax: I am lurklite, a "lightweight" version of lurk. I support a limited subset of the commands at https://luk3yx.github.io/lurk, and you can find my source code on https://github.com/luk3yx/lurklite.
+[16:09:43] <hax> ah yes, so for that place I'd need to put a space in it, but lurk doesn't like spaces...
+[16:11:16] <hax> .t america/detroit
+[16:11:17] <lurk> hax: 2022-04-03 10:11:17 EDT
+[16:11:24] <hax> alright that'll work
+[16:17:47] <Andrew> k
+[16:20:29] <Andrew> hax: Lurk is unstable
+[16:20:52] <hax> !tz america/detroit
+[16:20:52] <LibreBot> hax: Error: "tz" is not a valid command.
+[16:20:56] <hax> !tztime america/detroit
+[16:20:56] <LibreBot> hax: Error: Unknown timezone
+[16:21:01] <hax> !tztime EDT
+[16:21:01] <LibreBot> hax: Error: Unknown timezone
+[16:21:05] <hax> !tztime UTC
+[16:21:05] <LibreBot> hax: 2022-04-03T14:21:05+0000
+[16:21:12] <hax> alright at least you know UTC...
+[16:21:21] <hax> but do you know any *others*
+[16:21:28] <hax> !help tztime
+[16:21:28] <LibreBot> hax: (tztime <region>/<city> (or <region>/<state>/<city>)) -- Takes a city and its region, and returns its local time. This command uses the IANA Time Zone Database.
+[16:21:40] <Andrew> hax: in theory, EST is not a standard timezone
+[16:21:47] <Andrew> !tztime GMT
+[16:21:47] <LibreBot> Andrew: 2022-04-03T14:21:47+0000
+[16:22:45] <hax> !tztime America/Detroit
+[16:22:45] <LibreBot> hax: 2022-04-03T10:22:45-0400
+[16:22:47] <hax> heh
+[16:22:52] <hax> cares about capitalization
+[16:23:21] <Andrew> ofc it does
+[16:23:32] <Andrew> it literally looks it up in /usr/share/zoneinfo
+[16:24:18] <hax> make a copy and lowercase it, then compare the lowercased version of what was requested
+[16:24:39] <Andrew> but what if you have "asia" and "Asia"
+[16:24:56] <hax> then countries should get better names
+[16:25:23] <Andrew> lo
+[16:25:53] <Andrew> hax: I like the idea of Guilds/Spaces
+[16:26:11] <Andrew> hax: Many tims a project/community has multiple things to talk about
+[16:26:31] <hax> Andrew: that's one main think people complain about missing when they list reasons to use discord over IRC
+[16:26:37] <hax> *things
+[16:26:44] <hax> **thing
+[16:27:53] <Andrew> Iit's a really reasonable one
+[16:28:57] <hax> ye
+[16:29:02] <Andrew> hax: But are direct  hannels sometimes needed?
+[16:29:34] <hax> they can be useful
+[16:29:39] <Andrew> yeah
+[16:29:47] <hax> never required though, you can always setup a group of 1 :P
+[16:30:00] <Andrew> ttie
+[16:30:04] <Andrew> *true
+[16:30:06] <hax> but shouldn't be hard to make it possible to do with both options
+[16:33:27] <Andrew> hax: Also, something stupid about the element matrix client:
+[16:33:53] <Andrew> It doesn't show you the "connect to an alternative homeserver" option when it can't get to matrox.org
+[16:33:59] <hax> lol
+[16:34:04] <hax> dumb client
+[16:34:09] <Andrew> yup
+[16:34:15] <Andrew> Electron App, too
+[16:34:36] <hax> last I heard, electron in general is dumb
+[16:34:36] <Andrew> Which is obviously the best graphics library to use: Chromium HTML/CSS/JS
+[16:34:41] <hax> XD
+[16:35:31] <Andrew> *totally
+[16:35:40] <Andrew> Anyways, to the topic
+[16:35:56] <Andrew> hax: Say that alice on server a wants to send a message to bob on server b
+[16:36:03] <Andrew> a gives b some udp stuff
+[16:36:15] <Andrew> a few datagrams, for a 2 kilobyte large message
+[16:36:22] <Andrew> how is b supposed to respond?
+[16:36:35] <Andrew> give a a confirmination checksum?
+[16:36:52] <hax> checksum is done in udp itself
+[16:37:07] <hax> simply tell server a that the message was received
+[16:37:12] <Andrew> Okay, so we only need to ACK packets
+[16:37:20] <hax> ye
+[16:37:21] <Andrew> beause packets don't always get through
+[16:37:23] <Andrew> good
+[16:39:22] <Andrew> hax: are you a human
+[16:39:27] <hax> debatable
+[16:41:31] <Andrew> hax: Do you think that WebIRC is a lame idea
+[16:41:49] <hax> Web.*
+[16:41:49] <Andrew> hax: What they should be doung is making their web interface a server
+[16:42:01] <hax> it's lame but people will want it
+[16:42:10] <Andrew> no i mean
+[16:42:17] <Andrew> do yiu even know what webirc is
+[16:42:24] <hax> uh not really
+[16:42:32] <hax> but from the name I can guarantee it's dumb
+[16:42:48] <hax> I was assuming you meant a web client
+[16:43:16] <Andrew> it's for hosted clients affiliated to an irc network to be able to tell the network that "this user comes from hax.spectrum.whatever, please use that as the host instead of thelounge.andrewyu.org"
+[16:43:39] <hax> ah
+[16:43:41] <Andrew> what they really should be doing is implement the s2s protocol and manage its own users that way
+[16:43:48] <hax> yes
+[16:44:28] <Andrew> I think they don't want to implement things for the 10 s2s protocols out there
+[16:44:37] <hax> lol yeah
+[16:45:01] <Andrew> well anyways
+[16:45:09] <Andrew> hax: install mmark and xml2rfc
+[16:45:16] <Andrew> mmark from github: go build; go install
+[16:45:23] <Andrew> xml2rfc: pip3 install
+[16:45:41] * hax proceeds to not
+[16:46:38] <Andrew> :(
+[16:46:49] <Andrew> they're really small programs tbh
+[16:51:53] <Andrew> hax: pull
+[16:51:56] <Andrew> PULL UP
+[16:51:58] <Andrew> (jk)
+[16:52:06] * hax stalls
+[16:52:16] <Andrew> no you don't
+[16:52:27] <Andrew> you spin
+[16:52:30] <hax> nah
+[16:52:44] <Andrew> you stall and spin
+[16:52:49] <hax> I wasn't in an uncoordinated turn at the time
+[16:52:51] <hax> ;)
+[16:52:56] <Andrew> because you're right foot got stuck on the rudder
+[16:53:07] <Andrew> and you have your left foot on the yoke
+[16:53:10] <hax> XD
+[16:53:21] <Andrew> anyways
+[16:53:24] <Andrew> pulled?
+[16:53:35] <hax> idc?
+[16:53:40] <Andrew> yup
+[16:53:42] <hax> k
+[16:53:49] <Andrew> we'e gonna write specs
+[16:54:00] <Andrew> i wonder why the letter after ' is usually missed
+[16:54:15] <Andrew> maybe i messed up whi
+[16:54:20] <Andrew> le wriing the firmware
+[16:54:33] <hax> added 500000 files?
+[16:54:36] <Andrew> yes
+[16:54:51] <Andrew> how'd you know
+[16:54:59] <hax> lol
+[16:55:46] <Andrew> anyways, you should be able to compile those rfc-style documents now
+[16:56:22] <Andrew> from markdown, that is
+[17:02:59] <Andrew> hax: when do you sleep btw
+[17:05:23] <hax> in prob 12 hours
+[17:05:46] <Andrew> sounds like normal human sleeping time
+[17:05:50] <hax> exactly
+[17:06:10] <Andrew> now that you're basically opposite from my uptime
+[17:06:16] <Andrew> I've adjusted my sleeping plans
+[17:09:48] <Andrew> hax: Edit whitepaper.md to your heart's content
+[17:13:54] <Andrew> hax: I've got an ida!
+[17:13:56] <Andrew> *idea
+[17:14:03] <Andrew> Ascii art captchas
+[17:21:37] <hax> I've got an idea as well
+[17:21:44] <hax> don't use captchas in the first place
+[17:21:55] <hax> it's not like a bot can't just impliment the server protocol
+[17:22:50] <Andrew> hax: No i mean, for checking if the user is a bot
+[17:23:06] <hax> why bother checking
+[17:23:26] <Andrew> ...
+[17:23:35] <Andrew> REGISTER spam1 
+[17:23:36] <Andrew> REGISTER spam2
+[17:23:38] <Andrew> REGISTER spam3
+[17:23:39] <hax> let the bot tell you it's a bot like some IRC implimentations
+[17:23:41] <Andrew> you get the point
+[17:23:48] <Andrew> I know but
+[17:23:49] <Andrew> spambots
+[17:24:02] <hax> yeah sure a bot can spam register stuff, but so can a user with a custom client
+[17:24:13] <hax> or a user with xdotool, or...
+[17:24:36] <Andrew> hax: Can custom clients and xdotool solve captchas
+[17:25:06] <hax> no, but a user solving it and releasing a bot afterwards sure can
+[17:25:33] <hax> well, technically yes one could make an AI to solve captchas, but
+[17:27:44] <Andrew> hax: ill spam a captcha here
+[17:27:50] <Andrew>           _           _     _       _   _                                
+[17:27:51] <Andrew> __      _| |__   __ _| |_  (_)___  | |_| |__   ___   ___ _   _ _ __ ___  
+[17:27:53] <Andrew> \ \ /\ / / '_ \ / _` | __| | / __| | __| '_ \ / _ \ / __| | | | '_ ` _ \ 
+[17:27:55] <Andrew>  \ V  V /| | | | (_| | |_  | \__ \ | |_| | | |  __/ \__ \ |_| | | | | | |
+[17:27:57] <Andrew>   \_/\_/ |_| |_|\__,_|\__| |_|___/  \__|_| |_|\___| |___/\__,_|_| |_| |_|
+[17:27:59] <Andrew>                                                                          
+[17:28:01] <Andrew>   __                       _       _   _                  
+[17:28:03] <Andrew>  / _|_ __ ___  _ __ ___   (_)_____/ | | |_ ___                   
+[17:28:05] <Andrew> | |_| '__/ _ \| '_ ` _ \  | |_____| | | __/ _ \                     
+[17:28:07] <Andrew> |  _| | | (_) | | | | | | | |_____| | | || (_) |                    
+[17:28:09] <Andrew> |_| |_|  \___/|_| |_| |_| |_|     |_|  \__\___/                     
+[17:28:11] <Andrew>                                                  
+[17:28:13] <Andrew>                  _ _   _             _        __ _       _ _          
+[17:28:15] <Andrew>  _ __   ___  ___(_) |_(_)_   _____  (_)_ __  / _(_)_ __ (_) |_ _   _  
+[17:28:17] <Andrew> | '_ \ / _ \/ __| | __| \ \ / / _ \ | | '_ \| |_| | '_ \| | __| | | | 
+[17:28:19] <Andrew> | |_) | (_) \__ \ | |_| |\ V /  __/ | | | | |  _| | | | | | |_| |_| | 
+[17:28:21] <Andrew> | .__/ \___/|___/_|\__|_| \_/ \___| |_|_| |_|_| |_|_| |_|_|\__|\__, | 
+[17:28:23] <Andrew> |_|                                                            |___/  
+[17:28:25] <Andrew>   __              _                         _                         
+[17:28:27] <Andrew>  / _| ___  _ __  / |   _____   _____ _ __  (_)                           
+[17:28:29] <Andrew> | |_ / _ \| '__| | |  / _ \ \ / / _ \ '__| | |                           
+[17:28:31] <Andrew> |  _| (_) | |    | | | (_) \ V /  __/ |    | |                           
+[17:28:33] <Andrew> |_|  \___/|_|    |_|  \___/ \_/ \___|_|    |_|                           
+[17:28:35] <Andrew>                                                
+[17:28:37] <Andrew>                                     _ ___                 _ _                
+[17:28:39] <Andrew>  ___  __ _ _   _  __ _ _ __ ___  __| |__ \ __      ___ __(_) |_ ___          
+[17:28:41] <Andrew> / __|/ _` | | | |/ _` | '__/ _ \/ _` | / / \ \ /\ / / '__| | __/ _ \         
+[17:28:43] <Andrew> \__ \ (_| | |_| | (_| | | |  __/ (_| ||_|   \ V  V /| |  | | ||  __/         
+[17:28:45] <Andrew> |___/\__, |\__,_|\__,_|_|  \___|\__,_|(_)    \_/\_/ |_|  |_|\__\___|         
+[17:28:47] <Andrew>         |_|
+[17:28:49] <Andrew>                                                               _       
+[17:28:51] <Andrew>  _   _  ___  _   _ _ __    __ _ _ __  _____      _____ _ __  (_)_ __  
+[17:28:53] <Andrew> | | | |/ _ \| | | | '__|  / _` | '_ \/ __\ \ /\ / / _ \ '__| | | '_ \ 
+[17:28:55] <Andrew> | |_| | (_) | |_| | |    | (_| | | | \__ \\ V  V /  __/ |    | | | | |
+[17:28:57] <Andrew>  \__, |\___/ \__,_|_|     \__,_|_| |_|___/ \_/\_/ \___|_|    |_|_| |_|
+[17:28:59] <Andrew>  |___/                                                                 
+[17:29:01] <Andrew>   __                _   _                   _    __                      
+[17:29:03] <Andrew>  / _|_ __ __ _  ___| |_(_) ___  _ __   __ _| |  / _| ___  _ __ _ __ ___  
+[17:29:05] <Andrew> | |_| '__/ _` |/ __| __| |/ _ \| '_ \ / _` | | | |_ / _ \| '__| '_ ` _ \ 
+[17:29:07] <Andrew> |  _| | | (_| | (__| |_| | (_) | | | | (_| | | |  _| (_) | |  | | | | | |
+[17:29:09] <Andrew> |_| |_|  \__,_|\___|\__|_|\___/|_| |_|\__,_|_| |_|  \___/|_|  |_| |_| |_|
+[17:29:11] <Andrew>                                                                           
+[17:29:13] <Andrew>           _ _   _       _       _                              _             
+[17:29:15] <Andrew> __      _(_) |_| |__   | | __ _| |_ _____  __  ___ _   _ _ __ | |_ __ ___  __
+[17:29:17] <Andrew> \ \ /\ / / | __| '_ \  | |/ _` | __/ _ \ \/ / / __| | | | '_ \| __/ _` \ \/ /
+[17:29:19] <Andrew>  \ V  V /| | |_| | | | | | (_| | ||  __/>  <  \__ \ |_| | | | | || (_| |>  < 
+[17:29:21] <Andrew>   \_/\_/ |_|\__|_| |_| |_|\__,_|\__\___/_/\_\ |___/\__, |_| |_|\__\__,_/_/\_\
+[17:29:23] <Andrew>                                                    |___/
+[17:29:29] <hax> -1
+[17:29:50] <Andrew> Weong
+[17:29:52] <Andrew> *weong
+[17:29:54] <Andrew> *wrong
+[17:29:55] <hax> weight
+[17:29:58] <Andrew> the answer is
+[17:30:17] <Andrew> \frac{\pi^2}{6}
+[17:30:27] <Andrew> or as i've recently taken into calling it
+[17:30:37] <Andrew> \frac{{\pi}^{2}}{6}
+[17:30:43] <Andrew> or as i've recently taken into calling it
+[17:30:48] <Andrew> pi squared over six
+[17:30:53] <hax> lol
+[17:31:45] <Andrew> hax: that' actually the answer to \sum_{i=1}^{\infty}{\frac{1}{i^2}}
+[17:32:05] <hax> "I wonder why no one us using IDC"
+[17:32:10] <hax> also
+[17:32:12] <Andrew> well, i is a variable for the sigma, not \sqrt{-1}
+[17:32:20] <Andrew> no one us using idc?
+[17:32:30] <hax> if you ask questions like that XD
+[17:32:39] <Andrew> ?
+[17:32:43] <hax> anyways, how do you plan on implimenting that with a federated network?
+[17:32:58] <hax> *no one is
+[17:33:40] <hax> having to respond to a captcha from every server you connect to is a pain, and you can't have one central one to verify
+[17:33:41] <Andrew> hax: That's not really related to idc
+[17:34:02] <Andrew> Just brought that up due to people complaining about email verification in #libera
+[17:34:09] <hax> ah
+[17:34:40] <Andrew> hax: Anyways, edit whitepaper.md to your heart's content
+[17:34:44] <hax> well you can't really do email verification on IDC either
+[17:34:49] <Andrew> why
+[17:34:54] <Andrew> no i mean
+[17:35:03] <Andrew> at least in the client to server registration process
+[17:35:12] <Andrew> you can use captchas and emails there
+[17:35:33] <hax> pointless, they can just host their own server and connect
+[17:35:46] <Andrew> Not many people do that tbh
+[17:35:59] <Andrew> So it's pointful, though not 100% effective
+[17:36:09] <Andrew> i.e. do you host an email server?
+[17:36:10] <hax> yeah but if they want to excape the verification, that's how
+[17:36:21] <Andrew> also, we'e gonna use a dns txt record to determine stuff like:
+[17:36:22] <hax> no but I also don't spam stuff with my email
+[17:36:36] <hax> so I have no reason to evade email verification
+[17:36:44] <Andrew> hax: still that's at least a barriar for spammers, nothing is perfect
+[17:36:46] <Andrew> anyways...
+[17:36:49] <Andrew> also, we'e gonna use a dns txt record to determine stuff like:
+[17:36:54] <hax> though in reality I just use a temp mail thing
+[17:37:26] <Andrew> - for the user andrew@andrewyu.org, or actually anything @andrewyu.org, which server should i contact?
+[17:37:39] <hax> andrewyu.org ofc
+[17:37:53] <Andrew> note that a large prganization might have their idc server on idc.andrewyu.org, but they want the domain to be @andrewyu.org
+[17:38:04] <Andrew> dont mind my spelling btw
+[17:38:30] <hax> then you need an actual domain name attached
+[17:38:35] <Andrew> 00,00email uses MX records to deal with this
+[17:38:37] <hax> or they get write-only ;P
+[17:38:43] <Andrew> ?
+[17:38:51] <Andrew> ??
+[17:39:02] * Andrew is confised
+[17:39:15] <hax> well in some way or another you need an address to contact connected to the user
+[17:39:46] <hax> so if you don't use the displayed domain name...
+[17:39:58] <Andrew> No i mean this
+[17:40:05] <Andrew> Yes you use the displayed domain name
+[17:40:10] <Andrew> But instead of connecting to it
+[17:40:28] <Andrew> You check if it has TXT records of "IDC <idc server's actual domain>
+[17:40:37] <Andrew> the
+[17:40:51] <Andrew> * if it does, use the "idc server's actual domain" to communicate with
+[17:41:02] <Andrew> if it doesn't, use the displayed domain part of the user id
+[17:41:23] <Andrew> mind you large organizations like having multiple servers for multiple services
+[17:42:07] <Andrew> guess how my server sends requests to mail.fudan.edu.cn when I literally wrote teacher@fudan.edu.cn in To: and nothing else telling it about the server
+[17:42:13] <Andrew> it checks the MX record
+[17:42:42] <Andrew> also, we'd want a record that tells us which alternative port to connect to, in case the server uses a non-standard idc port
+[17:42:58] <hax> or we could do it the simple way
+[17:43:14] <hax> user@displayedhostname@idc.andrewyu.org:39857
+[17:44:07] <Andrew> hax: Let's use URLs
+[17:44:15] <Andrew> because they're not a bad standard
+[17:44:40] <Andrew> idc://idc.andrewyu.org:12345/andrew
+[17:44:44] <hax> idc:irc.andrewyu.org:2957 instead? just adds an extra prefix
+[17:44:47] <hax> ah
+[17:44:59] <Andrew> hax: but still, organizations like having clean names, but let's ignore them
+[17:45:02] <hax> you'rem issing the displayed hostname there though
+[17:45:19] <hax> idc://idc.andrewyu.org:12345/andrewyu.org/andrew
+[17:45:35] <hax> though displayed hostname being different from real hostname presents it's own issues
+[17:45:38] <Andrew> what's the point of a displayed hostname when you literally need the long string to talk to the 
+[17:46:04] <hax> you were the one who suggested it for if an organization wants it different
+[17:46:27] <Andrew> that's why I proposed txt records
+[17:46:45] <hax> and if there's several sources that all want andrewyu.org?
+[17:46:45] <Andrew> with txt records you can have just a display name
+[17:46:56] <Andrew> several sources that all want andrewyu.org?
+[17:47:09] <hax> e.g. idc.andrewyu.org and othersection.andrewyu.org
+[17:47:38] <Andrew> No it's like: "andrewyu.org" has a TXT record telling IDC servers who want to message "*@andrewyu.org" that the server is at the cname or A record of "idc.andrewyu.org"
+[17:47:51] <hax> yes
+[17:47:53] <Andrew> Why would several servers want the same domain
+[17:48:03] <hax> bc an organization can have more than one server
+[17:48:52] <Andrew> hax: Load balencers?
+[17:49:03] <hax> ye, that's one example
+[17:49:20] <Andrew> hax: Then the txt records work, just have multiple arguments
+[17:49:32] <hax> but what if the user is on one server and not the other
+[17:49:35] <Andrew> kinda like how irc rotate domains work
+[17:49:46] <Andrew> hax: load balencers are distributed but syncronized
+[17:49:56] <hax> as I said, "one example"
+[17:49:59] <Andrew> hax: And oh, I've got a complicated idea
+[17:50:07] <Andrew> for an organization!
+[17:50:14] <Andrew> the organization has server 1 and 2
+[17:50:27] <Andrew> 1 and 2 trust each other and tcplink to each other like how irc networks do
+[17:50:30] <hax> let's just do "hostname is the place to send to"
+[17:50:36] <Andrew> ?
+[17:50:45] <Andrew> but where youre gonna put that info?
+[17:50:49] <hax> no complicated differing hostnames, records, etc
+[17:50:57] <hax> andrew@idc.andrewyu.org
+[17:51:27] <Andrew> hax: Okay, if we find the need for multihostd later, we can still think of them, right
+[17:51:57] <Andrew> hax: Also, how do you propose we do security, since tls is cringe? especially the x509 part of tls, which is one of the core aspects thereof
+[17:52:16] <hax> just some form of encryption
+[17:52:19] <hax> idc
+[17:52:25] <hax> *some decent form
+[17:52:30] <Andrew> Problem is
+[17:52:36] <Andrew> How are we going to verify connections
+[17:52:42] <Andrew> To be not MITM'ed
+[17:52:47] <hax> you can't
+[17:52:51] <Andrew> ?
+[17:53:00] <Andrew> I am thinking of Web of Trust
+[17:53:09] <hax> you can't trust servers, anyone can host any
+[17:53:20] <Andrew> no, no, no
+[17:53:24] <Andrew> i mean
+[17:53:38] <Andrew> When idc.example.org sends a message to idc.andrewyu.org
+[17:53:55] <Andrew> idc.example.org wants to make sure that it's connecting to idc.andrewyu.org
+[17:54:11] <Andrew> and the connection isn't being mitm'ed by idc.luk3yx.org
+[17:54:11] <hax> all you can do is source ip
+[17:54:17] <Andrew> ...
+[17:54:20] <Andrew> That's useless
+[17:54:22] <hax> yep
+[17:54:25] <Andrew> Web of trust is good
+[17:55:00] <Andrew> hax: read web of trust
+[17:55:08] <hax> k
+[17:55:14] <Andrew> hax: simple introductions should suffice
+[17:55:31] <Andrew> While you're reading ill talk here, ignore me until you finish reading
+[17:55:46] <Andrew> WoT is mainly used in OpenPGP
+[17:55:47] <hax> ah that
+[17:55:55] <Andrew> which sadly doesn' have forward secrecy
+[17:56:36] <Andrew> hax: you know what forward secrecy is?
+[17:56:36] <hax> now how do you add a new one that doesn't know any others?
+[17:56:41] <hax> no
+[17:57:17] <Andrew> forward secrecy: If I send a message to hax today and luk3yx gets my 
+[17:57:22] <Andrew> private key tomirriw
+[17:57:32] <Andrew> luk3yx cannot see my conversation with hax today
+[17:57:52] <Andrew> this is accomplished by using something like the diffie hellman key exchange for every connection
+[17:58:00] <hax> ah ye
+[17:59:02] <Andrew> and in the case where a new server is introduced
+[17:59:08] <Andrew> server N is new
+[17:59:16] <Andrew> server A B C D is old
+[17:59:34] <Andrew> N contacts ABC, who now know the pubkey of supposed N
+[17:59:51] <Andrew> then they pass it around and find that they have the same pubkey
+[18:00:07] <Andrew> so they kinda trust that N is not being impersonated on the connection to them
+[18:00:35] <Andrew> this info is also given (maybe automagically, with a server friendslist of pgp trust whatever)
+[18:00:38] <Andrew> to D
+[18:00:47] <Andrew> and D finds that it has different keys
+[18:00:54] <Andrew> so D thinks that it's being MITMed
+[18:01:02] <Andrew> in practice you'd have much more than four servers
+[18:01:07] <hax> ye
+[18:01:15] <hax> makes sense
+[18:10:18] <Andrew> http://bash.org/?244321
+[18:11:35] <Andrew> All OpenPGP-compliant implementations include a certificate vetting scheme to assist with this; its operation has been termed a web of trust. OpenPGP identity certificates (which include public key(s) and owner information) can be digitally signed by other users who, by that act, endorse the association of that public key with the person or entity listed in the certificate. This is
+[18:11:37] <Andrew> commonly done at key signing parties.
+[18:11:39] <Andrew> OpenPGP-compliant implementations also include a vote counting scheme which can be used to determine which public key – owner association a user will trust while using PGP. For instance, if three partially trusted endorsers have vouched for a certificate (and so its included public key – owner binding), OR if one fully trusted endorser has done so, the association between owner
+[18:11:41] <Andrew> and public key in that certificate will be trusted to be correct. The parameters are user-adjustable (e.g., no partials at all, or perhaps 6 partials) and can be completely bypassed if desired.
+[18:11:43] <Andrew> The scheme is flexible, unlike most public key infrastructure designs, and leaves trust decision(s) in the hands of individual users. It is not perfect and requires both caution and intelligent supervision by users. Essentially all PKI designs are less flexible and require users to follow the trust endorsement of the PKI generated, certificate authority (CA)-signed, certificates.
+[18:11:45] <Andrew> Intelligence is normally neither required nor allowed. These arrangements are not perfect either, and require both caution and care by users.
+[18:15:34] <Andrew> In contrast, a typical X.509 PKI permits each certificate to be signed only by a single party: a certificate authority (CA). The CA's certificate may itself be signed by a different CA, all the way up to a 'self-signed' root certificate. Root certificates must be available to those who use a lower level CA certificate and so are typically distributed widely. They are for instance,
+[18:15:35] <Andrew> distributed with such applications as browsers and email clients. In this way SSL/TLS-protected Web pages, email messages, etc. can be authenticated without requiring users to manually install root certificates. Applications commonly include over one hundred root certificates from dozens of PKIs, thus by default bestowing trust throughout the hierarchy of certificates which lead
+[18:15:37] <Andrew> back to them.
+[18:15:49] <Andrew> hax: I'm surprised that you don' t know about the WoT
+[18:16:26] <hax> mostly haven't had a reason to find it ;P
+[18:16:34] <hax> until now, that is
+[18:17:02] <Andrew> Important idea in encryptuon
+[18:17:20] <hax> I haven't really messed with that much yet
+[18:18:37] <Andrew> Ah
+[18:22:08] <Andrew> hax: also, https://www.rubin.ch/pgp/weboftrust.en.html, but I doubt that you need to know much more
+[18:22:16] <Andrew> also, dont visit that with a graphical browser
+[18:22:21] <Andrew> you WILL be blinded
+[18:22:24] <hax> lol
+[18:22:30] * hax does it
+[18:22:48] <hax> looks... fine
+[18:23:32] <Andrew> yellowwwww
+[18:23:38] <hax> so?
+[18:24:25] <Andrew> i guess
+[18:30:12] <Andrew> back tothe point
+[18:31:52] * Andrew looks at a 14 gigabyte "squid-game.tar.xz"
+[18:32:32] <Andrew> hax: time to get productive, at least for me
+[18:32:47] <Andrew> hax: How are you gonna write about UDP in the WP
+[18:38:36] <hax> no idea
+[18:40:04] <Andrew> I mean
+[18:40:26] <Andrew> Tell me in your words why you think we'e gonna use UDP and take the trouble to handle low-level ourselves
+[18:40:59] <hax> so we don't use up all the ports available bc tcp is dumb
+[18:41:20] <Andrew> Why would we use up all the ports?
+[18:41:25] <hax> bc connection spam
+[18:41:55] <hax> now if you want that in smth official it should definitely be written much nicer
+[18:41:57] <Andrew> (I'm logging this and I'm going to paraphrase this into the whitepaper, can you be more specific as you came up with this idea so you can probably explain it best?)
+[18:42:14] <hax> uhhh let's see
+[18:43:03] <Andrew> How are we going to define "spaces" (guilds) in RFC-speak? :(
+[18:43:49] <hax> "due to the high number of incoming and outgoing connections, tcp would use up many of the host's available ports, potentially blocking other services"
+[18:44:31] <Andrew> yay
+[18:44:31] <lurk> ​Yay!
+[18:44:41] *** lurk was kicked by Andrew (Inappropriate for this discussion)
+[18:59:15] *** hax is now known as new
+[18:59:27] *** new is now known as hax
+[18:59:50] <Andrew> ?
+[19:02:41] <Andrew> hax: Do you think roles and permissions would be good?
+[19:02:47] * Andrew is writing
+[19:03:27] <hax> permissions good, roles probably complicated
+[19:04:28] <Andrew> hax: It'd be messey if we don't have roles and only permissions, tbh
+[19:05:02] <Andrew> Wanna give all mods the ability to do (something)? send 10 lines to change privs for ech person
+[19:05:16] <Andrew> Roles aren't that hard to play with anyways
+[19:05:40] <Andrew> hax: Let's make everything very messey by adding in RTC ... not for now
+[19:06:08] <Andrew> hax: kinda feels like we're making a libre and technically-sane version of Discard
+[19:08:40] <hax> Andrew: federated libre discard like thing...
+[19:08:45] <hax> prob not too far from it
+[19:08:49] <Andrew> Yup
+[19:09:02] <Andrew> But: Sane.
+[19:09:06] <hax> yes
+[19:09:07] <Andrew> No http APIs
+[19:09:16] <Andrew> No API token garbage
+[19:09:20] <hax> lol yeah
+[19:09:21] <Andrew> Just the Internet
+[19:10:33] <Andrew> hax: Same-role-level command effects
+[19:10:39] <Andrew> Now this is getting a bit complicated
+[19:10:42] <Andrew> hax: also, pull
+[19:10:45] <hax> ye
+[19:11:22] <Andrew> Should we have manage-lower-roles-only?
+[19:11:38] <Andrew> (except for FOUNDER)
+[19:11:54] <Andrew> That's how it works for +a and +h on insp and unreal
+[19:11:56] <hax> eh how about we make that more simply role level based on permissions
+[19:12:07] <Andrew> ?
+[19:12:18] <hax> no custom role level manage lower only/etc
+[19:12:40] <hax> roles are simply groups of permissions to grant to people
+[19:12:49] <Andrew> Okay, good
+[19:13:28] <Andrew> uggh, but letting halfops kick ops isn't fun
+[19:13:38] <Andrew> I mean sometimes people like having some hierachy
+[19:13:42] <hax> ah yeah
+[19:13:44] <Andrew> i.e. in schools 
+[19:13:53] <hax> hmm
+[19:14:06] <hax> alright complicated role levels it is
+[19:14:44] <Andrew> Or maybe n-dimensional role levels for each permission
+[19:14:54] <Andrew> i.e. role a can mute role b, but role b can ban role a
+[19:14:56] <Andrew> makes no sense
+[19:15:03] <hax> lol
+[19:15:30] <Andrew> would make sense as an april fools joke, so every april fools, the protocol messes itself up, which implementations MUST implement
+[19:15:37] <hax> XD
+[19:15:59] <Andrew> jokes aside, let's just go with that
+[19:16:08] <hax> which that
+[19:16:18] <Andrew> levels :\
+[19:16:23] <hax> custom ones?
+[19:16:33] <hax> or automatic ones
+[19:16:52] <Andrew> Of course there should be custom ones, I'll write it down in the docs, see what you think after i commitpush
+[19:16:57] <hax> k
+[19:17:53] <Andrew> hax: Now let's not do anything stupid like implement special @pinfs, 
+[19:17:56] <Andrew> *pings
+[19:18:03] <hax> yeah
+[19:18:06] <Andrew> wait, wait.
+[19:18:18] <Andrew> Nobody would type out the complete uid to ping people
+[19:18:23] <hax> yepp
+[19:18:25] <Andrew> So should pings be nickname-based.
+[19:18:29] <hax> tab complete to the rescue?
+[19:18:33] <hax> hm
+[19:18:35] <Andrew> s/\./?/
+[19:18:49] <hax> doable but what is people have the same nick on different servers
+[19:18:50] <Andrew> But the  we have nickname collisions
+[19:19:13] <hax> also we could make it actually be "@name" simply so "name" doesn't ping them
+[19:19:23] <hax> but plaintext @name
+[19:19:28] <hax> not <@19359247562754732>
+[19:19:31] <Andrew> lol
+[19:19:33] <hax> (or whatever0
+[19:19:39] <hax> s/0/)/
+[19:20:01] <Andrew> maybe be like, you can have a different nick on each guild, and people in the same guild cannot have nuck collisions
+[19:20:18] <hax> too complicated
+[19:20:25] <hax> just allow nick collisions
+[19:20:28] <Andrew> Thats how xmpp does it, when s/guild/Multi User Chat/
+[19:20:41] <Andrew> Then are clients supposed to show the UID?
+[19:20:46] <Andrew> Or just the nick
+[19:20:55] <hax> pinging the nick will ping all with the nick
+[19:21:10] <hax> optinally you can ping the full nick@address
+[19:21:12] <Andrew> ...
+[19:21:14] <hax> to specify one
+[19:21:20] <Andrew> ugggh
+[19:21:52] <hax> can let custom nicks per group, but don't force them to not collide
+[19:21:59] <Andrew> group?
+[19:22:04] <hax> guild
+[19:22:20] <Andrew> Then we see stuff like
+[19:22:29] <Andrew> <nick> Hi
+[19:22:31] <Andrew> <nick> Hi there
+[19:22:33] <Andrew> <nick> H
+[19:22:39] <Andrew> <nick> Who are you
+[19:22:43] <Andrew> <nick> Who are you??
+[19:22:46] <Andrew> <nick> Wh
+[19:22:53] <Andrew> <nick> I'm nick
+[19:22:57] <Andrew> <nick> I'm also called nick
+[19:23:08] <Andrew> They are confusing
+[19:23:19] <hax> hmmm
+[19:23:45] * Andrew thinks of using nick#0001 and immediatly discards the idea
+[19:24:00] <hax> lol
+[19:24:55] <Andrew> I think I'd have to go with NickPerSpace and SpaceNoNickCollision
+[19:28:38] <Andrew> hax: 
+[19:28:39] <Andrew> A user may haveanicknameforusewithin thespace,independentoftheirnicknamewhenusedoutsideofspaces,whichisanalphanumeric of length up to 128 characters.  A space may not have two users with the same nickname.  In these cases, the user joined later will have a underscore appended to per nickname until it no longer collides with any other nickname in the space.  If during this process
+[19:28:41] <Andrew> the nickname exceeds 128 characters, the user is required to choose another nickname.
+[19:28:54] <Andrew> err
+[19:29:00] <Andrew> spaces disappeared in xclip???
+[19:29:19] <Andrew> A user may haveanicknameforusewithin thespace,independentoftheirnicknamewhenusedoutsideofspaces,whichisanalphanumeric of length up to 128 characters.  A space may not have two users with the same nickname.  In these cases, the user joined later will have a underscore appended to per nickname until it no longer collides with any other nickname in the space.  If during this process
+[19:29:20] <Andrew> the nickname exceeds 128 characters, the user is required to choose another nickname.
+[19:29:25] <Andrew> ...
+[19:29:27] <Andrew> wtf
+[19:29:34] <hax> eh I can read it
+[19:30:10] <hax> should be a random number
+[19:30:15] <Andrew> Why
+[19:30:17] <hax> _ is limited
+[19:30:22] <Andrew> Why not cute little underscores
+[19:30:43] <Andrew> And why random numbers?
+[19:31:01] <Andrew> I can understand that andrew1 is a collider of andrew
+[19:31:12] <Andrew> but andrew8 or andrew7264 doesn't sound like it
+[19:38:21] <Andrew> hax: ideas?
+[19:38:27] <Andrew> luk3yx: 
+[20:30:44] <Andrew> hax and luk3yx: gimme a list of discord permissions
+[20:30:50] <Andrew> and what they do
+[20:31:14] <hax> Andrew: you can make it incriment if you want
+[20:31:30] <Andrew> ?
+[20:32:00] <hax> @Andrew | And why random numbers?  
+[20:32:05] <Andrew> Oh
+[20:39:07] <Andrew> hax: pull up
+[20:39:51] <Andrew> err, how do i make lists again...
+[20:42:14] <Andrew> hax: rfc3514:
+[20:42:17] <Andrew> Firewalls [@!CBR03], packet filters, intrusion detection systems, and
+[20:42:18] <Andrew> the like often have difficulty distinguishing between packets that
+[20:42:20] <Andrew> have malicious intent and those that are merely unusual.  The problem
+[20:42:22] <Andrew> is that making such determinations is hard.  To solve this problem,
+[20:42:24] <Andrew> we define a security flag, known as the "evil" bit, in the IPv4
+[20:42:26] <Andrew> [@!RFC0791] header.  Benign packets have this bit set to 0; those that
+[20:42:28] <Andrew> are used for an attack will have the bit set to 1.
+[20:47:34] <Andrew> hax: Please pull from the repository
+[20:47:47] <Andrew> hax: Alt+L in weechat gives you raw mode
+[20:48:19] <hax> pull complete
+[20:48:43] <Andrew> less whitepaper.txt
+[20:49:02] <Andrew> might as well print it if you want to
+[20:59:39] <Andrew> hax: gg
+[20:59:44] <Andrew> *gtg, bye
+[21:00:10] <hax> cya
+[21:00:14] <hax> gn
+[21:00:48] <Andrew> hax: I pushed, especially the roles and permissions part needs your review and editing
+[21:01:14] <Andrew> I might as well copy it here...
+[21:02:20] <Andrew> ## Space Roles
+[21:02:22] <Andrew> Roles designate the power of a given user in a space.  Each space must have a FOUNDER and a MEMBER role, where FOUNDER is a special role with all possible permissions within a space.  MEMBER is a special role given to all users who JOIN the space by default.  Roles are ordered, with FOUNDER always being the highest.
+[21:02:24] <Andrew> Roles have a set of permissions both within the scope of the whole space and specific channels in the space.  Roles may only utilize their permissions on users below their role.
+[21:02:26] <Andrew> ## Permissions
+[21:02:28] <Andrew> Permissions designate what actions a role may perform in a space and its respective channels.  Permissions are granted by roles containing the permission.  Permissions are identified by a uppercase string that begins with +.
+[21:02:30] <Andrew> Space permissions are include:
+[21:02:39] <Andrew> +READ
+[21:02:40] <Andrew> :       Be in the space;
+[21:02:42] <Andrew> +INTERACT
+[21:02:44] <Andrew> :       Affect the space;
+[21:02:46] <Andrew> +MUTE
+[21:02:48] <Andrew> :       Render a user unable to speak or otherwise interact in the space;
+[21:02:50] <Andrew> +KICK
+[21:02:52] <Andrew> :       Removes a user from the space;
+[21:02:54] <Andrew> +BAN
+[21:02:56] <Andrew> :       Removes a user from the space, and prohibit them from re-joining;
+[21:02:58] <Andrew> +ROLES
+[21:03:00] <Andrew> :       Manage roles of users with lower ranks, may only promote to the same rank as themself and demote users of lower ranks.
+[21:03:02] <Andrew> Channel permissions include:
+[21:03:04] <Andrew> Channel permissions include:
+[21:03:06] <Andrew> +READ
+[21:03:08] <Andrew> :       Read messages from the channel; Users without this permission is not considered to be in the channel;
+[21:03:10] <Andrew> +INTERACT
+[21:03:12] <Andrew> :       Affect the channel;
+[21:03:14] <Andrew> +MUTE
+[21:03:16] <Andrew> :       Give the user the -MESSAGE anti-permission.
+[21:03:18] <Andrew> +BAN
+[21:03:20] <Andrew> :       Give the user the -READ anti-permission.
+[21:04:28] <hax> why are mute and interact seperate?
+[21:04:49] <hax> and mute references a message permission, which is not mentioned elsewhere
+[21:05:18] <hax> also you can get rid of the +, it's not needed here
+[21:09:39] <hax> channel-specific read permissions should exist for channels inside spaces
+[21:09:55] <hax> and not a read permission for the whole space
+[21:10:11] <hax> (read for whole is essentially just a "not banned" permission)
