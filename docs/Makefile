@@ -1,7 +1,7 @@
 all: whitepaper.txt
 
-whitepaper.txt:
-	# https://github.com/mmarkdown/mmark
-	mmark whitepaper.md > whitepaper.xml
-	# pip3 install xml2rfc
+whitepaper.txt: whitepaper.xml
 	xml2rfc whitepaper.xml --verbose --text
+
+whitepaper.xml: whitepaper.md
+	mmark whitepaper.md > whitepaper.xml
