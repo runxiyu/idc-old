@@ -1,8 +1,0 @@
-<figure><name>A sample function.
-</name>
-<sourcecode type="c">main() int {
-        return 0
-}
-</sourcecode>
-</figure>
-<t>And some other text.</t>

@@ -1,3 +1,0 @@
-.# Note
-
-A note

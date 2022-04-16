@@ -516,6 +516,9 @@ Replies:
 ## Server queries and commands
 
 
+
+# IANA Considerations
+# Security Considerations
 # Acknowledgements
 
 This document has multiple ideas suggested by Test_User \<hax@andrewyu.org\> and luk3yx.

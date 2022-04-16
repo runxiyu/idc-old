@@ -1,3 +1,0 @@
-~~~ go
-println("hello")
-~~~
