@@ -2,3 +2,6 @@ Internet Delay Chat Protocol
 
 git://git.andrewyu.org/internet-delay-chat.git
 ircs://irc.andrewyu.org:6697/#idc
+
+Whitepaper is in docs/.
+Compilation of documentation requires mmark and xml2rfc.
