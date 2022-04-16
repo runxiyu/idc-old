@@ -4,14 +4,15 @@ abbrev = "Internet Delay Chat Protocol"
 #ipr= "trust200902"
 area = "Internet"
 workgroup = "Andrew's Haxxor Working Group"
-submissiontype = "IETF"
+#submissiontype = "IETF"
+submissiontype = "independent"
 keyword = [""]
 #date = 2022-04-04T00:00:00Z
 
 [seriesInfo]
 name = "Internet-Draft"
 value = "internet-delay-chat"
-stream = "IETF"
+stream = "independent"
 status = "informational"
 
 [[author]]

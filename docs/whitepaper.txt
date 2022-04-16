@@ -42,14 +42,14 @@ Copyright Notice
    Provisions Relating to IETF Documents (https://trustee.ietf.org/
    license-info) in effect on the date of publication of this document.
    Please review these documents carefully, as they describe your rights
-   and restrictions with respect to this document.  Code Components
-   extracted from this document must include Revised BSD License text as
-   described in Section 4.e of the Trust Legal Provisions and are
-   provided without warranty as described in the Revised BSD License.
+   and restrictions with respect to this document.
 
 Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+     1.1.  Servers . . . . . . . . . . . . . . . . . . . . . . . . .   3
+     1.2.  Clients . . . . . . . . . . . . . . . . . . . . . . . . .   3
+     1.3.  Users . . . . . . . . . . . . . . . . . . . . . . . . . .   3
 
 
 
@@ -58,9 +58,6 @@ Yu                       Expires 18 October 2022                [Page 1]
 Internet-Draft        Internet Delay Chat Protocol            April 2022
 
 
-     1.1.  Servers . . . . . . . . . . . . . . . . . . . . . . . . .   3
-     1.2.  Clients . . . . . . . . . . . . . . . . . . . . . . . . .   3
-     1.3.  Users . . . . . . . . . . . . . . . . . . . . . . . . . .   4
        1.3.1.  Administrators  . . . . . . . . . . . . . . . . . . .   4
      1.4.  Spaces  . . . . . . . . . . . . . . . . . . . . . . . . .   4
      1.5.  Channels  . . . . . . . . . . . . . . . . . . . . . . . .   5
@@ -77,21 +74,21 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
      4.1.  One-to-one communication  . . . . . . . . . . . . . . . .   9
      4.2.  One-to-many . . . . . . . . . . . . . . . . . . . . . . .   9
        4.2.1.  To a list . . . . . . . . . . . . . . . . . . . . . .   9
-       4.2.2.  To a channel  . . . . . . . . . . . . . . . . . . . .  10
-   5.  Message details . . . . . . . . . . . . . . . . . . . . . . .  10
-     5.1.  Connection Registration . . . . . . . . . . . . . . . . .  11
-       5.1.1.  Password message  . . . . . . . . . . . . . . . . . .  11
+       4.2.2.  To a channel  . . . . . . . . . . . . . . . . . . . .   9
+   5.  Message details . . . . . . . . . . . . . . . . . . . . . . .   9
+     5.1.  Connection Registration . . . . . . . . . . . . . . . . .  10
+       5.1.1.  Password message  . . . . . . . . . . . . . . . . . .  10
        5.1.2.  Nick message  . . . . . . . . . . . . . . . . . . . .  11
-       5.1.3.  User message  . . . . . . . . . . . . . . . . . . . .  12
+       5.1.3.  User message  . . . . . . . . . . . . . . . . . . . .  11
        5.1.4.  Server message  . . . . . . . . . . . . . . . . . . .  12
-       5.1.5.  Quit  . . . . . . . . . . . . . . . . . . . . . . . .  13
-       5.1.6.  Server quit message . . . . . . . . . . . . . . . . .  13
-     5.2.  Channel operations  . . . . . . . . . . . . . . . . . . .  14
-       5.2.1.  Join message  . . . . . . . . . . . . . . . . . . . .  14
+       5.1.5.  Quit  . . . . . . . . . . . . . . . . . . . . . . . .  12
+       5.1.6.  Server quit message . . . . . . . . . . . . . . . . .  12
+     5.2.  Channel operations  . . . . . . . . . . . . . . . . . . .  13
+       5.2.1.  Join message  . . . . . . . . . . . . . . . . . . . .  13
        5.2.2.  Part message  . . . . . . . . . . . . . . . . . . . .  14
-       5.2.3.  Mode message  . . . . . . . . . . . . . . . . . . . .  15
-     5.3.  Server queries and commands . . . . . . . . . . . . . . .  18
-   6.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  18
+       5.2.3.  Mode message  . . . . . . . . . . . . . . . . . . . .  14
+     5.3.  Server queries and commands . . . . . . . . . . . . . . .  17
+   6.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  17
 
 1.  Introduction
 
@@ -105,7 +102,10 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
    multiple servers each with multiple clients, that connect to each
    other in order to exchange messages, in a multi-centered fashion.
 
-
+   Existing protocols are limited.  Internet Relay Chat as in RFC 1459
+   has been in use since May 1993, a very simple protocol for
+   teleconferencing system.  Later updates such as RFC 2812 have been
+   badly accepted.  It was not designed for personal instant messaging.
 
 
 
@@ -113,11 +113,6 @@ Yu                       Expires 18 October 2022                [Page 2]
 
 Internet-Draft        Internet Delay Chat Protocol            April 2022
 
-
-   Existing protocols are limited.  Internet Relay Chat as in RFC 1459
-   has been in use since May 1993, a very simple protocol for
-   teleconferencing system.  Later updates such as RFC 2812 have been
-   badly accepted.  It was not designed for personal instant messaging.
 
    IRC is real time.  When a client disconnects, the network no longer
    recognizes the client, and messages during the client's downtime are
@@ -159,17 +154,6 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
    server.  Each client is distinguished from other clients by a unique
    CID having a length of 9 characters, private to each server.
 
-
-
-
-
-
-
-Yu                       Expires 18 October 2022                [Page 3]
-
-Internet-Draft        Internet Delay Chat Protocol            April 2022
-
-
 1.3.  Users
 
    Each client is associated with a user.  Users are identified by a
@@ -178,6 +162,14 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
    the actual server.  The UID is unique in the Internet.  Messages are
    directed at users, which are then sent to all connected clients of
    the said user.  If the user has no connected clients, i.e. the user
+
+
+
+Yu                       Expires 18 October 2022                [Page 3]
+
+Internet-Draft        Internet Delay Chat Protocol            April 2022
+
+
    is offline, the message SHOULD be kept until the user reconnects.
 
 1.3.1.  Administrators
@@ -217,15 +209,6 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
    invited.  As part of the protocol, a user may be a part of several
    spaces at once.
 
-
-
-
-
-Yu                       Expires 18 October 2022                [Page 4]
-
-Internet-Draft        Internet Delay Chat Protocol            April 2022
-
-
    A user may have a nickname for use within the space, independent of
    their nickname when used outside of spaces, which is an alphanumeric
    of length up to 128 characters.  A space may not have two users with
@@ -235,6 +218,13 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
    any other nickname in the space.  If during this process the nickname
    exceeds 128 characters, the user is required to choose another
    nickname.
+
+
+
+Yu                       Expires 18 October 2022                [Page 4]
+
+Internet-Draft        Internet Delay Chat Protocol            April 2022
+
 
    Note: We'd need to define what "packet" is, since they're not lines
    in TCP, or datagrams in UDP, but something custom.
@@ -274,14 +264,6 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
    and management permissions are granted via roles; users who have a
    role with a given permission have the permission, and users who don't
    have any roles containing a permission don't have the permission.
-
-
-
-Yu                       Expires 18 October 2022                [Page 5]
-
-Internet-Draft        Internet Delay Chat Protocol            April 2022
-
-
    Roles are ranked linearly, and may be set to self-deroleable.
 
    Note that the examples below note an example setup.  Those with the
@@ -292,6 +274,14 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
    *  2 teacher :: talk, read, mute, deafen, ban, react
    *  3 student :: talk, read, react
    *  0 default :: talk, read
+
+
+
+Yu                       Expires 18 October 2022                [Page 5]
+
+Internet-Draft        Internet Delay Chat Protocol            April 2022
+
+
    *  -1 spammer :: -talk, read, -react
 
 2.4.  Management Permissions
@@ -331,13 +321,6 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
    to server and server to server communication is essentially
    asynchronous in nature.
 
-
-
-Yu                       Expires 18 October 2022                [Page 6]
-
-Internet-Draft        Internet Delay Chat Protocol            April 2022
-
-
    Each IDC message may consist of up to three main parts: the prefix
    (optional), the command, and the command parameters (of which there
    may be up to 30).  The prefix, command, and all parameters are
@@ -347,6 +330,14 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
    colon character (':', 0x3b), which must be the first character of the
    message itself.  There must be no gap (whitespace) between the colon
    and the prefix.  The prefix is used by servers to indicate the true
+
+
+
+Yu                       Expires 18 October 2022                [Page 6]
+
+Internet-Draft        Internet Delay Chat Protocol            April 2022
+
+
    origin of the message.  If the prefix is missing from the message, it
    is assumed to have originated from the connection from which it was
    received.  Clients should not use prefix when sending a message from
@@ -379,21 +370,6 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
 
    The BNF representation for this is:
 
-
-
-
-
-
-
-
-
-
-
-Yu                       Expires 18 October 2022                [Page 7]
-
-Internet-Draft        Internet Delay Chat Protocol            April 2022
-
-
  <message>  ::= [':' <prefix> <SPACE> ] <command> <params> <crlf>
  <prefix>   ::= <servername> | <nick> [ '!' <user> ] [ '@' <host> ]
  <command>  ::= <letter> { <letter> } | <number> <number> <number>
@@ -408,6 +384,15 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
  <crlf>     ::= CR LF
 
    NOTES:
+
+
+
+
+
+Yu                       Expires 18 October 2022                [Page 7]
+
+Internet-Draft        Internet Delay Chat Protocol            April 2022
+
 
    1.  <SPACE> is consists only of SPACE character(s) (0x20).  Specially
        notice that TABULATION, and all other control characters are
@@ -434,22 +419,6 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
    parameter after the command is the list of targets, which can be
    described with:
 
-
-
-
-
-
-
-
-
-
-
-
-Yu                       Expires 18 October 2022                [Page 8]
-
-Internet-Draft        Internet Delay Chat Protocol            April 2022
-
-
    <target>     ::= <to> [ "," <target> ]
    <to>         ::= <channel> | <user> '@' <server> | <mask>
    <channel>    ::= ('#') <chstring>
@@ -469,6 +438,17 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
 
    <nonwhite>   ::= <any 8bit code except SPACE (0x20), NUL (0x0), CR
                      (0xd), and LF (0xa)>
+
+
+
+
+
+
+
+Yu                       Expires 18 October 2022                [Page 8]
+
+Internet-Draft        Internet Delay Chat Protocol            April 2022
+
 
 4.  IDC Concepts.
 
@@ -498,14 +478,6 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
    the message is to be delivered and the server breaks it up and
    dispatches a separate copy of the message to each given destination.
    This isn't as efficient as using a group since the destination list
-
-
-
-Yu                       Expires 18 October 2022                [Page 9]
-
-Internet-Draft        Internet Delay Chat Protocol            April 2022
-
-
    is broken up and the dispatch sent without checking to make sure
    duplicates aren't sent down each path.
 
@@ -526,6 +498,13 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
    On the following pages are descriptions of each message recognized by
    the IRC server and client.  All commands described in this section
    must be implemented by any server for this protocol.
+
+
+
+Yu                       Expires 18 October 2022                [Page 9]
+
+Internet-Draft        Internet Delay Chat Protocol            April 2022
+
 
    Where the reply ERR_NOSUCHSERVER is listed, it means that the
    <server> parameter could not be found.  The server must not send any
@@ -553,15 +532,6 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
    sender of the message so remote servers may send back a reply along
    the correct path.
 
-
-
-
-
-Yu                       Expires 18 October 2022               [Page 10]
-
-Internet-Draft        Internet Delay Chat Protocol            April 2022
-
-
 5.1.  Connection Registration
 
    The commands described here are used to register a connection with an
@@ -584,6 +554,13 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
      Command: PASS
 
    Parameters: <password>
+
+
+
+Yu                       Expires 18 October 2022               [Page 10]
+
+Internet-Draft        Internet Delay Chat Protocol            April 2022
+
 
    The PASS command is used to set a 'connection password'.  The
    password can and must be set before any attempt to register the
@@ -608,15 +585,6 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
      Command: NICK
 
    Parameters: <nickname>
-
-
-
-
-
-Yu                       Expires 18 October 2022               [Page 11]
-
-Internet-Draft        Internet Delay Chat Protocol            April 2022
-
 
    NICK message is used to give user a nickname or change the previous
    one.
@@ -643,6 +611,13 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
    security reasons, but they are used in server to server
    communication.
 
+
+
+Yu                       Expires 18 October 2022               [Page 11]
+
+Internet-Draft        Internet Delay Chat Protocol            April 2022
+
+
    It must be noted that realname parameter must be the last parameter,
    because it may contain space characters and must be prefixed with a
    colon (':') to make sure this is recognised as such.
@@ -663,16 +638,6 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
 
    The SERVER message must only be accepted from a connection which is
    yet to be registered and is attempting to register as a server.
-
-
-
-
-
-
-Yu                       Expires 18 October 2022               [Page 12]
-
-Internet-Draft        Internet Delay Chat Protocol            April 2022
-
 
    Most errors that occur with the receipt of a SERVER command result in
    the connection being terminated by the destination host (target
@@ -701,6 +666,14 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
 
      Command: SQUIT
 
+
+
+
+Yu                       Expires 18 October 2022               [Page 12]
+
+Internet-Draft        Internet Delay Chat Protocol            April 2022
+
+
    Parameters: <server> <comment>
 
    The SQUIT message is needed to tell about quitting servers.  If a
@@ -722,13 +695,6 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
    Replies:
 
        ERR_NOPRIVILEGES                ERR_NOSUCHSERVER
-
-
-
-Yu                       Expires 18 October 2022               [Page 13]
-
-Internet-Draft        Internet Delay Chat Protocol            April 2022
-
 
 5.2.  Channel operations
 
@@ -754,6 +720,16 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
    These are discussed in more detail under the MODE command (see
    section 4.2.3 for more details).
 
+
+
+
+
+
+Yu                       Expires 18 October 2022               [Page 13]
+
+Internet-Draft        Internet Delay Chat Protocol            April 2022
+
+
    Once a user has joined a channel, they receive notice about all
    commands their server receives which affect the channel.  This
    includes MODE, KICK, PART, QUIT and of course PRIVMSG/NOTICE.  The
@@ -778,14 +754,6 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
 
    Command: PART Parameters: <channel>{,<channel>}
 
-
-
-
-Yu                       Expires 18 October 2022               [Page 14]
-
-Internet-Draft        Internet Delay Chat Protocol            April 2022
-
-
    The PART message causes the client sending the message to be removed
    from the list of active users for all given channels listed in the
    parameter string.
@@ -808,6 +776,15 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
 5.2.3.1.  Channel modes
 
    Parameters: <channel> {[+|-]|<modes>} [<param>]
+
+
+
+
+
+Yu                       Expires 18 October 2022               [Page 14]
+
+Internet-Draft        Internet Delay Chat Protocol            April 2022
+
 
    The MODE command is provided so that channel operators may change the
    characteristics of `their' channel.  It is also required that servers
@@ -834,14 +811,6 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
    A user MODE command may only be accepted if both the sender of the
    message and the nickname given as a parameter are both the same.
 
-
-
-
-Yu                       Expires 18 October 2022               [Page 15]
-
-Internet-Draft        Internet Delay Chat Protocol            April 2022
-
-
    The available modes are as follows:
 
        SERVER_NOTICES - marks a user for receipt of server notices;
@@ -861,6 +830,17 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
        ERR_UNKNOWNMODE                 ERR_NOSUCHCHANNEL
        ERR_USERSDONTMATCH              RPL_UMODEIS
        ERR_UMODEUNKNOWNFLAG
+
+
+
+
+
+
+
+Yu                       Expires 18 October 2022               [Page 15]
+
+Internet-Draft        Internet Delay Chat Protocol            April 2022
+
 
 5.2.3.3.  Topic message
 
@@ -888,16 +868,6 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
    channel(s) to return information about if valid.  There is no error
    reply for bad channel names.
 
-
-
-
-
-
-Yu                       Expires 18 October 2022               [Page 16]
-
-Internet-Draft        Internet Delay Chat Protocol            April 2022
-
-
    If no <channel> parameter is given, a list of all channels and their
    occupants is returned.  At the end of this list, a list of users who
    are visible but either not on any channel or not on a visible channel
@@ -919,6 +889,14 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
    recognised as being a channel operator on the given channel.
 
    Replies:
+
+
+
+
+Yu                       Expires 18 October 2022               [Page 16]
+
+Internet-Draft        Internet Delay Chat Protocol            April 2022
+
 
           ERR_NEEDMOREPARAMS              ERR_NOSUCHNICK
           ERR_NOTONCHANNEL                ERR_USERONCHANNEL
@@ -942,17 +920,6 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
        ERR_NEEDMOREPARAMS              ERR_NOSUCHCHANNEL
        ERR_BADCHANMASK                 ERR_CHANOPRIVSNEEDED
        ERR_NOTONCHANNEL
-
-
-
-
-
-
-
-Yu                       Expires 18 October 2022               [Page 17]
-
-Internet-Draft        Internet Delay Chat Protocol            April 2022
-
 
 5.3.  Server queries and commands
 
@@ -982,27 +949,4 @@ Internet-Draft        Internet Delay Chat Protocol            April 2022
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Yu                       Expires 18 October 2022               [Page 18]
+Yu                       Expires 18 October 2022               [Page 17]
