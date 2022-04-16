@@ -3,10 +3,10 @@ Title = "Internet Delay Chat Protocol"
 abbrev = "Internet Delay Chat Protocol"
 #ipr= "trust200902"
 area = "Internet"
-workgroup = "Network Working Group"
+workgroup = "Andrew's Haxxor Working Group"
 submissiontype = "IETF"
 keyword = [""]
-date = 2022-04-04T00:00:00Z
+#date = 2022-04-04T00:00:00Z
 
 [seriesInfo]
 name = "Internet-Draft"
@@ -27,7 +27,7 @@ fullname="Andrew Yu"
 
 .# Abstract
 
-THIS DOCUMENT IS STILL A DRAFT.  THE "STATUS OF THIS MEMO" PART OF THE DOCUMENT IS FALSE.  Distribution of this memo is unlimited.  No other copying message in this file is accurate.
+<!--THIS DOCUMENT IS STILL A DRAFT.  THE "STATUS OF THIS MEMO" PART OF THE DOCUMENT IS FALSE.  Distribution of this memo is unlimited.  No other copying message in this file is accurate.-->
 
 This document specifies a new Internet Protocol for messaging over the Internet.
 
@@ -106,23 +106,30 @@ permission preceeded by a "-" (ASCII 0x2D HYPHEN-MINUS) character.
 
 ## Roles
 
-Roles are sets of permissions, anti-permissions and management
-permissions (as defined in section 4).  Users may have multiple
-roles and must at least have one role.
+Roles are sets of permissions, anti-permissions and management permissions (as defined in section 4).  Users may have multiple roles and must at least have one role.  All permissions, anti-permissions, and management permissions are granted via roles; users who have a role with a given permission have the permission, and users who don't have any roles containing a permission don't have the permission.  Roles are ranked linearly, and may be set to self-deroleable.
 
-Note that the examples below note an example setup.  Those with the
-"roles" management permission may customize these, as noted in
-section 4.
+Note that the examples below note an example setup.  Those with the "roles" management permission may customize these, as noted in section 4.
 
-- student :: talk, read
-- teacher :: talk, read, mute, deafen, ban
-- administrator :: talk, read, mute, deafen, kick, ban
+- 1 administrator :: talk, read, mute, deafen, kick, ban, react
+- 2 teacher :: talk, read, mute, deafen, ban, react
+- 3 student :: talk, read, react
+- 0 default :: talk, read
+- -1 spammer :: -talk, read, -react
 
 ## Management Permissions
 
+Management permissions allow managing roles.
+
+There exists a management permission for each permission, and thus, each anti-permission.
+
+A user may give a user of a role, if all of the following conditions are met:
+- The user affected has a lower role than the actor;
+- The role given is lower or equal to the actor's role;
+- The actor has all corresponding management permissions for the permissions and anti-permissions of the role given.
+
+(how does granting management permissions work again)
 
 # The IDC Specification
-
 
 ## Overview
 

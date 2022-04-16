@@ -1,7 +1,12 @@
-all: whitepaper.txt
+all: update
 
 whitepaper.txt: whitepaper.xml
 	xml2rfc whitepaper.xml --verbose --text
 
 whitepaper.xml: whitepaper.md
 	mmark whitepaper.md > whitepaper.xml
+
+update: whitepaper.txt
+	git add .
+	git commit -m "auto update"
+	git push
