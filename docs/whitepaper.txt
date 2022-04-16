@@ -9,7 +9,7 @@ Expires: 6 October 2022
 
 
                       Internet Delay Chat Protocol
-                                  TBD
+                          internet-delay-chat
 
 Abstract
 
@@ -55,44 +55,46 @@ Copyright Notice
 
 Yu                       Expires 6 October 2022                 [Page 1]
 
-RFC TBD               Internet Delay Chat Protocol            April 2022
+Internet-Draft        Internet Delay Chat Protocol            April 2022
 
 
 Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
      1.1.  Servers . . . . . . . . . . . . . . . . . . . . . . . . .   3
-     1.2.  Clients . . . . . . . . . . . . . . . . . . . . . . . . .   3
+     1.2.  Clients . . . . . . . . . . . . . . . . . . . . . . . . .   4
      1.3.  Users . . . . . . . . . . . . . . . . . . . . . . . . . .   4
        1.3.1.  Administrators  . . . . . . . . . . . . . . . . . . .   4
      1.4.  Spaces  . . . . . . . . . . . . . . . . . . . . . . . . .   4
      1.5.  Channels  . . . . . . . . . . . . . . . . . . . . . . . .   5
-     1.6.  Space Roles . . . . . . . . . . . . . . . . . . . . . . .   5
-     1.7.  Permissions . . . . . . . . . . . . . . . . . . . . . . .   5
-     1.8.  Anti-permissions  . . . . . . . . . . . . . . . . . . . .   6
-   2.  The IDC Specification . . . . . . . . . . . . . . . . . . . .   6
-     2.1.  Overview  . . . . . . . . . . . . . . . . . . . . . . . .   6
-     2.2.  Character codes . . . . . . . . . . . . . . . . . . . . .   6
-     2.3.  Messages  . . . . . . . . . . . . . . . . . . . . . . . .   6
-   3.  IDC Concepts. . . . . . . . . . . . . . . . . . . . . . . . .   9
-     3.1.  One-to-one communication  . . . . . . . . . . . . . . . .   9
-     3.2.  One-to-many . . . . . . . . . . . . . . . . . . . . . . .   9
-       3.2.1.  To a list . . . . . . . . . . . . . . . . . . . . . .   9
-       3.2.2.  To a channel  . . . . . . . . . . . . . . . . . . . .   9
-   4.  Message details . . . . . . . . . . . . . . . . . . . . . . .   9
-     4.1.  Connection Registration . . . . . . . . . . . . . . . . .  10
-       4.1.1.  Password message  . . . . . . . . . . . . . . . . . .  10
-       4.1.2.  Nick message  . . . . . . . . . . . . . . . . . . . .  11
-       4.1.3.  User message  . . . . . . . . . . . . . . . . . . . .  11
-       4.1.4.  Server message  . . . . . . . . . . . . . . . . . . .  12
-       4.1.5.  Quit  . . . . . . . . . . . . . . . . . . . . . . . .  12
-       4.1.6.  Server quit message . . . . . . . . . . . . . . . . .  12
-     4.2.  Channel operations  . . . . . . . . . . . . . . . . . . .  13
-       4.2.1.  Join message  . . . . . . . . . . . . . . . . . . . .  13
-       4.2.2.  Part message  . . . . . . . . . . . . . . . . . . . .  14
-       4.2.3.  Mode message  . . . . . . . . . . . . . . . . . . . .  14
-     4.3.  Server queries and commands . . . . . . . . . . . . . . .  17
-   5.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  17
+   2.  Permission System . . . . . . . . . . . . . . . . . . . . . .   5
+     2.1.  Permissions . . . . . . . . . . . . . . . . . . . . . . .   5
+     2.2.  Anti-permissions  . . . . . . . . . . . . . . . . . . . .   5
+     2.3.  Roles . . . . . . . . . . . . . . . . . . . . . . . . . .   6
+     2.4.  Management Permissions  . . . . . . . . . . . . . . . . .   6
+   3.  The IDC Specification . . . . . . . . . . . . . . . . . . . .   6
+     3.1.  Overview  . . . . . . . . . . . . . . . . . . . . . . . .   6
+     3.2.  Character codes . . . . . . . . . . . . . . . . . . . . .   6
+     3.3.  Messages  . . . . . . . . . . . . . . . . . . . . . . . .   6
+   4.  IDC Concepts. . . . . . . . . . . . . . . . . . . . . . . . .   9
+     4.1.  One-to-one communication  . . . . . . . . . . . . . . . .   9
+     4.2.  One-to-many . . . . . . . . . . . . . . . . . . . . . . .   9
+       4.2.1.  To a list . . . . . . . . . . . . . . . . . . . . . .   9
+       4.2.2.  To a channel  . . . . . . . . . . . . . . . . . . . .   9
+   5.  Message details . . . . . . . . . . . . . . . . . . . . . . .   9
+     5.1.  Connection Registration . . . . . . . . . . . . . . . . .  10
+       5.1.1.  Password message  . . . . . . . . . . . . . . . . . .  10
+       5.1.2.  Nick message  . . . . . . . . . . . . . . . . . . . .  11
+       5.1.3.  User message  . . . . . . . . . . . . . . . . . . . .  11
+       5.1.4.  Server message  . . . . . . . . . . . . . . . . . . .  12
+       5.1.5.  Quit  . . . . . . . . . . . . . . . . . . . . . . . .  12
+       5.1.6.  Server quit message . . . . . . . . . . . . . . . . .  12
+     5.2.  Channel operations  . . . . . . . . . . . . . . . . . . .  13
+       5.2.1.  Join message  . . . . . . . . . . . . . . . . . . . .  13
+       5.2.2.  Part message  . . . . . . . . . . . . . . . . . . . .  14
+       5.2.3.  Mode message  . . . . . . . . . . . . . . . . . . . .  14
+     5.3.  Server queries and commands . . . . . . . . . . . . . . .  17
+   6.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  17
 
 1.  Introduction
 
@@ -100,19 +102,23 @@ Table of Contents
    number of months for use with federated multimedia conferencing.
    This document describes the current IDC protocol.
 
-   IDC itself is a messaging system, which (through the use of the
-   client-server and server-to-server model) is well-suited to running
-   on many machines in a distributed fashion.  A typical setup involves
-   multiple servers each with multiple clients, that connect to each
-   other in order to exchange messages, in a multi-centered fashion.
+
+
+
 
 
 
 
 Yu                       Expires 6 October 2022                 [Page 2]
 
-RFC TBD               Internet Delay Chat Protocol            April 2022
+Internet-Draft        Internet Delay Chat Protocol            April 2022
 
+
+   IDC itself is a messaging system, which (through the use of the
+   client-server and server-to-server model) is well-suited to running
+   on many machines in a distributed fashion.  A typical setup involves
+   multiple servers each with multiple clients, that connect to each
+   other in order to exchange messages, in a multi-centered fashion.
 
    Existing protocols are limited.  Internet Relay Chat as in RFC 1459
    has been in use since May 1993, a very simple protocol for
@@ -153,12 +159,6 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
    a server is unable to connect to another server, where then servers
    SHOULD utilize servers in between as routing.
 
-1.2.  Clients
-
-   A client is anything connecting to a server that is not another
-   server.  Each client is distinguished from other clients by a unique
-   CID having a length of 9 characters, private to each server.
-
 
 
 
@@ -167,19 +167,24 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
 Yu                       Expires 6 October 2022                 [Page 3]
 
-RFC TBD               Internet Delay Chat Protocol            April 2022
+Internet-Draft        Internet Delay Chat Protocol            April 2022
 
+
+1.2.  Clients
+
+   A client is anything connecting to a server that is not another
+   server.  Each client is distinguished from other clients by a unique
+   CID having a length of 9 characters, private to each server.
 
 1.3.  Users
 
    Each client is associated with a user.  Users are identified by a
    UID, in the form of user@host, where host is either (1) the FQDN of
-   the server the user resides on or (2) a domain with a SRV record "IDC
-   <domain>" where <domain> is the FQDN of the server.  The UID is
-   unique in the Internet.  Messages are directed at users, which are
-   then sent to all connected clients of the said user.  If the user has
-   no connected clients, i.e. the user is offline, the message SHOULD be
-   kept until the user reconnects.
+   the server the user resides on or (2) a domain with a SRV record to
+   the actual server.  The UID is unique in the Internet.  Messages are
+   directed at users, which are then sent to all connected clients of
+   the said user.  If the user has no connected clients, i.e. the user
+   is offline, the message SHOULD be kept until the user reconnects.
 
 1.3.1.  Administrators
 
@@ -213,18 +218,18 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
    joining, the space is created under the server the user is on and the
    creating user becomes the space operator.  If the space already
    exists, whether or not the request to JOIN that space is honoured
-   depends on the current options of the space.  For example, if the
-   space is invite-only, (+INVITE_ONLY), then the user may only join if
-   invited.  As part of the protocol, a user may be a part of several
-   spaces at once.
-
 
 
 
 Yu                       Expires 6 October 2022                 [Page 4]
 
-RFC TBD               Internet Delay Chat Protocol            April 2022
+Internet-Draft        Internet Delay Chat Protocol            April 2022
 
+
+   depends on the current options of the space.  For example, if the
+   space is invite-only, (+INVITE_ONLY), then the user may only join if
+   invited.  As part of the protocol, a user may be a part of several
+   spaces at once.
 
    A user may have a nickname for use within the space, independent of
    their nickname when used outside of spaces, which is an alphanumeric
@@ -246,74 +251,67 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
    '#' character and a name, where the name is an alphanumeric string of
    up to 128 characters, to the space that the channel is in.
 
-1.6.  Space Roles
+2.  Permission System
 
-   Roles designate the power of a given user in a space.  Each space
-   must have a FOUNDER and a MEMBER role, where FOUNDER is a special
-   role with all possible permissions within a space.  MEMBER is a
-   special role given to all users who JOIN the space by default.  Roles
-   are ordered, with FOUNDER always being the highest.
+2.1.  Permissions
 
-   Roles have a set of permissions both within the scope of the whole
-   space and specific channels in the space.  Roles may only utilize
-   their permissions on users below their role.
+   Permissions allow users to perform actions that do not interfere with
+   the permissions other users.
 
-1.7.  Permissions
+   *  talk :: allow the user to talk
+   *  read :: allow the user to read the chat
 
-   Permissions designate what actions a role may perform in a space and
-   its respective channels.  Permissions are granted by roles containing
-   the permission.  Permissions are identified by a uppercase string
-   that begins with +.
+2.2.  Anti-permissions
 
-   Space permissions are include:
+   Anti-permissions cause the user to be unable to exercise a matching
+   permission, even if their role contains the said permission.  There
+   exists an anti-permission for each permission, with the name of the
+   permission preceeded by a "-" (ASCII 0x2D HYPHEN-MINUS) character.
 
-   *  +READ Be in the space;
-   *  +INTERACT Affect the space;
-   *  +MUTE Give a user with lower roles the -READ anti-permission.
-   *  +KICK Removes a user from the space;
-   *  +BAN Removes a user from the space, and prohibit them from re-
-      joining;
+   *  -talk :: causes the user to be unable to talk
+   *  -read :: causes the user to be deafened
+
+
+
 
 
 
 
 Yu                       Expires 6 October 2022                 [Page 5]
 
-RFC TBD               Internet Delay Chat Protocol            April 2022
+Internet-Draft        Internet Delay Chat Protocol            April 2022
 
 
-   *  +ROLES Manage roles of users with lower ranks, may only promote to
-      the same rank as themself and demote users of lower ranks.
+2.3.  Roles
 
-   Channel permissions include:
+   Roles are sets of permissions, anti-permissions and management
+   permissions (as defined in section 4).  Users may have multiple roles
+   and must at least have one role.
 
-   *  +READ Read messages from the channel; Users without this
-      permission is not considered to be in the channel;
-   *  +INTERACT Affect the channel;
-   *  +MUTE Give a user with lower roles the -MESSAGE anti-permission.
-   *  +BAN Give a user with lower roles the -READ anti-permission.
+   Note that the examples below note an example setup.  Those with the
+   "roles" management permission may customize these, as noted in
+   section 4.
 
-1.8.  Anti-permissions
+   *  student :: talk, read
+   *  teacher :: talk, read, mute, deafen, ban
+   *  administrator :: talk, read, mute, deafen, kick, ban
 
-   Each permission has a corresponding anti-permission, named after the
-   permission but replacing '+' with '-'.  When a user has an anti-
-   permission, per ability to utilize the permission is lost even if
-   perse has a role with the permission.
+2.4.  Management Permissions
 
-2.  The IDC Specification
+3.  The IDC Specification
 
-2.1.  Overview
+3.1.  Overview
 
    The protocol as described herein is for use both with server to
    server and client to server connections.  There are similiar
    restrictions on server connections as for client connections as this
    is a federated protocol.
 
-2.2.  Character codes
+3.2.  Character codes
 
    The character encoding for IDC is UTF-8.
 
-2.3.  Messages
+3.3.  Messages
 
    Servers and clients send eachother messages which may or may not
    generate a reply.  If the message contains a valid command, as
@@ -330,16 +328,16 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
    The presence of a prefix is indicated with a single leading ASCII
    colon character (':', 0x3b), which must be the first character of the
    message itself.  There must be no gap (whitespace) between the colon
+   and the prefix.  The prefix is used by servers to indicate the true
+   origin of the message.  If the prefix is missing from the message, it
 
 
 
 Yu                       Expires 6 October 2022                 [Page 6]
 
-RFC TBD               Internet Delay Chat Protocol            April 2022
+Internet-Draft        Internet Delay Chat Protocol            April 2022
 
 
-   and the prefix.  The prefix is used by servers to indicate the true
-   origin of the message.  If the prefix is missing from the message, it
    is assumed to have originated from the connection from which it was
    received.  Clients should not use prefix when sending a message from
    themselves; if they use a prefix, the only valid prefix is the
@@ -389,9 +387,11 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
 
 
+
+
 Yu                       Expires 6 October 2022                 [Page 7]
 
-RFC TBD               Internet Delay Chat Protocol            April 2022
+Internet-Draft        Internet Delay Chat Protocol            April 2022
 
 
    1.  <SPACE> is consists only of SPACE character(s) (0x20).  Specially
@@ -447,16 +447,16 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
 Yu                       Expires 6 October 2022                 [Page 8]
 
-RFC TBD               Internet Delay Chat Protocol            April 2022
+Internet-Draft        Internet Delay Chat Protocol            April 2022
 
 
-3.  IDC Concepts.
+4.  IDC Concepts.
 
    This section is devoted to describing the actual concepts behind the
    organization of the IDC protocol and how the current implementations
    deliver different classes of messages.
 
-3.1.  One-to-one communication
+4.1.  One-to-one communication
 
    Communication on a one-to-one basis is usually only performed by
    clients, since most server-server traffic is not a result of servers
@@ -464,13 +464,13 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
    talk to each other, it is required that all servers be able to send a
    message to any other server.
 
-3.2.  One-to-many
+4.2.  One-to-many
 
    The main goal of IRC is to provide a forum which allows easy and
    efficient conferencing (one to many conversations).  IRC offers
    several means to achieve this, each serving its own purpose.
 
-3.2.1.  To a list
+4.2.1.  To a list
 
    The least efficient style of one-to-many conversation is through
    clients talking to a 'list' of users.  How this is done is almost
@@ -481,7 +481,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
    is broken up and the dispatch sent without checking to make sure
    duplicates aren't sent down each path.
 
-3.2.2.  To a channel
+4.2.2.  To a channel
 
    In IRC the channel has a role equivalent to that of the multicast
    group; their existence is dynamic (coming and going as people join
@@ -493,7 +493,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
    each client-server combination until the original message has fanned
    out and reached each member of the channel.
 
-4.  Message details
+5.  Message details
 
    On the following pages are descriptions of each message recognized by
    the IRC server and client.  All commands described in this section
@@ -503,7 +503,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
 Yu                       Expires 6 October 2022                 [Page 9]
 
-RFC TBD               Internet Delay Chat Protocol            April 2022
+Internet-Draft        Internet Delay Chat Protocol            April 2022
 
 
    Where the reply ERR_NOSUCHSERVER is listed, it means that the
@@ -532,7 +532,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
    sender of the message so remote servers may send back a reply along
    the correct path.
 
-4.1.  Connection Registration
+5.1.  Connection Registration
 
    The commands described here are used to register a connection with an
    IRC server as either a user or a server as well as correctly
@@ -549,7 +549,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
    2.  Nick message
    3.  User message
 
-4.1.1.  Password message
+5.1.1.  Password message
 
      Command: PASS
 
@@ -559,7 +559,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
 Yu                       Expires 6 October 2022                [Page 10]
 
-RFC TBD               Internet Delay Chat Protocol            April 2022
+Internet-Draft        Internet Delay Chat Protocol            April 2022
 
 
    The PASS command is used to set a 'connection password'.  The
@@ -580,7 +580,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
           PASS secretpasswordhere
 
-4.1.2.  Nick message
+5.1.2.  Nick message
 
      Command: NICK
 
@@ -593,7 +593,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
         ERR_NONICKNAMEGIVEN             ERR_ERRONEUSNICKNAME
 
-4.1.3.  User message
+5.1.3.  User message
 
      Command: USER
 
@@ -615,7 +615,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
 Yu                       Expires 6 October 2022                [Page 11]
 
-RFC TBD               Internet Delay Chat Protocol            April 2022
+Internet-Draft        Internet Delay Chat Protocol            April 2022
 
 
    It must be noted that realname parameter must be the last parameter,
@@ -630,7 +630,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
    USER andrew@andrewyu.org :Andrew Yu
 
-4.1.4.  Server message
+5.1.4.  Server message
 
      Command: SERVER
 
@@ -645,7 +645,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
    rather than the numeric since the ERROR command has several useful
    properties which make it useful here.
 
-4.1.5.  Quit
+5.1.5.  Quit
 
      Command: QUIT
 
@@ -662,7 +662,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
    sort of message reflecting the nature of the event which caused it to
    happen.
 
-4.1.6.  Server quit message
+5.1.6.  Server quit message
 
      Command: SQUIT
 
@@ -671,7 +671,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
 Yu                       Expires 6 October 2022                [Page 12]
 
-RFC TBD               Internet Delay Chat Protocol            April 2022
+Internet-Draft        Internet Delay Chat Protocol            April 2022
 
 
    Parameters: <server> <comment>
@@ -696,14 +696,14 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
        ERR_NOPRIVILEGES                ERR_NOSUCHSERVER
 
-4.2.  Channel operations
+5.2.  Channel operations
 
    This group of messages is concerned with manipulating channels, their
    properties (channel modes), and their contents (typically users).  In
    implementing these, a number of race conditions are inevitable when
    users send commands which will ultimately clash.
 
-4.2.1.  Join message
+5.2.1.  Join message
 
    Command: JOIN Parameters: <channel>{,<channel>} [<key>{,<key>}]
 
@@ -727,7 +727,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
 Yu                       Expires 6 October 2022                [Page 13]
 
-RFC TBD               Internet Delay Chat Protocol            April 2022
+Internet-Draft        Internet Delay Chat Protocol            April 2022
 
 
    Once a user has joined a channel, they receive notice about all
@@ -750,7 +750,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
        ERR_NOSUCHCHANNEL               ERR_TOOMANYCHANNELS
        RPL_TOPIC
 
-4.2.2.  Part message
+5.2.2.  Part message
 
    Command: PART Parameters: <channel>{,<channel>}
 
@@ -763,7 +763,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
        ERR_NEEDMOREPARAMS              ERR_NOSUCHCHANNEL
        ERR_NOTONCHANNEL
 
-4.2.3.  Mode message
+5.2.3.  Mode message
 
    Command: MODE
 
@@ -773,7 +773,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
    When parsing MODE messages, it is recommended that the entire message
    be parsed first and then the changes which resulted then passed on.
 
-4.2.3.1.  Channel modes
+5.2.3.1.  Channel modes
 
    Parameters: <channel> {[+|-]|<modes>} [<param>]
 
@@ -783,7 +783,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
 Yu                       Expires 6 October 2022                [Page 14]
 
-RFC TBD               Internet Delay Chat Protocol            April 2022
+Internet-Draft        Internet Delay Chat Protocol            April 2022
 
 
    The MODE command is provided so that channel operators may change the
@@ -802,7 +802,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
    give/take the ability to speak on a moderated channel; KEY - set a
    channel key (password).
 
-4.2.3.2.  User modes
+5.2.3.2.  User modes
 
    Parameters: <nickname> {[+|-]|<modes>} [<param>]
 
@@ -839,10 +839,10 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
 Yu                       Expires 6 October 2022                [Page 15]
 
-RFC TBD               Internet Delay Chat Protocol            April 2022
+Internet-Draft        Internet Delay Chat Protocol            April 2022
 
 
-4.2.3.3.  Topic message
+5.2.3.3.  Topic message
 
    Command: TOPIC Parameters: <channel> [<topic>]
 
@@ -857,7 +857,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
        RPL_NOTOPIC                     RPL_TOPIC
        ERR_CHANOPRIVSNEEDED
 
-4.2.3.4.  Names message
+5.2.3.4.  Names message
 
    Command: NAMES Parameters: [<channel>{,<channel>}]
 
@@ -877,7 +877,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
        RPL_NAMREPLY                    RPL_ENDOFNAMES
 
-4.2.3.5.  Invite message
+5.2.3.5.  Invite message
 
    Command: INVITE Parameters: <nickname> <channel>
 
@@ -895,7 +895,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
 
 Yu                       Expires 6 October 2022                [Page 16]
 
-RFC TBD               Internet Delay Chat Protocol            April 2022
+Internet-Draft        Internet Delay Chat Protocol            April 2022
 
 
           ERR_NEEDMOREPARAMS              ERR_NOSUCHNICK
@@ -903,7 +903,7 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
           ERR_CHANOPRIVSNEEDED
           RPL_INVITING                    RPL_AWAY
 
-4.2.3.6.  Kick command
+5.2.3.6.  Kick command
 
    Command: KICK Parameters: <channel> <user> [<comment>]
 
@@ -921,9 +921,9 @@ RFC TBD               Internet Delay Chat Protocol            April 2022
        ERR_BADCHANMASK                 ERR_CHANOPRIVSNEEDED
        ERR_NOTONCHANNEL
 
-4.3.  Server queries and commands
+5.3.  Server queries and commands
 
-5.  Acknowledgements
+6.  Acknowledgements
 
    This document has multiple ideas suggested by Test_User
    <hax@andrewyu.org> and luk3yx.

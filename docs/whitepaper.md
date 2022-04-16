@@ -9,8 +9,8 @@ keyword = [""]
 date = 2022-04-04T00:00:00Z
 
 [seriesInfo]
-name = Internet-Draft""
-value = "idc"
+name = "Internet-Draft"
+value = "internet-delay-chat"
 stream = "IETF"
 status = "informational"
 
@@ -84,37 +84,42 @@ A user may have a nickname for use within the space, independent of their nickna
 
 Channels are a group of users in a space who have permissions for reading the channel.  Channel identifiers are strings, appending a '#' character and a name, where the name is an alphanumeric string of up to 128 characters, to the space that the channel is in.
 
-## Space Roles
-
-Roles designate the power of a given user in a space.  Each space must have a FOUNDER and a MEMBER role, where FOUNDER is a special role with all possible permissions within a space.  MEMBER is a special role given to all users who JOIN the space by default.  Roles are ordered, with FOUNDER always being the highest.
-
-Roles have a set of permissions both within the scope of the whole space and specific channels in the space.  Roles may only utilize their permissions on users below their role.
+# Permission System
 
 ## Permissions
 
-Permissions designate what actions a role may perform in a space and its respective channels.  Permissions are granted by roles containing the permission.  Permissions are identified by a uppercase string that begins with +.
+Permissions allow users to perform actions that do not interfere with
+the permissions other users.
 
-Space permissions are include:
-
-  * +READ Be in the space;
-  * +INTERACT Affect the space;
-  * +MUTE Give a user with lower roles the -READ anti-permission.
-  * +KICK Removes a user from the space;
-  * +BAN Removes a user from the space, and prohibit them from re-joining;
-  * +ROLES Manage roles of users with lower ranks, may only promote to the same rank as themself and demote users of lower ranks.
-
-
-Channel permissions include:
-
-  * +READ Read messages from the channel; Users without this permission is not considered to be in the channel;
-  * +INTERACT Affect the channel;
-  * +MUTE Give a user with lower roles the -MESSAGE anti-permission.
-  * +BAN Give a user with lower roles the -READ anti-permission.
-
+- talk :: allow the user to talk
+- read :: allow the user to read the chat
 
 ## Anti-permissions
 
-Each permission has a corresponding anti-permission, named after the permission but replacing '+' with '-'.  When a user has an anti-permission, per ability to utilize the permission is lost even if perse has a role with the permission.
+Anti-permissions cause the user to be unable to exercise a matching
+permission, even if their role contains the said permission.  There
+exists an anti-permission for each permission, with the name of the
+permission preceeded by a "-" (ASCII 0x2D HYPHEN-MINUS) character.
+
+- -talk :: causes the user to be unable to talk
+- -read :: causes the user to be deafened
+
+## Roles
+
+Roles are sets of permissions, anti-permissions and management
+permissions (as defined in section 4).  Users may have multiple
+roles and must at least have one role.
+
+Note that the examples below note an example setup.  Those with the
+"roles" management permission may customize these, as noted in
+section 4.
+
+- student :: talk, read
+- teacher :: talk, read, mute, deafen, ban
+- administrator :: talk, read, mute, deafen, kick, ban
+
+## Management Permissions
+
 
 # The IDC Specification
 
