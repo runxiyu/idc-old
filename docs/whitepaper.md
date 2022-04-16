@@ -24,6 +24,15 @@ fullname="Andrew Yu"
   [author.address.postal]
   city = "Shanghai"
   country = "China"
+[[author]]
+initials="T."
+surname="User"
+fullname="Test_User"
+ [author.address]
+ email = "hax@andrewyu.org"
+  [author.address.postal]
+  city = "North Carolina"
+  country = "United States"
 %%%
 
 .# Abstract
