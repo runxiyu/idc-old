@@ -1,7 +1,7 @@
 %%%
 Title = "Internet Delay Chat Protocol"
 abbrev = "Internet Delay Chat Protocol"
-#ipr= "trust200902"
+ipr= "none"
 area = "Internet"
 workgroup = "Andrew's Haxxor Working Group"
 #submissiontype = "IETF"
