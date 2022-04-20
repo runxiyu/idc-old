@@ -14,9 +14,9 @@ client_id_count = 0
 async def sendToAllClientsOfUser(username, toWrite):
     if users[username]["clients"]:
         i = 0
-        for (reader, writer) in users[username]["clients"]:
-            writer.write(toWrite)
-            await writer.drain()
+        for pair in users[username]["clients"]:
+            pair[1].write(toWrite)
+            await pair[1].drain()
             i += 1
         return i
     else:
@@ -33,11 +33,12 @@ async def checkedTimedOriginedMessageToUser(
             targetUsername,
             command
             + b"\t"
-            + (time.time().encode("utf-8"))
+            + (str(time.time()).encode("utf-8"))
             + b"\t"
             + originUsername
             + b"\t"
-            + text,
+            + text
+            + b"\r\n",
         )
         return True
     else:
@@ -118,11 +119,11 @@ async def clientLoop(reader, writer):
                         )
                         loggedInAs = args[1]
                         users[loggedInAs]["clients"].append(cid)
-                        queue = users.[loggedInAs]["queue"]
+                        queue = users[loggedInAs]["queue"]
                         if len(queue) > 0:
                             for i in range(0, len(queue)):
                                 writer.write(queue.pop(i))
-                        del i
+                            del i
                         del queue
                     else:
                         writer.write(
@@ -140,7 +141,7 @@ async def clientLoop(reader, writer):
                 )
             else:
                 await checkedTimedOriginedMessageToUser(
-                    loggedInAs, args[1], "PRIVATE_MESSAGE", args[2]
+                    loggedInAs, args[1], b"PRIVATE_MESSAGE", args[2]
                 )
         else:
             writer.write(
