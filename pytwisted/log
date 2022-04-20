@@ -1,12 +1,6 @@
-2022-04-03T02:08:21+0800 [-] Loading server.py...
-2022-04-03T02:08:21+0800 [-] Loaded.
-2022-04-03T02:08:21+0800 [twisted.scripts._twistd_unix.UnixAppLogger#info] twistd 22.2.0 (/usr/bin/python3.9 3.9.9) starting up.
-2022-04-03T02:08:21+0800 [twisted.scripts._twistd_unix.UnixAppLogger#info] reactor class: twisted.internet.epollreactor.EPollReactor.
-2022-04-03T02:08:21+0800 [-] ServerFactory starting on 1025
-2022-04-03T02:08:21+0800 [twisted.internet.protocol.ServerFactory#info] Starting factory <twisted.internet.protocol.ServerFactory object at 0x7f540e89dbb0>
-2022-04-03T02:08:28+0800 [stdout#info] '0MWMMP' b'password\thunter2'
-2022-04-03T02:08:28+0800 [stdout#info] b'PASSWORD'
-2022-04-03T02:08:31+0800 [stdout#info] '0MWMMP' b'user\tandrew'
-2022-04-03T02:08:31+0800 [stdout#info] b'USER'
-2022-04-03T02:08:39+0800 [stdout#info] '0MWMMP' b'hi'
-2022-04-03T02:08:39+0800 [stdout#info] b'HI'
+2022-04-20T10:13:42+0200 [-] Loading server.py...
+2022-04-20T10:13:43+0200 [-] Loaded.
+2022-04-20T10:13:43+0200 [twisted.scripts._twistd_unix.UnixAppLogger#info] twistd 20.3.0 (/usr/bin/python3 3.9.2) starting up.
+2022-04-20T10:13:43+0200 [twisted.scripts._twistd_unix.UnixAppLogger#info] reactor class: twisted.internet.epollreactor.EPollReactor.
+2022-04-20T10:13:43+0200 [-] ServerFactory starting on 1025
+2022-04-20T10:13:43+0200 [twisted.internet.protocol.ServerFactory#info] Starting factory <twisted.internet.protocol.ServerFactory object at 0x7fdaa348be80>

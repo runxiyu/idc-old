@@ -1,4 +1,6 @@
-"""The most basic chat protocol possible.
+"""
+Example IDC server written in Python with Twisted (because we wanted this to be
+quick and dirty)
 
 run me with twistd -y chatserver.py, and then connect with multiple
 clients to port 1025
@@ -10,10 +12,11 @@ import random
 with open("config.py", "r") as c:
     exec(c.read())
 
+
 class User:
     def __init__(self, username):
-        self.clients = [] # Client()
-        self.in_channels = [] # Channel()
+        self.clients = []  # Client()
+        self.in_channels = []  # Channel()
 
     def add_client(self, client):
         self.clients.append(client)
@@ -36,22 +39,22 @@ class User:
     def message(self, target, message):
         pass
 
+
 class Channel:
     def __init__(self, name):
         self.name = name
-        self.users = [] # User()
-        self.modes = [] # ("ban", "hax@andrewyu.org")
+        self.users = []  # User()
+        self.modes = []  # ("ban", "hax@andrewyu.org")
 
-    def broadcast_join(self, user): # must be called with User().join
+    def broadcast_join(self, user):  # must be called with User().join
         self.users.append(user)
         for u in self.users:
             u.send("JOIN", user.get_id(), seld.name)
 
-    def broadcast_part(self, user, reason=""): # must be called with User().part
+    def broadcast_part(self, user, reason=""):  # must be called with User().part
         self.users.append(user)
         for u in self.users:
             u.send("PART", user.get_id(), seld.name, reason)
-        
 
 
 class Client(basic.LineReceiver):
@@ -72,7 +75,7 @@ class Client(basic.LineReceiver):
 
     def connectionLost(self, reason):
         del self.factory.clients[self.cid]
-        del self
+        del self  # del self? Won't this just do nothing?
 
     def lineReceived(self, line):
         print(repr(self.cid), repr(line))
@@ -115,7 +118,8 @@ class Client(basic.LineReceiver):
                         self.username = args[1]
                         self.ready = True
                         self.send(
-                            b"REPLY_LOGGED_IN", b"You are now logged in as " + args[1] + "."
+                            b"REPLY_LOGGED_IN",
+                            b"You are now logged in as " + args[1] + b".",
                         )
                         if args[1] not in self.factory.users.keys():
                             self.factory.users[args[1]] = [self]
@@ -135,13 +139,17 @@ class Client(basic.LineReceiver):
                     b"You may not use this command before logging in.",
                 )
         else:
-            if cmd == "MESSAGE":
-                pass
+            if cmd == b"MESSAGE" and len(args) == 3:
+                self.send_msg(args[1], args[2])
+                # why is it invaliding rather than passing
+            elif cmd == b"PING":
+                # miniirc_idc expects replies to PINGs
+                self.send(b"PONG", args[-1])
             else:
                 self.send(
-                        b"ERR_INVALID_COMMAND",
-                        b"The command you sent, " + cmd + ", is invalid."
-                        )
+                    b"ERR_INVALID_COMMAND",
+                    b"The command you sent, " + cmd + b", is invalid.",
+                )
 
     def quote(self, bytestring):
         try:
@@ -150,13 +158,34 @@ class Client(basic.LineReceiver):
             raise
 
     def send(self, *args):
-        buf = b""
-        for i in args:
-            i = i.replace(b"\\", b"\\\\")
-            i = i.replace(b"\t", b"\\\t")
-            buf += i
-            buf += b"\t"
-        self.quote(buf[:-1])
+        #buf = b""
+        #for i in args:
+        #    i = i.replace(b"\\", b"\\\\")
+        #    i = i.replace(b"\t", b"\\\t")
+        #    buf += i
+        #    buf += b"\t"
+        #self.quote(buf[:-1])
+        self.quote(b'\t'.join(
+            arg.replace(b'\\', b'\\\\').replace(b'\t', b'\\\t')
+            for arg in args
+        ))
+
+    def send_msg(self, recipient, msg):
+        if recipient not in config.users:
+            self.send(
+                b'ERR_I_AM_TOO_LAZY_TO_FIGURE_OUT_WHAT_CODE_TO_USE_HERE',
+                b'User does not exist!',
+            )
+            return
+        target_clients = self.factory.users.get(recipient)
+        if not target_clients:
+            # not [] == True
+            self.send(b'ERR_USER_NOT_ONLINE', b'User is not online!')
+            return
+        for client in target_clients:
+            # I have no idea what message format you want but this looks like
+            # IRC so I'll do that
+            client.send(b':' + self.username, b'MESSAGE', msg)
 
 
 from twisted.internet import protocol
@@ -164,9 +193,9 @@ from twisted.application import service, internet
 
 factory = protocol.ServerFactory()
 factory.protocol = Client
-factory.clients = {} # cid: Client()
-factory.channels = {} # name: Channel()
-factory.users = {} # username: [Client()]
+factory.clients = {}  # cid: Client()
+factory.channels = {}  # name: Channel()
+factory.users = {}  # username: [Client()]
 
 application = service.Application("chatserver")
 internet.TCPServer(1025, factory).setServiceParent(application)
