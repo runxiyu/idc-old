@@ -1,6 +1,12 @@
 class config:
     server_name = "home.andrewyu.org"
     users = {
+        b"Noisytoot": {
+            "password": b"pissnet",
+            "bio": b"Ron",
+            "permissions": {"god"},
+            "options": ["offline-messages", "eat-cookies"],
+        },
         b"andrew": {
             "password": b"hunter2",
             "bio": b"Andrew Yu",
@@ -17,6 +23,12 @@ class config:
             "password": b"billy",
             "bio": b"Random bot",
             "permissions": {"god"},
+            "options": ["offline-messages", "eat-cookies"],
+        },
+        b"vitali64": {
+            "password": b"o",
+            "bio": b"bad",
+            "permissions": set(),
             "options": ["offline-messages", "eat-cookies"],
         },
         b"lurk": {

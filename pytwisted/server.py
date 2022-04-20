@@ -20,9 +20,11 @@ class User:
 
     def add_client(self, client):
         self.clients.append(client)
+        self.send(b"NOTE_NEW_CLIENT\tA new client has connected with CID " + client.cid.encode("utf-8") + b".")
 
     def del_client(self, client):
         self.clients.remove(client)
+        self.send(b"NOTE_EXIT_CLIENT\tClient " + client.cid.encode("utf-8") + b" has disconnected.")
 
     def send(self, *args):
         for client in self.clients:
@@ -46,15 +48,15 @@ class Channel:
         self.users = []  # User()
         self.modes = []  # ("ban", "hax@andrewyu.org")
 
-    def broadcast_join(self, user):  # must be called with User().join
+    def broadcast_join(self, user):  # should be called with User().join
         self.users.append(user)
         for u in self.users:
-            u.send("JOIN", user.get_id(), seld.name)
+            u.send("JOIN", user.get_id(), self.name)
 
     def broadcast_part(self, user, reason=""):  # must be called with User().part
         self.users.append(user)
         for u in self.users:
-            u.send("PART", user.get_id(), seld.name, reason)
+            u.send("PART", user.get_id(), self.name, reason)
 
 
 class Client(basic.LineReceiver):
@@ -173,8 +175,8 @@ class Client(basic.LineReceiver):
     def send_msg(self, recipient, msg):
         if recipient not in config.users:
             self.send(
-                b'ERR_I_AM_TOO_LAZY_TO_FIGURE_OUT_WHAT_CODE_TO_USE_HERE',
-                b'User does not exist!',
+                b'ERR_NONEXISTANT_USER',
+                b'User ' + recipient + b' does not exist.',
             )
             return
         target_clients = self.factory.users.get(recipient)
