@@ -34,7 +34,7 @@ class User:
         self.channels.remove(channel)
 
     def message(self, target, message):
-        
+        pass
 
 class Channel:
     def __init__(self, name):
