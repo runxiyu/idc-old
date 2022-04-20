@@ -25,12 +25,14 @@ async def sendToAllClientsOfUser(username, toWrite):
             return False
         return None
 
+class UserNotFoundError(Exception): pass
+
 
 async def checkedTimedOriginedMessageToUser(
     originUsername, targetUsername, command, text
 ):
     if targetUsername in users.keys() and originUsername in users.keys():
-        await sendToAllClientsOfUser(
+        return await sendToAllClientsOfUser(
             targetUsername,
             command
             + b"\t"
@@ -41,9 +43,8 @@ async def checkedTimedOriginedMessageToUser(
             + text
             + b"\r\n",
         )
-        return True
     else:
-        return False
+        return UserNotFoundError("User nonexistant")
 
 
 async def clientLoop(reader, writer):
@@ -143,20 +144,22 @@ async def clientLoop(reader, writer):
             writer.write(repr(users).encode("utf-8"))
         elif not loggedIn:
             writer.write(b"ERR_UNREGISTERED\tYou haven't logged in.\r\n")
-        elif cmd == b"PRIVATE_MESSAGE":
+        elif cmd == b"PRIVMSG":
             if len(args) != 3:
                 writer.write(
-                    b"ERR_ARGUMEHT_NUMBER\tThe PRIVATE_MESSAGE command takes two positional arguments: Username and text.\r\n"
+                    b"ERR_ARGUMEHT_NUMBER\tThe PRIVMSG command takes two positional arguments: Username and text.\r\n"
                 )
             else:
-                if not await checkedTimedOriginedMessageToUser(
-                    loggedInAs, args[1], b"PRIVATE_MESSAGE", args[2]
-                ):
+                r = await checkedTimedOriginedMessageToUser(loggedInAs, args[1], b"PRIVMSG", args[2])
+                if isinstance(r, UserNotFoundError):
                     writer.write(
                         b"ERR_DESTINATION_NONEXISTANT\tThe destination user "
                         + args[1]
                         + b" does not exist.\r\n"
                     )
+                elif r is None:
+                    writer.write(b"ERR_NO_OFFLINE_MSGS\t" + args[1] + b"is offline and does not have offline-messages.\r\n")
+                del r
         else:
             writer.write(
                 b'ERR_UNKNOWN_COMMAND\t"' + cmd + b'" is an unknown command.\r\n'
@@ -173,7 +176,7 @@ async def clientLoop(reader, writer):
 
 
 async def main():
-    server = await asyncio.start_server(clientLoop, "", 1026)
+    server = await asyncio.start_server(clientLoop, "", 1025)
 
     async with server:
         await server.serve_forever()
