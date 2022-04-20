@@ -20,9 +20,10 @@ async def sendToAllClientsOfUser(username, toWrite):
             i += 1
         return i
     else:
-        users[username]["queue"].append(toWrite)
-        return False
-        # bursting the queue on connect hasn't been written
+        if "offline-messages" in users[username]["options"]:
+            users[username]["queue"].append(toWrite)
+            return False
+        return None
 
 
 async def checkedTimedOriginedMessageToUser(
@@ -120,10 +121,11 @@ async def clientLoop(reader, writer):
                         loggedInAs = args[1]
                         users[loggedInAs]["clients"].append(cid)
                         queue = users[loggedInAs]["queue"]
-                        if len(queue) > 0:
-                            for i in range(0, len(queue)):
-                                writer.write(queue.pop(i))
-                            del i
+                        if queue:
+                            for m in queue:
+                                writer.write(m)
+                            del m
+                            users[loggedInAs]["queue"] = []
                         del queue
                     else:
                         writer.write(
@@ -140,9 +142,8 @@ async def clientLoop(reader, writer):
                     b"ERR_ARGUMEHT_NUMBER\tThe PRIVATE_MESSAGE command takes two positional arguments: Username and text.\r\n"
                 )
             else:
-                await checkedTimedOriginedMessageToUser(
-                    loggedInAs, args[1], b"PRIVATE_MESSAGE", args[2]
-                )
+                if not await checkedTimedOriginedMessageToUser(loggedInAs, args[1], b"PRIVATE_MESSAGE", args[2]):
+                    writer.write(b"ERR_DESTINATION_NONEXISTANT\tThe destination user " + args[1] + " does not exist.\r\n")
         else:
             writer.write(
                 b'ERR_UNKNOWN_COMMAND\t"' + cmd + b'" is an unknown command.\r\n'
