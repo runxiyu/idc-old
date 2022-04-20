@@ -1,3 +1,5 @@
+ # please enlarge your terminal
+
 import time
 import asyncio
 import config
@@ -13,17 +15,19 @@ client_id_count = 0
 
 async def sendToAllClientsOfUser(username, toWrite):
     if users[username]["clients"]:
-        i = 0
-        for pair in users[username]["clients"]:
-            pair[1].write(toWrite)
-            await pair[1].drain()
-            i += 1
-        return i
-    else:
-        if "offline-messages" in users[username]["options"]:
-            users[username]["queue"].append(toWrite)
-            return False
-        return None
+        try:
+            i = 0
+            for pair in users[username]["clients"]:
+                pair[1].write(toWrite)
+                await pair[1].drain()
+                i += 1
+            return i
+        except Exception:
+            pass
+    if "offline-messages" in users[username]["options"]:
+        users[username]["queue"].append(toWrite)
+        return False
+    return None
 
 class UserNotFoundError(Exception): pass
 
@@ -31,7 +35,7 @@ class UserNotFoundError(Exception): pass
 async def checkedTimedOriginedMessageToUser(
     originUsername, targetUsername, command, text
 ):
-    if targetUsername in users.keys() and originUsername in users.keys():
+    if targetUsername in users.keys():
         return await sendToAllClientsOfUser(
             targetUsername,
             command
@@ -54,7 +58,7 @@ async def clientLoop(reader, writer):
     client_id_count += 1
     clients[cid] = (reader, writer)
     loggedIn = False
-    loggedInAs = Exception
+    loggedInAs = None
     ln = b""
     while True:
         newln = await reader.read(9)
@@ -90,10 +94,8 @@ async def clientLoop(reader, writer):
         args.append(current)
         del current
 
-        print(args)
-
         if not args[0]:
-            return
+            continue
         cmd = args[0].upper()
 
         if cmd == b"SERVER":
@@ -158,7 +160,7 @@ async def clientLoop(reader, writer):
                         + b" does not exist.\r\n"
                     )
                 elif r is None:
-                    writer.write(b"ERR_NO_OFFLINE_MSGS\t" + args[1] + b"is offline and does not have offline-messages.\r\n")
+                    writer.write(b"ERR_NO_OFFLINE_MSGS\t" + args[1] + b" is offline and does not have offline-messages.\r\n")
                 del r
         else:
             writer.write(
@@ -170,7 +172,7 @@ async def clientLoop(reader, writer):
     writer.close()
     try:
         users[loggedInAs]["clients"].remove(cid)
-    except UnboundLocalError:
+    except KeyError:
         pass
     del clients[cid]
 
