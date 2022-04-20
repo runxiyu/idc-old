@@ -149,8 +149,14 @@ async def clientLoop(reader, writer):
                     b"ERR_ARGUMEHT_NUMBER\tThe PRIVATE_MESSAGE command takes two positional arguments: Username and text.\r\n"
                 )
             else:
-                if not await checkedTimedOriginedMessageToUser(loggedInAs, args[1], b"PRIVATE_MESSAGE", args[2]):
-                    writer.write(b"ERR_DESTINATION_NONEXISTANT\tThe destination user " + args[1] + b" does not exist.\r\n")
+                if not await checkedTimedOriginedMessageToUser(
+                    loggedInAs, args[1], b"PRIVATE_MESSAGE", args[2]
+                ):
+                    writer.write(
+                        b"ERR_DESTINATION_NONEXISTANT\tThe destination user "
+                        + args[1]
+                        + b" does not exist.\r\n"
+                    )
         else:
             writer.write(
                 b'ERR_UNKNOWN_COMMAND\t"' + cmd + b'" is an unknown command.\r\n'
