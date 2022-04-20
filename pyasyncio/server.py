@@ -1,11 +1,11 @@
 import asyncio
 import config
+from pprint import pprint
 
 users = config.users
 for username in users: users[username]['clients'] = []
 clients = {} # cid: (reader, writer)
 client_id_count = 0
-
 
 async def clientLoop(reader, writer):
     addr = writer.get_extra_info("peername")
@@ -66,13 +66,22 @@ async def clientLoop(reader, writer):
                     if args[2] == goodPassword:
                         writer.write(b"RPL_LOGIN_GOOD\tYou have logged in as " + args[1] + b"@" + config.server_name + b".\r\n")
                         loggedInAs = args[1]
-                        registerLogin(cid, args[1])
+                        users[loggedInAs]['clients'].append(cid)
                     else:
                         writer.write(b"ERR_PASS_INVALID\tIncorrect password for " + args[1] + b".\r\n")
+        elif cmd == b"DUMP":
+            pprint(clients)
+            pprint(users)
+        else:
+            writer.write(b"ERR_UNKNOWN_COMMAND\t\" + cmd + \" is an unknown command.\r\n")
 
         await writer.drain()
 
     writer.close()
+    try:
+        users[loggedInAs]['clients'].remove(cid)
+    except KeyError:
+        pass
     del clients[cid]
 
 
