@@ -52,6 +52,8 @@ async def clientLoop(reader, writer):
     cid = str(client_id_count)
     client_id_count += 1
     clients[cid] = (reader, writer)
+    loggedIn = False
+    loggedInAs = Exception
     ln = b""
     while True:
         newln = await reader.read(9)
@@ -119,13 +121,16 @@ async def clientLoop(reader, writer):
                             + b".\r\n"
                         )
                         loggedInAs = args[1]
+                        loggedIn = True
                         users[loggedInAs]["clients"].append(cid)
                         queue = users[loggedInAs]["queue"]
                         if queue:
+                            writer.write(b"BURST\r\n")
                             for m in queue:
                                 writer.write(m)
                             del m
                             users[loggedInAs]["queue"] = []
+                            writer.write(b"END_BURST\r\n")
                         del queue
                     else:
                         writer.write(
@@ -136,6 +141,8 @@ async def clientLoop(reader, writer):
         elif cmd == b"DUMP":  # TODO: This is for debugging purposes, obviously
             writer.write(repr(clients).encode("utf-8"))
             writer.write(repr(users).encode("utf-8"))
+        elif not loggedIn:
+            writer.write(b"ERR_UNREGISTERED\tYou haven't logged in.\r\n")
         elif cmd == b"PRIVATE_MESSAGE":
             if len(args) != 3:
                 writer.write(
@@ -143,7 +150,7 @@ async def clientLoop(reader, writer):
                 )
             else:
                 if not await checkedTimedOriginedMessageToUser(loggedInAs, args[1], b"PRIVATE_MESSAGE", args[2]):
-                    writer.write(b"ERR_DESTINATION_NONEXISTANT\tThe destination user " + args[1] + " does not exist.\r\n")
+                    writer.write(b"ERR_DESTINATION_NONEXISTANT\tThe destination user " + args[1] + b" does not exist.\r\n")
         else:
             writer.write(
                 b'ERR_UNKNOWN_COMMAND\t"' + cmd + b'" is an unknown command.\r\n'
