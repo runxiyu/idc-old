@@ -18,12 +18,14 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from __future__ import annotations
+
 import time
 import asyncio
 import logging
 import config
 
-# from dataclasses import dataclass # nah not doing this for now
+from dataclasses import dataclass, field # do it for existing stuff (i.e. fusers and clientsa) first
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -33,16 +35,65 @@ class UserNotFoundError(Exception):
 
 
 class WeirdError(Exception):
-    pass
+    def __str__(self):
+        return '\x1b(0'
+
+@dataclass
+class Client:
+    reader: asyncio.StreamReader
+    writer: asyncio.StreamWriter
 
 
-users = config.users
-for username in users:
-    users[username]["clients"] = []
-    users[username]["queue"] = []
+@dataclass
+class User:
+    username: bytes  # Can names please be strings
+    password: bytes
+    bio: bytes
+    permissions: set[str]
+    options: set[str]
+    clients: list[Client] = field(default_factory=list)
+    queue: list[bytes] = field(default_factory=list)
+
+
+@dataclass
+class Permissions:
+    permissions: set[str]
+    anti_permissions: set[str]
+    management_permissions: set[str]
+
+
+@dataclass
+class Role(Permissions):
+    name: str
+    channel_overrides: dict[str, Permissions]
+
+
+@dataclass
+class Guild:
+    name: str
+    users: list[str]
+    user_roles: dict[str, set[str]]
+    roles: dict[str, Role]
+
+users = {name: User(username=name, **user) for name, user in config.users}
+# anyways
+# we're still gonna use functions, like normal functions (side effects are okay) instead of methods
+
 
 clients = {}  # cid: (reader, writer)
 client_id_count = 0
+
+# put this in config.py
+# guilds = {
+#     "Hackers": {
+#                    "users": ["luk3yx", "andrew", "hax"],
+#                }
+# }`
+# name: {"users": [username],
+#        "userRoles": {userName: set(roles)},
+#        "rolePermissions": {roleName: [set(permissions), set(antiPermission), set(managementPermissions), {channelName: [...]}]},
+#        "channels" : {channelName: {}},
+#       }
 
 
 def getKeyByValue(d, s):
