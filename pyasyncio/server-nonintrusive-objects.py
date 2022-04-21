@@ -2,6 +2,12 @@
 # Internet Delay Chat Server
 # Example implementation in Python asyncio
 #
+# This implementation uses some parts of object-oriented Python, while trying
+# to be uninstrusive such as not having two layers of subclassing.  When I
+# learn how to actually write practical (as opposed to plainly theoretical and
+# purely functional programs), this implementation won't be maintained by me
+# anymore. -- Andrew
+#
 # The Internet Delay Chat specifications and implementations are all under
 # heavy development.  No stability may be expected.
 #
@@ -44,11 +50,6 @@ import secrets
 
 import config
 
-from dataclasses import (
-    dataclass,
-    field,
-)
-
 logging.basicConfig(level=logging.DEBUG)
 
 
@@ -60,21 +61,59 @@ class StrangeError(Exception):
     pass
 
 
-@dataclass
 class Client:
-    reader: asyncio.StreamReader
-    writer: asyncio.StreamWriter
+    client_accumulation = 0
+
+    def __init__(
+        self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter
+    ) -> None:
+        Client.client_accumulation += 1
+        self.reader: asyncio.StreamReader = reader
+        self.writer: asyncio.StreamWriter = writer
+        self.clientId: bytes = str(Client.client_accumulation).encode("utf-8")
+        # self.user won't be defined here, unless we decide to make a nullUser of some sort
+
+    async def writeRaw(self, toWrite: bytes) -> None:
+        self.writer.write(toWrite)
+        await self.writer.drain()
+
+    async def writeArgs(self, *toWrite: list[bytes]) -> None:
+        line: bytes = (
+            b"\t".join(
+                arg.replace(b"\\", b"\\\\").replace(b"\t", b"\\\t") for arg in args
+            )
+            + b"\r\n"
+        )
+        await self.writeRaw(line)
 
 
-@dataclass
 class User:
-    username: bytes
-    password: bytes
-    bio: bytes
-    permissions: set[bytes]
-    options: set[bytes]
-    clients: list[Client] = field(default_factory=list)
-    queue: list[bytes] = field(default_factory=list)
+    def __init__(self, username: bytes, userConfiguration):
+        self.username: bytes = username
+        self.password: bytes = userConfiguration.password
+        self.bio: bytes = userConfiguration.bio
+        self.permissions: set[bytes] = userConfiguration.serverPermissions
+        self.options: set[bytes] = userConfiguration.serverOptions
+        # I'm unclear what would happen if the below lists are empty.  Having
+        # an empty clientlist and queue is pretty normal.
+        self.clients: list[Client] = []
+        self.queue: list[bytes] = []
+    def addClient(self, client: Client):
+        self.clients.append(client)
+    def delClient(self, client: Client):
+        self.clients.remove(client)
+    async def writeArgsToAllClients(self, delayable: bool, *toWrite: bytes) -> int:
+        if self.clients:
+            i: int = 0
+            for client in self.clients:
+                await client.writeArgs(*toWrite)
+                i += 1
+            return i
+        elif "offline-messages" in self.options:
+            self.queue.append(toWrite)
+            return 0
+        else:
+            raise MessageUndeliverableError("User offline and does not accept offline messages")
 
 
 @dataclass
@@ -150,8 +189,8 @@ async def argWrite(writer, *args):
 async def sendToAllClientsOfUser(username, *args):
     if users[username].clients:
         i = 0
-        for cid in users[username].clients:
-            writer = clients[cid]
+        for clientId in users[username].clients:
+            writer = clients[clientId]
             await argWrite(writer, *args)
             i += 1
         return i
@@ -179,9 +218,9 @@ async def checkedTimedOriginedMessageToUser(
 async def clientLoop(reader, writer):
     addr = writer.get_extra_info("peername")
     global client_id_count
-    cid = str(client_id_count)
+    clientId = str(client_id_count)
     client_id_count += 1
-    clients[cid] = writer
+    clients[clientId] = writer
     loggedIn = False
     loggedInAs = None
     ln = b""
@@ -222,7 +261,7 @@ async def clientLoop(reader, writer):
         if not args[0]:
             continue
 
-        logging.debug(cid + " >>> " + repr(args))
+        logging.debug(clientId + " >>> " + repr(args))
         cmd = args[0].upper()
 
         if cmd == b"SERVER":
@@ -262,7 +301,7 @@ async def clientLoop(reader, writer):
                         )
                         loggedInAs = args[1]
                         loggedIn = True
-                        users[loggedInAs].clients.append(cid)
+                        users[loggedInAs].clients.append(clientId)
                         queue = users[loggedInAs].queue
                         if queue:
                             await argWrite(writer, b"OFFLINE_MESSAGES\r\n")
@@ -349,10 +388,10 @@ async def clientLoop(reader, writer):
 
     writer.close()
     try:
-        users[loggedInAs].clients.remove(cid)
+        users[loggedInAs].clients.remove(clientId)
     except KeyError:
         pass
-    del clients[cid]
+    del clients[clientId]
 
 
 async def main():
