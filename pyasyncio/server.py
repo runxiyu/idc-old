@@ -18,11 +18,21 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# Todo list:
+# - Use sources correctly, i.e. :andrew@andrewyu.org
+# - Federation, and usernames should contain the server name somehow
+# - Guilds and channels
+# - TLS
+# - VOIP
+# - Yay
+
 from __future__ import annotations
 
 import time
 import asyncio
 import logging
+import secrets
+
 import config
 
 from dataclasses import (
@@ -49,40 +59,60 @@ class Client:
 
 @dataclass
 class User:
-    username: bytes  # Can names please be strings
+    username: bytes  # Can names please be bytesings
     password: bytes
     bio: bytes
-    permissions: set[str]
-    options: set[str]
+    permissions: set[bytes]
+    options: set[bytes]
     clients: list[Client] = field(default_factory=list)
     queue: list[bytes] = field(default_factory=list)
 
 
 @dataclass
 class PermissionSet:
-    permissions: set[str]
-    anti_permissions: set[str]
-    management_permissions: set[str]
+    permissions: set[bytes]
+    anti_permissions: set[bytes]
+    management_permissions: set[bytes]
 
 
 @dataclass
 class Role(PermissionSet):
-    name: str
-    channel_overrides: dict[str, PermissionSet]
+    name: bytes
+    channel_overrides: dict[bytes, PermissionSet]
+
+
+@dataclass
+class Channel:
+    name: bytes
+    users: list[bytes]
 
 
 @dataclass
 class Guild:
-    name: str
-    users: list[str]
-    userRoles: dict[str, set[str]]  # camel case because it looks more like haskell lol
-    roles: dict[str, Role]
+    name: bytes
+    description: bytes
+    users: list[bytes]
+    userRoles: dict[
+        bytes, set[bytes]
+    ]  # camel case because it looks more like haskell lol
+    roles: dict[bytes, Role]
+    channels: dict[bytes, Channel]
 
 
-users = {name: User(username=name, **user) for name, user in config.users}
+#    ... str? most of those should be bytes
+# anything that will possibly get transmitted in the socket should be a bytes()
+
+# time to rewrite everything below
 
 
-clients = {}  # cid: (reader, writer)
+users = {name: User(username=name, **user) for name, user in config.users.items()}
+guilds = {name: Guild(name=name, **guild) for name, guild in config.guilds.items()}
+
+clients: dict[
+    bytes, Client
+] = {}  # because server ops might want to transmit and receive CIDs
+# your controls, semi-afk
+# anyways, rewriting the below sounds slightly painful
 client_id_count = 0
 
 # put this in config.py
@@ -128,15 +158,15 @@ async def argWrite(writer, *args):
 
 
 async def sendToAllClientsOfUser(username, *args):
-    if users[username]["clients"]:
+    if users[username].clients:
         i = 0
-        for cid in users[username]["clients"]:
+        for cid in users[username].clients:
             writer = clients[cid]
             await argWrite(writer, *args)
             i += 1
         return i
-    elif "offline-messages" in users[username]["options"]:
-        users[username]["queue"].append(toWrite)
+    elif "offline-messages" in users[username].options:
+        users[username].queue.append(toWrite)
         return False
     return None
 
@@ -224,7 +254,9 @@ async def clientLoop(reader, writer):
                 )
             else:
                 try:
-                    goodPassword = users[args[1]]["password"]
+                    goodPassword = users[args[1]].password
+                    # u to undo, dd is "delete line", 4dd is "delete this line and the next three", "cw" is change this word, "5cw" is "change this word and the next four"
+                    # redo: ^r
                 except KeyError:
                     await argWrite(
                         writer,
@@ -232,7 +264,7 @@ async def clientLoop(reader, writer):
                         b"The username provided is invalid.",
                     )
                 else:
-                    if args[2] == goodPassword:
+                    if secrets.compare_digest(args[2], goodPassword):
                         await argWrite(
                             writer,
                             b"RPL_LOGIN_GOOD",
@@ -240,14 +272,14 @@ async def clientLoop(reader, writer):
                         )
                         loggedInAs = args[1]
                         loggedIn = True
-                        users[loggedInAs]["clients"].append(cid)
-                        queue = users[loggedInAs]["queue"]
+                        users[loggedInAs].clients.append(cid)
+                        queue = users[loggedInAs].queue
                         if queue:
                             await argWrite(writer, b"OFFLINE_MESSAGES\r\n")
                             for m in queue:
                                 writer.write(m)
                             del m
-                            users[loggedInAs]["queue"] = []
+                            users[loggedInAs].queue = []
                             await argWrite(writer, b"END_OFFLINE_MESSAGES\r\n")
                         del queue
                     else:
@@ -289,7 +321,7 @@ async def clientLoop(reader, writer):
                     )
                 del r
         elif cmd == b"KILL":
-            if not "kill" in users[loggedInAs]["permissions"]:
+            if not "kill" in users[loggedInAs].permissions:
                 await argWrite(
                     writer,
                     b"ERR_SERVER_PERMS",
@@ -314,7 +346,7 @@ async def clientLoop(reader, writer):
 
     writer.close()
     try:
-        users[loggedInAs]["clients"].remove(cid)
+        users[loggedInAs].clients.remove(cid)
     except KeyError:
         pass
     del clients[cid]

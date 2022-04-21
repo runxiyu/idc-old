@@ -37,3 +37,13 @@ users = {
         "options": ["bot", "no-offline-messages"],
     },
 }
+
+guilds = {
+    b"Haxxors": {
+        "description": b"Haxxors guild",
+        "userRoles": [],
+        "channels": [],
+        "users": {b"Andrew", b"lurk"},
+        "roles": [],
+    }
+}
