@@ -277,12 +277,12 @@ async def clientLoop(reader, writer):
                         users[loggedInAs].clients.append(cid)
                         queue = users[loggedInAs].queue
                         if queue:
-                            await argWrite(writer, b"OFFLINE_MESSAGES\r\n")
+                            await argWrite(writer, b"OFFLINE_MESSAGES")
                             for m in queue:
                                 writer.write(m)
                             del m
                             users[loggedInAs].queue = []
-                            await argWrite(writer, b"END_OFFLINE_MESSAGES\r\n")
+                            await argWrite(writer, b"END_OFFLINE_MESSAGES")
                         del queue
                     else:
                         await argWrite(
