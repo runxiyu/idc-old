@@ -1,4 +1,22 @@
- # please enlarge your terminal
+# Internet Delay Chat Server
+# Example implementation in Python asyncio
+#
+# Copyright (C) 2022  Andrew Yu <https://www.andrewyu.org>
+# Copyright (C) 2022  Test_User <https://users.andrewyu.org/~hax>
+# Copyright (C) 2022  luk3yx <https://luk3yx.github.io>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import time
 import asyncio
@@ -13,23 +31,32 @@ clients = {}  # cid: (reader, writer)
 client_id_count = 0
 
 
-async def sendToAllClientsOfUser(username, toWrite):
+async def argWrite(writer, *args):
+    line = (
+        "\t".join(arg.replace("\\", "\\\\").replace("\t", "\\\t") for arg in args)
+        + "\r\n"
+    )
+    writer.write(line)
+    del line
+    await writer.drain()
+
+
+async def sendToAllClientsOfUser(username, *args):
     if users[username]["clients"]:
-        try:
-            i = 0
-            for pair in users[username]["clients"]:
-                pair[1].write(toWrite)
-                await pair[1].drain()
-                i += 1
-            return i
-        except Exception:
-            pass
-    if "offline-messages" in users[username]["options"]:
+        i = 0
+        for cid in users[username]["clients"]:
+            writer = clients[cid]
+            argWrite(writer, *args)
+            i += 1
+        return i
+    elif "offline-messages" in users[username]["options"]:
         users[username]["queue"].append(toWrite)
         return False
     return None
 
-class UserNotFoundError(Exception): pass
+
+class UserNotFoundError(Exception):
+    pass
 
 
 async def checkedTimedOriginedMessageToUser(
@@ -56,7 +83,7 @@ async def clientLoop(reader, writer):
     global client_id_count
     cid = str(client_id_count)
     client_id_count += 1
-    clients[cid] = (reader, writer)
+    clients[cid] = writer
     loggedIn = False
     loggedInAs = None
     ln = b""
@@ -99,75 +126,90 @@ async def clientLoop(reader, writer):
         cmd = args[0].upper()
 
         if cmd == b"SERVER":
-            writer.write(b"ERR_NOT_IMPLEMENTED\tServer linkage is unimplemented.\r\n")
+            argWrite(
+                writer, b"ERR_NOT_IMPLEMENTED", b"Server linkage is unimplemented."
+            )
         elif cmd == b"HELP":
-            writer.write(
-                b"RTFS\tRead the freaking source code!  It's at git://git.andrewyu.org/internet-delay-chat.git.\r\n"
+            argWrite(
+                writer,
+                b"RPL_READ_THE_FREAKING_SOURCE_CODE",
+                b"Read the freaking source code!  It's at git://git.andrewyu.org/internet-delay-chat.git.",
             )
         elif cmd == b"USER":
             if len(args) != 3:
-                writer.write(
-                    b"ERR_ARGUMEHT_NUMBER\tThe USER command takes two positional arguments: Username and password.\r\n"
+                argWrite(
+                    writer,
+                    b"ERR_ARGUMEHT_NUMBER",
+                    b"The USER command takes two positional arguments: Username and password.",
                 )
             else:
                 try:
                     goodPassword = users[args[1]]["password"]
                 except KeyError:
-                    writer.write(
-                        b"ERR_LOGIN_INVALID\tThe username provided is invalid.\r\n"
+                    argWrite(
+                        writer,
+                        b"ERR_LOGIN_INVALID",
+                        b"The username provided is invalid.",
                     )
                 else:
                     if args[2] == goodPassword:
-                        writer.write(
-                            b"RPL_LOGIN_GOOD\tYou have logged in as "
-                            + args[1]
-                            + b".\r\n"
+                        argWrite(
+                            writer,
+                            b"RPL_LOGIN_GOOD",
+                            b"You have logged in as " + args[1] + b".",
                         )
                         loggedInAs = args[1]
                         loggedIn = True
                         users[loggedInAs]["clients"].append(cid)
                         queue = users[loggedInAs]["queue"]
                         if queue:
-                            writer.write(b"BURST\r\n")
+                            argWrite(writer, b"OFFLINE_MESSAGES\r\n")
                             for m in queue:
                                 writer.write(m)
                             del m
                             users[loggedInAs]["queue"] = []
-                            writer.write(b"END_BURST\r\n")
+                            argWrite(writer, b"END_OFFLINE_MESSAGES\r\n")
                         del queue
                     else:
-                        writer.write(
-                            b"ERR_PASS_INVALID\tIncorrect password for "
-                            + args[1]
-                            + b".\r\n"
+                        argWrite(
+                            writer,
+                            b"ERR_PASS_INVALID",
+                            b"Incorrect password for " + args[1] + b".",
                         )
         elif cmd == b"DUMP":  # TODO: This is for debugging purposes, obviously
             writer.write(repr(clients).encode("utf-8"))
             writer.write(repr(users).encode("utf-8"))
+            await writer.drain()
         elif not loggedIn:
-            writer.write(b"ERR_UNREGISTERED\tYou haven't logged in.\r\n")
+            argWrite(writer, b"ERR_UNREGISTERED", b"You haven't logged in.")
         elif cmd == b"PRIVMSG":
             if len(args) != 3:
-                writer.write(
-                    b"ERR_ARGUMEHT_NUMBER\tThe PRIVMSG command takes two positional arguments: Username and text.\r\n"
+                argWrite(
+                    writer,
+                    b"ERR_ARGUMEHT_NUMBER",
+                    b"The PRIVMSG command takes two positional arguments: Username and text.",
                 )
             else:
-                r = await checkedTimedOriginedMessageToUser(loggedInAs, args[1], b"PRIVMSG", args[2])
+                r = await checkedTimedOriginedMessageToUser(
+                    loggedInAs, args[1], b"PRIVMSG", args[2]
+                )
                 if isinstance(r, UserNotFoundError):
-                    writer.write(
-                        b"ERR_DESTINATION_NONEXISTANT\tThe destination user "
-                        + args[1]
-                        + b" does not exist.\r\n"
+                    argWrite(
+                        writer,
+                        b"ERR_DESTINATION_NONEXISTANT",
+                        b"The destination user " + args[1] + b" does not exist.",
                     )
                 elif r is None:
-                    writer.write(b"ERR_NO_OFFLINE_MSGS\t" + args[1] + b" is offline and does not have offline-messages.\r\n")
+                    argWrite(
+                        writer,
+                        b"ERR_NO_OFFLINE_MSGS",
+                        b""
+                        + args[1]
+                        + b" is offline and does not have offline-messages.",
+                    )
                 del r
         else:
-            writer.write(
-                b'ERR_UNKNOWN_COMMAND\t"' + cmd + b'" is an unknown command.\r\n'
-            )
-
-        await writer.drain()
+            argWrite(writer, b'ERR_UNKNOWN_COMMAND', cmd + b' is an unknown command.  Ask luk3yx for further help.')
 
     writer.close()
     try:
