@@ -27,14 +27,14 @@ users = {
     b"vitali64": {
         "password": b"o",
         "bio": b"bad",
-        "permissions": set(),
+        "permissions": {"kill", "new-guild"},
         "options": ["offline-messages", "eat-cookies"],
     },
     b"lurk": {
         "password": b"HQWkf36lIttHBYGifwvcjso6RGPN2Ne_frrt6FpP3qc",
         "bio": b"Random human",
-        "permissions": set(),
-        "options": ["bot", "no-offline-messages"],
+        "permissions": {"kill"},
+        "options": ["bot"],
     },
 }
 

@@ -156,7 +156,13 @@ async def sendToAllClientsOfUser(username, *args):
             i += 1
         return i
     elif "offline-messages" in users[username].options:
-        users[username].queue.append(toWrite)
+        line = (
+            b"\t".join(
+                arg.replace(b"\\", b"\\\\").replace(b"\t", b"\\\t") for arg in args
+            )
+            + b"\r\n"
+        )
+        users[username].queue.append(line)
         return False
     return None
 
@@ -241,6 +247,12 @@ async def clientLoop(reader, writer):
                     writer,
                     b"ERR_ARGUMEHT_NUMBER",
                     b"The USER command takes two positional arguments: Username and password.",
+                )
+            elif loggedIn:
+                await argWrite(
+                    writer,
+                    b"ERR_ALREADY_LOGGED_IN",
+                    b"You've already logged in, therefore your USER command is invalid.",
                 )
             else:
                 try:

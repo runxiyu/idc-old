@@ -1,4 +1,5 @@
 #!/bin/sh
+#
 # Internet Delay Chat Server
 # Example implementation in Python asyncio
 #
@@ -42,6 +43,7 @@
 # - MAKE A CLIENT!
 
 from __future__ import annotations
+from dataclasses import dataclass
 
 import time
 import asyncio
@@ -112,7 +114,9 @@ class User:
                 await client.writeArgs(*toWrite)
                 i += 1
             return i
-        elif "offline-messages" in self.options:
+        elif not delayable:
+            raise MessageUndeliverableError("User offline and message is not delayable")
+        elif b"offline-messages" in self.options:
             self.queue.append(toWrite)
             return 0
         else:
@@ -191,6 +195,7 @@ async def argWrite(writer, *args):
     await writer.drain()
 
 
+r"""
 async def sendToAllClientsOfUser(username, *args):
     if users[username].clients:
         i = 0
@@ -203,17 +208,17 @@ async def sendToAllClientsOfUser(username, *args):
         users[username].queue.append(toWrite)
         return False
     return None
+"""
 
 
 async def checkedTimedOriginedMessageToUser(
     originUsername, targetUsername, command, text
 ):
-    if targetUsername in users.keys():
-        return await sendToAllClientsOfUser(
-            targetUsername,
+    if targetUsername in users:
+        return await users[targetUsername].writeArgsToAllClients(
+            b":" + originUsername,
             command,
             str(time.time()).encode("utf-8"),
-            originUsername,
             text,
         )
     else:
@@ -230,7 +235,7 @@ async def clientLoop(reader, writer):
     loggedInAs = None
     ln = b""
     while True:
-        newln = await reader.read(512)
+        newln = await reader.read(4096)
         if newln == b"":
             break
         ln += newln
@@ -240,9 +245,12 @@ async def clientLoop(reader, writer):
         msg = lnSplt[0]
         ln = b""
 
+        r"""
         escaped = False
         args = []
         current = b""
+        # AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        # Alright I am burning this code
         for b in [msg[i : i + 1] for i in range(len(msg))]:
             if escaped:
                 if b == b"\\":
@@ -262,6 +270,14 @@ async def clientLoop(reader, writer):
         del escaped
         args.append(current)
         del current
+        """
+
+        # Stolen from miniirc_idc
+        # Is this horrible? Sure
+        # But at least it works (hopefully)
+        args = re.sub(r"\\(.)|\t", lambda m: m.group(1) or "\udeff", msg).split(
+            "\udeff"
+        )
 
         if not args[0]:
             continue
@@ -283,7 +299,7 @@ async def clientLoop(reader, writer):
             if len(args) != 3:
                 await argWrite(
                     writer,
-                    b"ERR_ARGUMEHT_NUMBER",
+                    b"ERR_ARGUMENT_NUMBER",
                     b"The USER command takes two positional arguments: Username and password.",
                 )
             else:
@@ -328,6 +344,8 @@ async def clientLoop(reader, writer):
             await writer.drain()
         elif not loggedIn:
             await argWrite(writer, b"ERR_UNREGISTERED", b"You haven't logged in.")
+        elif cmd == b"PING":
+            await argWrite(writer, b"PONG", *args[1:])
         elif cmd == b"PRIVMSG":
             if len(args) != 3:
                 await argWrite(
@@ -407,4 +425,7 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    import subprocess
+
+    if subprocess.call(("mypy", __file__)) == 0:
+        asyncio.run(main())
