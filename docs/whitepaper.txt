@@ -5,13 +5,15 @@
 Andrew's Haxxor Working Group                                      A. Yu
                                                                         
                                                                  T. User
-                                                           16 April 2022
+                                                           21 April 2022
 
 
                       Internet Delay Chat Protocol
                           internet-delay-chat
 
 Abstract
+
+   Docs are out of date, will update; reference servers/pyasyncio.
 
    This document specifies a new Internet Protocol for messaging over
    the Internet.
@@ -48,8 +50,6 @@ Table of Contents
        5.1.5.  Quit  . . . . . . . . . . . . . . . . . . . . . . . .  12
        5.1.6.  Server quit message . . . . . . . . . . . . . . . . .  12
      5.2.  Channel operations  . . . . . . . . . . . . . . . . . . .  13
-       5.2.1.  Join message  . . . . . . . . . . . . . . . . . . . .  13
-       5.2.2.  Part message  . . . . . . . . . . . . . . . . . . . .  14
 
 
 
@@ -58,9 +58,13 @@ Yu & User                     Informational                     [Page 1]
                       Internet Delay Chat Protocol            April 2022
 
 
+       5.2.1.  Join message  . . . . . . . . . . . . . . . . . . . .  13
+       5.2.2.  Part message  . . . . . . . . . . . . . . . . . . . .  14
        5.2.3.  Mode message  . . . . . . . . . . . . . . . . . . . .  14
      5.3.  Server queries and commands . . . . . . . . . . . . . . .  17
-   6.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  17
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  17
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  17
+   8.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  17
 
 1.  Introduction
 
@@ -102,10 +106,6 @@ Yu & User                     Informational                     [Page 1]
    XML is inherently bloated and causes unnecessary spam in the network.
    XMPP is not multicast either, messages are slow and especially
    inefficent with multi user chats.
-
-
-
-
 
 
 
@@ -904,14 +904,14 @@ Yu & User                     Informational                    [Page 16]
 
 5.3.  Server queries and commands
 
-6.  Acknowledgements
+6.  IANA Considerations
+
+7.  Security Considerations
+
+8.  Acknowledgements
 
    This document has multiple ideas suggested by Test_User
    <hax@andrewyu.org> and luk3yx.
-
-
-
-
 
 
 
