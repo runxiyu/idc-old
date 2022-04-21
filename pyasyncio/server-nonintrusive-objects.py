@@ -98,10 +98,13 @@ class User:
         # an empty clientlist and queue is pretty normal.
         self.clients: list[Client] = []
         self.queue: list[bytes] = []
+
     def addClient(self, client: Client):
         self.clients.append(client)
+
     def delClient(self, client: Client):
         self.clients.remove(client)
+
     async def writeArgsToAllClients(self, delayable: bool, *toWrite: bytes) -> int:
         if self.clients:
             i: int = 0
@@ -113,7 +116,9 @@ class User:
             self.queue.append(toWrite)
             return 0
         else:
-            raise MessageUndeliverableError("User offline and does not accept offline messages")
+            raise MessageUndeliverableError(
+                "User offline and does not accept offline messages"
+            )
 
 
 @dataclass
