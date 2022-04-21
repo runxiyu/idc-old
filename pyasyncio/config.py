@@ -3,25 +3,25 @@ users = {
     b"Noisytoot": {
         "password": b"pissnet",
         "bio": b"Ron",
-        "permissions": {"god"},
+        "permissions": {"kill"},
         "options": ["offline-messages", "eat-cookies"],
     },
     b"andrew": {
         "password": b"hunter2",
         "bio": b"Andrew Yu",
-        "permissions": {"god"},
+        "permissions": {"kill"},
         "options": ["offline-messages", "eat-cookies"],
     },
     b"hax": {
         "password": b"lurk",
         "bio": b"Professional h4xx0r",
-        "permissions": {"god"},
+        "permissions": {"kill"},
         "options": ["offline-messages", "eat-cookies"],
     },
     b"luk3yx": {
         "password": b"billy",
         "bio": b"Random bot",
-        "permissions": {"god"},
+        "permissions": {"kill"},
         "options": ["offline-messages", "eat-cookies"],
     },
     b"vitali64": {

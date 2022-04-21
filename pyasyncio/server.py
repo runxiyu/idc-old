@@ -40,6 +40,7 @@ users = config.users
 for username in users:
     users[username]["clients"] = []
     users[username]["queue"] = []
+
 clients = {}  # cid: (reader, writer)
 client_id_count = 0
 
@@ -234,6 +235,23 @@ async def clientLoop(reader, writer):
                         + b" is offline and does not have offline-messages.",
                     )
                 del r
+        elif cmd == b"KILL":
+            if not "kill" in users[loggedInAs]["permissions"]:
+                await argWrite(
+                    writer, b"ERR_SERVER_PERMS", b"You do not have the permission to use KILL."
+                )
+            elif 3 <= len(args) <= 4:
+                await argWrite(
+                    writer,
+                    b"ERR_NOT_IMPLEMENTED",
+                    b"The KILL command hasn't been implemented yet.",
+                )
+            else:
+                await argWrite(
+                    writer,
+                    b"ERR_ARGUMEHT_NUMBER",
+                    b"The KILL command takes two positional arguments: Target client and optional reason.",
+                )
         else:
             await argWrite(
                 writer, b"ERR_UNKNOWN_COMMAND", cmd + b" is an unknown command."
