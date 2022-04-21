@@ -25,7 +25,10 @@ import asyncio
 import logging
 import config
 
-from dataclasses import dataclass, field # do it for existing stuff (i.e. fusers and clientsa) first
+from dataclasses import (
+    dataclass,
+    field,
+)  # do it for existing stuff (i.e. fusers and clientsa) first
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -35,8 +38,8 @@ class UserNotFoundError(Exception):
 
 
 class WeirdError(Exception):
-    def __str__(self):
-        return '\x1b(0'
+    pass  # lol
+
 
 @dataclass
 class Client:
@@ -56,28 +59,27 @@ class User:
 
 
 @dataclass
-class Permissions:
+class PermissionSet:
     permissions: set[str]
     anti_permissions: set[str]
     management_permissions: set[str]
 
 
 @dataclass
-class Role(Permissions):
+class Role(PermissionSet):
     name: str
-    channel_overrides: dict[str, Permissions]
+    channel_overrides: dict[str, PermissionSet]
 
 
 @dataclass
 class Guild:
     name: str
     users: list[str]
-    user_roles: dict[str, set[str]]
+    userRoles: dict[str, set[str]]  # camel case because it looks more like haskell lol
     roles: dict[str, Role]
 
+
 users = {name: User(username=name, **user) for name, user in config.users}
-# anyways
-# we're still gonna use functions, like normal functions (side effects are okay) instead of methods
 
 
 clients = {}  # cid: (reader, writer)
@@ -289,7 +291,9 @@ async def clientLoop(reader, writer):
         elif cmd == b"KILL":
             if not "kill" in users[loggedInAs]["permissions"]:
                 await argWrite(
-                    writer, b"ERR_SERVER_PERMS", b"You do not have the permission to use KILL."
+                    writer,
+                    b"ERR_SERVER_PERMS",
+                    b"You do not have the permission to use KILL.",
                 )
             elif 3 <= len(args) <= 4:
                 await argWrite(
