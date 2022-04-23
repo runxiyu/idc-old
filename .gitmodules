@@ -1,3 +1,6 @@
 [submodule "client-idchat"]
 	path = client-idchat
 	url = git://git.andrewyu.org/idchat.git
+[submodule "clients/idchat"]
+	path = clients/idchat
+	url = git://git.andrewyu.org/idchat.git

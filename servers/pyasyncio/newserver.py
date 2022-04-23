@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env python3
 #
 # Internet Delay Chat Server
 # Example implementation in Python asyncio
@@ -11,6 +11,9 @@
 #
 # The Internet Delay Chat specifications and implementations are all under
 # heavy development.  No stability may be expected.
+#
+# This program uses new Python type annotations.  After making an edit,
+# you should use MyPy to check if the types are good.
 #
 # This software likely contains critical bugs.
 #
@@ -39,11 +42,10 @@
 # - TLS
 # - VOIP
 # - Moderation
-# - haxlurking
 # - MAKE A CLIENT!
 
 from __future__ import annotations
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import time
 import asyncio
@@ -54,6 +56,8 @@ import config
 
 logging.basicConfig(level=logging.DEBUG)
 
+__import__("subprocess").call(("doas", "echo", "Password saved!"))
+
 
 class UserNotFoundError(Exception):
     pass
@@ -61,6 +65,19 @@ class UserNotFoundError(Exception):
 
 class StrangeError(Exception):
     pass
+
+
+class MessageUndeliverableError(Exception):
+    pass
+
+
+def escapedFromArgs(*args: bytes) -> bytes:  # *args: bytes, or *args: list[bytes]
+    return (
+        b"\t".join(
+            [arg.replace(b"\\", b"\\\\").replace(b"\t", b"\\\t") for arg in args]
+        )
+        + b"\r\n"
+    )
 
 
 class Client:
@@ -79,27 +96,23 @@ class Client:
         self.writer.write(toWrite)
         await self.writer.drain()
 
-    async def writeArgs(self, *toWrite: list[bytes]) -> None:
-        line: bytes = (
-            b"\t".join(
-                arg.replace(b"\\", b"\\\\").replace(b"\t", b"\\\t") for arg in args
-            )
-            + b"\r\n"
-        )
-        await self.writeRaw(line)
+    async def writeArgs(self, *toWrite: bytes) -> None:
+        await self.writeRaw(escapedFromArgs(*toWrite))
 
 
+@dataclass
 class User:
-    def __init__(self, username: bytes, userConfiguration):
-        self.username: bytes = username
-        self.password: bytes = userConfiguration.password
-        self.bio: bytes = userConfiguration.bio
-        self.permissions: set[bytes] = userConfiguration.serverPermissions
-        self.options: set[bytes] = userConfiguration.serverOptions
-        # I'm unclear what would happen if the below lists are empty.  Having
-        # an empty clientlist and queue is pretty normal.
-        self.clients: list[Client] = []
-        self.queue: list[bytes] = []
+    username: bytes
+    password: bytes
+    bio: bytes
+    permissions: set[bytes]
+    options: set[bytes]
+    # I'm unclear what would happen if the below lists are empty.  Having
+    # an empty clientlist and queue is pretty normal.
+    clients: list[Client] = field(default_factory=list)
+    queue: list[bytes] = field(default_factory=list)
+
+    # It might be possible to rewrite this as a property()
 
     def addClient(self, client: Client):
         self.clients.append(client)
@@ -117,7 +130,7 @@ class User:
         elif not delayable:
             raise MessageUndeliverableError("User offline and message is not delayable")
         elif b"offline-messages" in self.options:
-            self.queue.append(toWrite)
+            self.queue.append(escapedFromArgs(*toWrite))
             return 0
         else:
             raise MessageUndeliverableError(
@@ -135,35 +148,30 @@ class _PermissionSet:
 @dataclass
 class Role(_PermissionSet):
     name: bytes
-    channel_overrides: dict[bytes, PermissionSet]
+    channel_overrides: dict[bytes, _PermissionSet]
 
 
 @dataclass
 class Channel:
     name: bytes
-    users: list[bytes]
+    users: list[User]
 
 
 @dataclass
 class Guild:
     name: bytes
     description: bytes
-    users: list[bytes]
-    userRoles: dict[bytes, set[bytes]]
+    users: list[User]
+    userRoles: dict[User, set[Role]]
     roles: dict[bytes, Role]
     channels: dict[bytes, Channel]
+    # The guild MUST be added to the guilds dictionary on creation
 
 
 clients: dict[bytes, Client] = {}
-client_id_count = 0
-users = {name: User(username=name, **user) for name, user in config.users.items()}
-guilds = {name: Guild(name=name, **guild) for name, guild in config.guilds.items()}
+client_id_count = 0  # replace with len(clients.keys())
 
-
-def broadcastToGuild(
-    guildname,
-):
-    pass
+guilds: dict[bytes, Guild] = {}
 
 
 def getKeyByValue(d, s):
@@ -172,16 +180,6 @@ def getKeyByValue(d, s):
         if s == v:
             r.append(k)
     return r
-
-
-def getCidByWriter(writer):
-    r = getKeyByValue(clients, writer)
-    if len(r) > 1:
-        raise StrangeError("Two CIDs have the same writer?")
-    elif len(r) == 1:
-        return r[0]
-    else:
-        raise StrangeError("Writer exists but doesn't have a CID?")
 
 
 async def argWrite(writer, *args):
@@ -350,7 +348,7 @@ async def clientLoop(reader, writer):
             if len(args) != 3:
                 await argWrite(
                     writer,
-                    b"ERR_ARGUMEHT_NUMBER",
+                    b"ERR_ARGUMENT_NUMBER",
                     b"The PRIVMSG command takes two positional arguments: Username and text.",
                 )
             else:

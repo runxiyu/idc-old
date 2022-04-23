@@ -25,8 +25,8 @@ users = {
         "options": ["offline-messages", "eat-cookies"],
     },
     b"vitali64": {
-        "password": b"o",
-        "bio": b"bad",
+        "password": b"hello",
+        "bio": b"Nice person",
         "permissions": {"kill", "new-guild"},
         "options": ["offline-messages", "eat-cookies"],
     },
