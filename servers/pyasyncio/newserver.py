@@ -193,6 +193,8 @@ def bytesToArgs(msg: bytes) -> tuple[bytes, dict[bytes, bytes]]:
     Example: PRIVMSG TARGET:yay MESSAGE:Hi
     (b'PRIVMSG', {b'TARGET': b'yay', b'MESSAGE': b'Hi'})
     """
+    # I'm pretty sure that this is one of luk3yx's hacks as it contains
+    # some byte sequences that I just can't understand.
     cmd = b""
     args = {}
     for arg in msg.split(b"\t"):
@@ -206,21 +208,17 @@ def bytesToArgs(msg: bytes) -> tuple[bytes, dict[bytes, bytes]]:
                 cmd = arg
             else:
                 raise ParserError("Two commands in one message")
-                # you should catch this execption!!
     return cmd, args
 
 
-def argsToBytes(*args: bytes) -> bytes:  # *args: bytes, or *args: list[bytes]
+def argsToBytes(cmd: bytes, **args: dict[bytes:bytes]) -> bytes:
     """
     From the arguments given, escape each argument (mainly the
     backslashes and tabs), then join them with tabs.
     """
-    return (
-        b"\t".join(
-            [arg.replace(b"\\", b"\\\\").replace(b"\t", b"\\\t") for arg in args]
-        )
-        + b"\r\n"
-    )
+    # TODO: This was written for the old positional protocol; the new
+    # key and value protocol needs a rewrite of this function.
+    return b"stub TODO TODO TODO at def argsToBytes"
 
 
 # Classes that describe vital parts of the program and IDC's logic.
@@ -232,28 +230,56 @@ class Server:
     pass
 
 
+@dataclass
 class Client:
-    client_accumulation = 0  # We might replace this with len(clients)
+    """
+    The Client class is an object related to each connection, or called
+    client.
+    """
 
-    def __init__(
-        self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter
-    ) -> None:
-        Client.client_accumulation += 1
-        self.reader: asyncio.StreamReader = reader
-        self.writer: asyncio.StreamWriter = writer
-        self.clientId: bytes = str(Client.client_accumulation).encode("utf-8")
-        # self.user won't be defined here, unless we decide to make a
-        # nullUser of some sort; setting it to None would cause type
-        # problems with annotations and MyPy.
-        # Do note that a client MUST belong to a user for actual usage,
-        # otherwise there's not much that the client can do.
+    clientId: bytes = str(len(clients) + 1).encode("utf-8")
+    reader: asyncio.StreamReader
+    writer: asyncio.StreamWriter
+    user: User
+
+    def __init__(self) -> None:
+        """
+        Nothing fancy, just puts itself into the global state.
+        """
+        clients[self.clientId] = self
+        # WARNING!  Importatn!  TODO!
+        # Should we be adding the client to the clients dictionary right
+        # here, or should we do that in clientLoop?
+        # If we put it in clientLoop, make sure that it does so quick
+        # enough, because if new clients are spawned before the old one
+        # adds itself to the clients dictionary, you would have client
+        # ID collisions, which can cause undefined behavior!
+
+    def __del__(self) -> None:
+        # TODO
+        """
+        Stub function, what do we do when a client disconnects?
+        (1) Remove it from the clients list
+        (2) Remove it from its user's client list (TODO)
+        """
+        del clients[self.clientId]
+        del self.user.clients[self.clientId]
 
     async def writeRaw(self, toWrite: bytes) -> None:
+        """
+        Write some stuff to the client.
+        """
         self.writer.write(toWrite)
         await self.writer.drain()
 
     async def writeArgs(self, *toWrite: bytes) -> None:
+        """
+        Write arguments to the client.
+        """
         await self.writeRaw(argsToBytes(*toWrite))
+
+    # I don't think we should put the client's mainloop into this class
+    # as it's not strictly an attribute of the client.
 
 
 @dataclass
@@ -372,10 +398,7 @@ async def clientLoop(
     client = Client
     clients[clientId] = client
     loggedIn = False
-    loggedInAs = None  # What's wrong with None? Sorry about the undos, I couldn't figure out how to redo ^r
-    # mypy hates None
-    # That isn't a good enough reason
-    # mypy is sort of smart
+    loggedInAs = None
     ln = b""
     while True:
         newln = await reader.read(4096)
