@@ -1,0 +1,11 @@
+#!/bin/sh
+for each in 'server.py'
+do
+    printf '=== %s ===\n' "$each"
+    printf -- '--- Reformatting ---\n'
+    black -l 72 "$each"
+    printf -- '--- PEP checking ---\n'
+    flake8 "$each"
+    printf -- '--- Type checking ---\n'
+    mypy --strict "$each"
+done
