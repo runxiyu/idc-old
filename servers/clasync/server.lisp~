@@ -1,0 +1,15 @@
+(ql:quickload 'cl-async)
+
+(defun echo-server ()
+  (as:tcp-server nil 5000
+    (lambda (sock data)
+            (as:write-socket-data sock data))
+    (lambda (ev)
+            (format t "ev: ~a~%" ev)))
+  (as:signal-handler as:+sigint+
+    (lambda (sig)
+            (declare (ignore sig))
+            (as:exit-event-loop))))
+
+
+(as:start-event-loop #'echo-server)

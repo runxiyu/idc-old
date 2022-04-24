@@ -1,0 +1,6 @@
+If you're new to how Common Lisp is usually set up:
+
+1. Install Steel Bank Common Lisp;
+2. Install QuickLisp;
+3. Without leaving the QuickLisp installation script, evaluate (ql:add-to-init-file)
+4. Launch the program, I guess.

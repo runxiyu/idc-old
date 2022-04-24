@@ -17,22 +17,32 @@
 #
 # This software likely contains critical bugs.
 #
-# Copyright (C) 2022  luk3yx <https://luk3yx.github.io>
-# Copyright (C) 2022  Andrew Yu <https://www.andrewyu.org>
-# Copyright (C) 2022  Test_User <https://users.andrewyu.org/~hax>
+# By: luk3yx <https://luk3yx.github.io>
+#     Andrew Yu <https://www.andrewyu.org>
+#     Test_User <https://users.andrewyu.org/~hax>
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Affero General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Affero General Public License for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# This is free and unencumbered software released into the public domain.
+# 
+# Anyone is free to copy, modify, publish, use, compile, sell, or
+# distribute this software, either in source code form or as a compiled
+# binary, for any purpose, commercial or non-commercial, and by any
+# means.
+# 
+# In jurisdictions that recognize copyright laws, the author or authors
+# of this software dedicate any and all copyright interest in the
+# software to the public domain. We make this dedication for the benefit
+# of the public at large and to the detriment of our heirs and
+# successors. We intend this dedication to be an overt act of
+# relinquishment in perpetuity of all present and future rights to this
+# software under copyright law.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+# OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+# OTHER DEALINGS IN THE SOFTWARE.
 
 # Todo list:
 # - Guilds and channels
@@ -193,34 +203,18 @@ async def argWrite(writer, *args):
     await writer.drain()
 
 
-r"""
-async def sendToAllClientsOfUser(username, *args):
-    if users[username].clients:
-        i = 0
-        for clientId in users[username].clients:
-            writer = clients[clientId]
-            await argWrite(writer, *args)
-            i += 1
-        return i
-    elif "offline-messages" in users[username].options:
-        users[username].queue.append(toWrite)
-        return False
-    return None
-"""
-
-
-async def checkedTimedOriginedMessageToUser(
-    originUsername, targetUsername, command, text
-):
-    if targetUsername in users:
-        return await users[targetUsername].writeArgsToAllClients(
-            b":" + originUsername,
-            command,
-            str(time.time()).encode("utf-8"),
-            text,
-        )
-    else:
-        return UserNotFoundError("User nonexistant")
+# async def checkedTimedOriginedMessageToUser(
+#     originUsername, targetUsername, command, text
+# ):
+#     if targetUsername in users:
+#         return await users[targetUsername].writeArgsToAllClients(
+#             b":" + originUsername,
+#             command,
+#             str(time.time()).encode("utf-8"),
+#             text,
+#         )
+#     else:
+#         return UserNotFoundError("User nonexistant")
 
 
 async def clientLoop(reader, writer):
@@ -243,12 +237,12 @@ async def clientLoop(reader, writer):
         msg = lnSplt[0]
         ln = b""
 
-        r"""
+        # This needs a rewrite
+        # Also, about this escaping thing, why not use \t as tab
+        # representation rather than \<insert real tab here>
         escaped = False
         args = []
         current = b""
-        # AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-        # Alright I am burning this code
         for b in [msg[i : i + 1] for i in range(len(msg))]:
             if escaped:
                 if b == b"\\":
@@ -268,14 +262,12 @@ async def clientLoop(reader, writer):
         del escaped
         args.append(current)
         del current
-        """
 
-        # Stolen from miniirc_idc
-        # Is this horrible? Sure
-        # But at least it works (hopefully)
-        args = re.sub(r"\\(.)|\t", lambda m: m.group(1) or "\udeff", msg).split(
-            "\udeff"
-        )
+        # args = re.sub(r"\\(.)|\t", lambda m: m.group(1) or "\udeff", msg).split(
+        #    "\udeff"
+        # )
+        # Bad because: (1) This is a hack, it looks dirty;
+        #              (2) It wants things to be decoded.
 
         if not args[0]:
             continue
@@ -285,7 +277,9 @@ async def clientLoop(reader, writer):
 
         if cmd == b"SERVER":
             await argWrite(
-                writer, b"ERR_NOT_IMPLEMENTED", b"Server linkage is unimplemented."
+                writer,
+                b"ERR_NOT_IMPLEMENTED",
+                b"Server linkage is unimplemented.  Please submit a patch to idc@andrewyu.org; this is a crucial feature.",
             )
         elif cmd == b"HELP":
             await argWrite(
