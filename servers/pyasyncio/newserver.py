@@ -6,7 +6,7 @@
 # This implementation uses some parts of object-oriented Python, while
 # trying # to be uninstrusive such as not having two layers of
 # subclassing.  When I # learn how to actually write practical (as
-# opposed to plainly theoretical and # purely functional programs),
+# opposed to plainly theoretical and purely functional programs),
 # this implementation won't be maintained by me anymore. -- Andrew
 #
 # The Internet Delay Chat specifications and implementations are all
@@ -17,11 +17,12 @@
 #
 # This software likely contains critical bugs.  Do not use it for
 # production as with any other experimental software.
-#
+# Please please report problems to <idc@andrewyu.org>.
+
 # By: luk3yx <https://luk3yx.github.io>
 #     Andrew Yu <https://www.andrewyu.org>
 #     Test_User <https://users.andrewyu.org/~hax>
-#
+
 # This is free and unencumbered software released into the public
 # domain.
 #
@@ -45,7 +46,7 @@
 # OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
-#
+
 # Todo list:
 # - New message format
 # - Guilds and channels
@@ -56,40 +57,87 @@
 # - VOIP
 # - Moderation
 # - MAKE A CLIENT!
-#
+
+# Variables whose values are transmitted in sockets and connections
+# should usually be a bytes object, rather than a string.  If we decode
+# and re-encode everything, users wouldn't be able to do stuff like
+# send binary files, which is a unwanted limitation.
+
+# -------------------------------------------------------------------- #
+#                              Typing                                  #
+# -------------------------------------------------------------------- #
+
 # Note that this program only runs properly on Python 3.9 and later.
 # This program heavily utilizes dataclasses so that the object-oriented
 # nature of Python may be utilized in a less harmful way; annotations
 # are used for static typechecking and will cause SyntaxErrors and
 # IndexErrors on older version that do not understand annotations.
-
+# It is recommended to pass the --strict option to mypy while doing
+# typechecks.  The following are the imports for typechecking.
+# Whenever you see things of form variable: type = something or
+# variable: containerType[type ...] = something, those are type
+# signatures.
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TypeVar
 
-import time  # for timestamps in messages
-import asyncio
-import logging
+# -------------------------------------------------------------------- #
+#                             Imports                                  #
+# -------------------------------------------------------------------- #
+
+
+# These are general imports...
+import time  # Most messages have timestamps
+import re  # Regular expressions might be used for parsing
+import asyncio  # Handles the most basic things
+import logging  # Need to dig into more fancy logging options (colors?)
 import secrets  # handles password-elated stuff
 
+# The configuration file for this program is written in Python itself,
+# and is imported as a library.  This allows for extreme flexibility.
+# However, as a complication, I haven't figured out a good way to
+# "rehash" the configuration file when it is updated.  Reload from
+# importlib might work, but it is unclear how importlib affects
+# scopes and coroutines that are already using the configuration.
+# Currently, just use the public configuration; a better-documented
+# reference configuration may be created, but that's a low priority for
+# now.  Another problem is, we don't know how to write configuration
+# from within the program.  I recall seeing dynamic Python configs
+# somewhere, but I don't remember where that is, please tell me if you
+# find one.
 import config
 
-# config.py, which should be where you put this program
-# an example configuration may be created soon
-
+# General rules for logging:
+# Raw I/O lines go into DEBUG
+# Things like joinquits should go to INFO
+# Not sure if we need WARN/ERROR/etc, but maybe do so on unexpected
+# exceptions (such as StrangeError, as opposed to errors that arise
+# in normal usage such as UserNotFoundError).
 logging.basicConfig(level=logging.DEBUG)
 
-# Some global dictionaries to store state
+# -------------------------------------------------------------------- #
+#                           Global State                               #
+# -------------------------------------------------------------------- #
 
-users: dict[bytes, User] = {}
-
+# Global dictionaries to store state.
+# The bytes objects below all have their respective names as keys.
 clients: dict[bytes, Client] = {}
-client_id_count = 0  # replace with len(clients.keys())
-
+users: dict[bytes, User] = {}
 guilds: dict[bytes, Guild] = {}
 
+# client_id_count = 0  # replace with len(clients.keys())
 
-# Custom exceptions
+# -------------------------------------------------------------------- #
+#                            Exceptions                                #
+# -------------------------------------------------------------------- #
+
+# The following are exceptions specific to our server.  Many of them
+# should be caught---we don't want the server to crash just because
+# a user tried to send a message to a nonexistant user.
+# We still raise exceptions, because many of those problems are detected
+# in more "internal" stages in the program, such as internal command-
+# handling functions.  Checking them before calling seems like putting
+# the checks in the wrong place.
 
 
 class ParserError(Exception):
@@ -120,26 +168,18 @@ class MessageUndeliverableError(Exception):
 
 class UserNotFoundError(MessageUndeliverableError):
     """
-    Trying to message, modify, or otherwise interact with a nonexistant
-    user.
+    Raise this for clients trying to message, modify, or otherwise
+    interact with a nonexistant user.
     """
 
     pass
 
 
-class RickRollError(BaseException):
-    """
-    Raise this when luk3yx rickrolls.
-    """
-
-    def __str__(self) -> str:
-        return """Never gonna give you up,
-never gonna let you down,
-never gonna run around and desert you!
-"""
-
-
+# Utility functions used everywhere.
 def timestamp() -> bytes:
+    """
+    This simply returns a floating-point timestamp in bytes.
+    """
     return str(time.time()).encode("utf-8")
 
 
@@ -147,7 +187,7 @@ _esc_re = re.compile(rb"\\(.)")
 _idc_escapes = {b"\\": b"\\\\", b"r": b"\r", b"n": b"\n", b"t": b"\t"}
 
 
-def parse_msg(msg: bytes) -> tuple[bytes, dict[bytes, bytes]]:
+def bytesToArgs(msg: bytes) -> tuple[bytes, dict[bytes, bytes]]:
     """
     Parses a raw IDC message into the command and arguments.
     Example: PRIVMSG TARGET:yay MESSAGE:Hi
@@ -183,43 +223,7 @@ def argsToBytes(*args: bytes) -> bytes:  # *args: bytes, or *args: list[bytes]
     )
 
 
-r'''
-def bytesToArgs(msg: bytes) -> list[bytes]:
-    """
-    Turns bytes, usually received from the socket, into arguments with
-    a parser.  This code is very inefficent!
-    """
-    escaped = False
-    args = []
-    current = b""
-    for b in [msg[i : i + 1] for i in range(len(msg))]:
-        if escaped:
-            if b == b"\\":
-                current += b"\\"
-            elif b == b"\t":
-                current += b"\t"
-            else:
-                current += b""
-            escaped = False
-        elif b == b"\\":
-            escaped = True
-        elif b == b"\t":
-            args.append(current)
-            current = b""
-        else:
-            current += b
-    args.append(current)
-    return args
-
-    # args = re.sub(r"\\(.)|\t", lambda m: m.group(1) or "\udeff",\
-    #    msg).split(
-    #    "\udeff"
-    # )
-    # Bad because: (1) This is a hack, it looks dirty;
-    #              (2) It wants things to be decoded.
-'''
-
-
+# Classes that describe vital parts of the program and IDC's logic.
 class Server:
     """
     Stub class for server linkage.
@@ -365,7 +369,8 @@ async def clientLoop(
     global client_id_count
     clientId = str(client_id_count).encode("utf-8")
     client_id_count += 1
-    clients[clientId] = writer
+    client = Client
+    clients[clientId] = client
     loggedIn = False
     loggedInAs = None  # What's wrong with None? Sorry about the undos, I couldn't figure out how to redo ^r
     # mypy hates None
