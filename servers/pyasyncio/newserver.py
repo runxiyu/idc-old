@@ -175,7 +175,29 @@ class UserNotFoundError(MessageUndeliverableError):
     pass
 
 
-# Utility functions used everywhere.
+# -------------------------------------------------------------------- #
+#                            Utilities                                 #
+# -------------------------------------------------------------------- #
+
+T = TypeVar("T")
+U = TypeVar("U")
+
+# I'm a little afraid here that the first time this function is called
+# T and U will be fixed types for the rest of the program.  Hopefully
+# not.
+
+
+def getKeyByValue(d: dict[T, U], s: U) -> list[T]:
+    """
+    Simple dictioary keys, knowing its value.
+    """
+    r = []
+    for k, v in d.items():
+        if s == v:
+            r.append(k)
+    return r
+
+
 def timestamp() -> bytes:
     """
     This simply returns a floating-point timestamp in bytes.
@@ -221,7 +243,11 @@ def argsToBytes(cmd: bytes, **args: dict[bytes:bytes]) -> bytes:
     return b"stub TODO TODO TODO at def argsToBytes"
 
 
-# Classes that describe vital parts of the program and IDC's logic.
+# -------------------------------------------------------------------- #
+#                            Classes                                   #
+# -------------------------------------------------------------------- #
+
+
 class Server:
     """
     Stub class for server linkage.
@@ -273,6 +299,8 @@ class Client:
         await self.writer.drain()
 
     async def writeArgs(self, *toWrite: bytes) -> None:
+        # This is one of the writeArgs things that needs to use
+        # keywords insteade of argpos.  <<TODO>>
         """
         Write arguments to the client.
         """
@@ -284,6 +312,14 @@ class Client:
 
 @dataclass
 class User:
+    """
+    There exists a User() object for each entity using this IDC server,
+    and possibly the same class for federated servers with some
+    if statements.
+    Users differ from clients because users usually represent people or
+    bots, while clients refer to specific connections.
+    """
+
     username: bytes
     password: bytes
     bio: bytes
@@ -292,21 +328,39 @@ class User:
     clients: list[Client] = field(default_factory=list)
     queue: list[bytes] = field(default_factory=list)
 
-    # It might be possible to rewrite this as a property()
+    # It might be possible to rewrite this as a property(), but that's
+    # not strictly necessary.  I'm also unsure if property() works like
+    # that for remotely appending things into lists?
+
+    # The addClient and delClient methods should be called by the
+    # respective client's mainloop.  These two functions only register
+    # the client on a user; it doesn't modify the client connection
+    # itself.  Particularly, it doesn't destroy connections when
+    # delClient is called.
 
     def addClient(self, client: Client) -> list[Client]:
+        """
+        Adds a client to the user
+        """
         self.clients.append(client)
         return self.clients
 
     def delClient(self, client: Client) -> list[Client]:
+        """
+        Removes a client from the user
+        """
         self.clients.remove(client)
         return self.clients
 
     async def writeArgsToAllClients(self, delayable: bool, *toWrite: bytes) -> int:
+        # This is one of the writeArgs things that needs to use
+        # keywords insteade of argpos.  <<TODO>>
         if self.clients:
             i: int = 0
             for client in self.clients:
                 await client.writeArgs(*toWrite)
+                # This is one of the writeArgs things that needs to use
+                # keywords insteade of argpos.  <<TODO>>
                 i += 1
             return i
         elif not delayable:
@@ -322,25 +376,51 @@ class User:
 
 @dataclass
 class _PermissionSet:
+    """
+    A permission set is just a set of three types of permissions,
+    read the whitepaper for details on how this should work.  Of course
+    this is really complicated and is unimplemented.
+    """
+
     permissions: set[bytes]
-    anti_permissions: set[bytes]
-    management_permissions: set[bytes]
+    antiPermissions: set[bytes]
+    managementPermissions: set[bytes]
 
 
 @dataclass
 class Role(_PermissionSet):
+    """
+    A role is used in a Guild and designates a user's permission set
+    there.  Each channel may have override permissions.
+    """
+
     name: bytes
-    channel_overrides: dict[bytes, _PermissionSet]
+    channelOverrides: dict[Channel, _PermissionSet]
 
 
 @dataclass
 class Channel:
+    """
+    Channels belong to Guilds and are specific ... well ... channels.
+    """
+
     name: bytes
     users: list[User]
+
+    async def writeArgsToAllUsers(self, delayable: bool, **args: []) -> None:
+        # This is one of the writeArgs things that needs to use
+        # keywords insteade of argpos.  <<TODO>>
+        pass
 
 
 @dataclass
 class Guild:
+    """
+    Treat Guilds as namespaces on Libera (but it's actually integrated,
+    or communities/spaces on Matrix, or "Servers" on Discord (it's their
+    terminology of using Guilds in the API).
+    """
+
     name: bytes
     description: bytes
     users: list[User]
@@ -349,26 +429,16 @@ class Guild:
     channels: dict[bytes, Channel]
     # The guild MUST be added to the guilds dictionary on creation, but
     # should we do it here?
-    # this is a question for you :)
+    # This is similar to "when do we put a Client() into clients{}?"
     # How often do you create guilds?
-    #  I 'm not sure how this matters, but probably not very often; we
+    # I'm not sure how this matters, but probably not very often; we
     # definitely do want a way to create guilds during runtime, because
-    # not al!l users have ac!ces to the configuration file and using realod()
-    # is bad practice
-
-
-# this is quite generic...
-# this is haskell syntax, is this possible?
-T = TypeVar("T")  # from typing import TypeVar
-U = TypeVar("U")
-
-
-def getKeyByValue(d: dict[T, U], s: U) -> list[T]:
-    r = []
-    for k, v in d.items():
-        if s == v:
-            r.append(k)
-    return r
+    # not all users have access to the configuration file and using
+    # reload crazily is bad and buggy
+    # Also, a guild object should be created when the first user of that
+    # guild comes online or something?  But that gets messey as we need
+    # to track which Guilds a user is in in two places... also the bane
+    # of object-oriented programming again.
 
 
 # Don't delete this yet, we haven't put it in User/Client yet
