@@ -47,6 +47,7 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 #
 # Todo list:
+# - New message format
 # - Guilds and channels
 # - Use sources correctly, i.e. :andrew@andrewyu.org
 # - Presence list
@@ -89,6 +90,14 @@ guilds: dict[bytes, Guild] = {}
 
 
 # Custom exceptions
+
+
+class ParserError(Exception):
+    """
+    Something happened during parsing!
+    """
+
+    pass
 
 
 class StrangeError(Exception):
@@ -134,6 +143,33 @@ def timestamp() -> bytes:
     return str(time.time()).encode("utf-8")
 
 
+_esc_re = re.compile(rb"\\(.)")
+_idc_escapes = {b"\\": b"\\\\", b"r": b"\r", b"n": b"\n", b"t": b"\t"}
+
+
+def parse_msg(msg: bytes) -> tuple[bytes, dict[bytes, bytes]]:
+    """
+    Parses a raw IDC message into the command and arguments.
+    Example: PRIVMSG TARGET:yay MESSAGE:Hi
+    (b'PRIVMSG', {b'TARGET': b'yay', b'MESSAGE': b'Hi'})
+    """
+    cmd = b""
+    args = {}
+    for arg in msg.split(b"\t"):
+        if b":" in arg:
+            key, value = arg.split(b":", 1)
+            args[key] = _esc_re.sub(
+                lambda m: _idc_escapes.get(m.group(1), b"\xef\xbf\xbd"), value
+            )
+        else:
+            if not cmd:
+                cmd = arg
+            else:
+                raise ParserError("Two commands in one message")
+                # you should catch this execption!!
+    return cmd, args
+
+
 def argsToBytes(*args: bytes) -> bytes:  # *args: bytes, or *args: list[bytes]
     """
     From the arguments given, escape each argument (mainly the
@@ -147,6 +183,7 @@ def argsToBytes(*args: bytes) -> bytes:  # *args: bytes, or *args: list[bytes]
     )
 
 
+r'''
 def bytesToArgs(msg: bytes) -> list[bytes]:
     """
     Turns bytes, usually received from the socket, into arguments with
@@ -180,6 +217,7 @@ def bytesToArgs(msg: bytes) -> list[bytes]:
     # )
     # Bad because: (1) This is a hack, it looks dirty;
     #              (2) It wants things to be decoded.
+'''
 
 
 class Server:
@@ -282,17 +320,19 @@ class Guild:
     # The guild MUST be added to the guilds dictionary on creation, but
     # should we do it here?
     # this is a question for you :)
-    # How often do you create guilds? 
+    # How often do you create guilds?
     #  I 'm not sure how this matters, but probably not very often; we
     # definitely do want a way to create guilds during runtime, because
     # not al!l users have ac!ces to the configuration file and using realod()
-    # is bad practice 
+    # is bad practice
 
 
 # this is quite generic...
 # this is haskell syntax, is this possible?
-T = TypeVar('T')  # from typing import TypeVar
-U = TypeVar('U')
+T = TypeVar("T")  # from typing import TypeVar
+U = TypeVar("U")
+
+
 def getKeyByValue(d: dict[T, U], s: U) -> list[T]:
     r = []
     for k, v in d.items():
@@ -317,7 +357,9 @@ def getKeyByValue(d: dict[T, U], s: U) -> list[T]:
 
 
 # what are the classes for this again
-async def clientLoop(reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
+async def clientLoop(
+    reader: asyncio.StreamReader, writer: asyncio.StreamWriter
+) -> None:
     # addr = writer.get_extra_info("peername")
     # maybe use this for login allowmask checking?
     global client_id_count
@@ -325,7 +367,10 @@ async def clientLoop(reader: asyncio.StreamReader, writer: asyncio.StreamWriter)
     client_id_count += 1
     clients[clientId] = writer
     loggedIn = False
-    loggedInAs = None
+    loggedInAs = None  # What's wrong with None? Sorry about the undos, I couldn't figure out how to redo ^r
+    # mypy hates None
+    # That isn't a good enough reason
+    # mypy is sort of smart
     ln = b""
     while True:
         newln = await reader.read(4096)
@@ -338,13 +383,12 @@ async def clientLoop(reader: asyncio.StreamReader, writer: asyncio.StreamWriter)
         msg = lnSplt[0]
         ln = b""
 
-        args = bytesToArgs(msg)
+        cmd, args = parse_msg(msg)
 
-        if not args[0]:
+        if not cmd:
             continue
 
-        logging.debug(clientId.decode("utf-8") + " >>> " + repr(args))
-        cmd = args[0].upper()
+        logging.debug("%s >>> %r %r", clientId.decode("utf-8"), cmd, args)
 
         if cmd == b"SERVER":
             await argWrite(
@@ -359,7 +403,7 @@ async def clientLoop(reader: asyncio.StreamReader, writer: asyncio.StreamWriter)
                 b"Read the freaking source code!  It's at git://git.andrewyu.org/internet-delay-chat.git.",
             )
         elif cmd == b"USER":
-            if len(args) != 3:
+            if "USERNAME" not in args or "PASSWORD" not in args:
                 await argWrite(
                     writer,
                     b"ERR_ARGUMENT_NUMBER",
@@ -367,7 +411,7 @@ async def clientLoop(reader: asyncio.StreamReader, writer: asyncio.StreamWriter)
                 )
             else:
                 try:
-                    goodPassword = users[args[1]].password
+                    goodPassword = users[args["USERNAME"]].password
                 except KeyError:
                     await argWrite(
                         writer,
@@ -375,13 +419,13 @@ async def clientLoop(reader: asyncio.StreamReader, writer: asyncio.StreamWriter)
                         b"The username provided is invalid.",
                     )
                 else:
-                    if secrets.compare_digest(args[2], goodPassword):
+                    if secrets.compare_digest(args["PASSWORD"], goodPassword):
                         await argWrite(
                             writer,
                             b"RPL_LOGIN_GOOD",
                             b"You have logged in as " + args[1] + b".",
                         )
-                        loggedInAs = args[1]
+                        loggedInAs = args["USERNAME"]
                         loggedIn = True
                         # users[loggedInAs].clients.append(Client())
                         queue = users[loggedInAs].queue
@@ -403,33 +447,33 @@ async def clientLoop(reader: asyncio.StreamReader, writer: asyncio.StreamWriter)
             writer.write(repr(clients).encode("utf-8"))
             writer.write(repr(users).encode("utf-8"))
             await writer.drain()
-        elif not loggedIn:
+        elif loggedInAs is None:
             await argWrite(writer, b"ERR_UNREGISTERED", b"You haven't logged in.")
         elif cmd == b"PING":
-            await argWrite(writer, b"PONG", *args[1:])
+            await argWrite(writer, b"PONG", b"COOKIE:" + args["COOKIE"])
         elif cmd == b"PRIVMSG":
-            if len(args) != 3:
+            if "TARGET" not in args or "MESSAGE" not in args:
                 await argWrite(
                     writer,
                     b"ERR_ARGUMENT_NUMBER",
-                    b"The PRIVMSG command takes two positional arguments: Username and text.",
+                    b"The PRIVMSG command takes two arguments: Target and MESSAGE.",
                 )
             else:
                 r = await checkedTimedOriginedMessageToUser(
-                    loggedInAs, args[1], b"PRIVMSG", args[2]
+                    loggedInAs, args["TARGET"], b"PRIVMSG", args["MESSAGE"]
                 )
                 if isinstance(r, UserNotFoundError):
                     await argWrite(
                         writer,
                         b"ERR_DESTINATION_NONEXISTANT",
-                        b"The destination user " + args[1] + b" does not exist.",
+                        b"The destination user " + args["TARGET"] + b" does not exist.",
                     )
                 elif r is None:
                     await argWrite(
                         writer,
                         b"ERR_NO_OFFLINE_MSGS",
                         b""
-                        + args[1]
+                        + args["TARGET"]
                         + b" is offline and does not have offline-messages.",
                     )
                 del r
@@ -440,7 +484,7 @@ async def clientLoop(reader: asyncio.StreamReader, writer: asyncio.StreamWriter)
                     b"ERR_SERVER_PERMS",
                     b"You do not have the permission to use KILL.",
                 )
-            elif 3 <= len(args) <= 4:
+            elif "VICTIM" not in args:
                 await argWrite(
                     writer,
                     b"ERR_NOT_IMPLEMENTED",
@@ -453,7 +497,7 @@ async def clientLoop(reader: asyncio.StreamReader, writer: asyncio.StreamWriter)
                     b"The KILL command takes two positional arguments: Target client and optional reason.",
                 )
         elif cmd == b"JOIN":
-            if 3 <= len(args) <= 4:
+            if "GUILD" not in args:
                 await argWrite(
                     writer,
                     b"ERR_NOT_IMPLEMENTED",
@@ -471,10 +515,17 @@ async def clientLoop(reader: asyncio.StreamReader, writer: asyncio.StreamWriter)
             )
 
     writer.close()
-    try:
-        users[loggedInAs].clients.remove(clientId)
-    except KeyError:
-        pass
+    if loggedInAs is not None:
+        try:
+            # loggedInAs could be None at this point
+            # Which won't make any actual difference but it upsets mypy
+            # true, we need a nullUser
+            # but wait, is loggedInAs a bytes or a User
+            # bad, we should use User, and define a nullUser if mypy wants that
+            # or use stuff from the typing module to make mypy happy
+            users[loggedInAs].clients.remove(clientId)
+        except KeyError:
+            pass
     del clients[clientId]
 
 
