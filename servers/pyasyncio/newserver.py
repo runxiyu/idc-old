@@ -416,7 +416,7 @@ class Channel:
 @dataclass
 class Guild:
     """
-    Treat Guilds as namespaces on Libera (but it's actually integrated,
+    Treat Guilds as namespaces on Libera (but it's actually integrated),
     or communities/spaces on Matrix, or "Servers" on Discord (it's their
     terminology of using Guilds in the API).
     """
@@ -456,12 +456,18 @@ class Guild:
 #         return UserNotFoundError("User nonexistant")
 
 
-# what are the classes for this again
+
+# -------------------------------------------------------------------- #
+#                         Client Main Loop                             #
+# -------------------------------------------------------------------- #
 async def clientLoop(
     reader: asyncio.StreamReader, writer: asyncio.StreamWriter
 ) -> None:
-    # addr = writer.get_extra_info("peername")
-    # maybe use this for login allowmask checking?
+    """
+    This coroutine witnesses clients from their connection to their
+    death.
+    """
+    addr = writer.get_extra_info("peername")
     global client_id_count
     clientId = str(client_id_count).encode("utf-8")
     client_id_count += 1
@@ -481,12 +487,14 @@ async def clientLoop(
         msg = lnSplt[0]
         ln = b""
 
-        cmd, args = parse_msg(msg)
+        cmd, args = bytesToArgs(msg)
 
         if not cmd:
             continue
 
         logging.debug("%s >>> %r %r", clientId.decode("utf-8"), cmd, args)
+
+        # Now that argWrite doesn't exist...
 
         if cmd == b"SERVER":
             await argWrite(
