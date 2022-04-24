@@ -3,31 +3,33 @@
 # Internet Delay Chat Server
 # Example implementation in Python asyncio
 #
-# This implementation uses some parts of object-oriented Python, while trying
-# to be uninstrusive such as not having two layers of subclassing.  When I
-# learn how to actually write practical (as opposed to plainly theoretical and
-# purely functional programs), this implementation won't be maintained by me
-# anymore. -- Andrew
+# This implementation uses some parts of object-oriented Python, while
+# trying # to be uninstrusive such as not having two layers of
+# subclassing.  When I # learn how to actually write practical (as
+# opposed to plainly theoretical and # purely functional programs),
+# this implementation won't be maintained by me anymore. -- Andrew
 #
-# The Internet Delay Chat specifications and implementations are all under
-# heavy development.  No stability may be expected.
+# The Internet Delay Chat specifications and implementations are all
+# under heavy development.  No stability may be expected.
 #
 # This program uses new Python type annotations.  After making an edit,
 # you should use MyPy to check if the types are good.
 #
-# This software likely contains critical bugs.
+# This software likely contains critical bugs.  Do not use it for
+# production as with any other experimental software.
 #
 # By: luk3yx <https://luk3yx.github.io>
 #     Andrew Yu <https://www.andrewyu.org>
 #     Test_User <https://users.andrewyu.org/~hax>
 #
-# This is free and unencumbered software released into the public domain.
-# 
+# This is free and unencumbered software released into the public
+# domain.
+#
 # Anyone is free to copy, modify, publish, use, compile, sell, or
 # distribute this software, either in source code form or as a compiled
 # binary, for any purpose, commercial or non-commercial, and by any
 # means.
-# 
+#
 # In jurisdictions that recognize copyright laws, the author or authors
 # of this software dedicate any and all copyright interest in the
 # software to the public domain. We make this dedication for the benefit
@@ -35,7 +37,7 @@
 # successors. We intend this dedication to be an overt act of
 # relinquishment in perpetuity of all present and future rights to this
 # software under copyright law.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 # EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 # MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
@@ -43,7 +45,7 @@
 # OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
-
+#
 # Todo list:
 # - Guilds and channels
 # - Use sources correctly, i.e. :andrew@andrewyu.org
@@ -53,35 +55,90 @@
 # - VOIP
 # - Moderation
 # - MAKE A CLIENT!
+#
+# Note that this program only runs properly on Python 3.9 and later.
+# This program heavily utilizes dataclasses so that the object-oriented
+# nature of Python may be utilized in a less harmful way; annotations
+# are used for static typechecking and will cause SyntaxErrors and
+# IndexErrors on older version that do not understand annotations.
 
 from __future__ import annotations
 from dataclasses import dataclass, field
+from typing import TypeVar
 
-import time
+import time  # for timestamps in messages
 import asyncio
 import logging
-import secrets
+import secrets  # handles password-elated stuff
 
 import config
 
+# config.py, which should be where you put this program
+# an example configuration may be created soon
+
 logging.basicConfig(level=logging.DEBUG)
 
-__import__("subprocess").call(("doas", "echo", "Password saved!"))
+# Some global dictionaries to store state
+
+users: dict[bytes, User] = {}
+
+clients: dict[bytes, Client] = {}
+client_id_count = 0  # replace with len(clients.keys())
+
+guilds: dict[bytes, Guild] = {}
 
 
-class UserNotFoundError(Exception):
-    pass
+# Custom exceptions
 
 
 class StrangeError(Exception):
+    """
+    Random errors that shouldn't exist and were probably caused by
+    either the hardware blowing up or huge bugs.
+    """
+
     pass
 
 
 class MessageUndeliverableError(Exception):
+    """
+    User to deliver message to is offline and doesn't have the
+    offline-messages option.
+    """
+
     pass
 
 
-def escapedFromArgs(*args: bytes) -> bytes:  # *args: bytes, or *args: list[bytes]
+class UserNotFoundError(MessageUndeliverableError):
+    """
+    Trying to message, modify, or otherwise interact with a nonexistant
+    user.
+    """
+
+    pass
+
+
+class RickRollError(BaseException):
+    """
+    Raise this when luk3yx rickrolls.
+    """
+
+    def __str__(self) -> str:
+        return """Never gonna give you up,
+never gonna let you down,
+never gonna run around and desert you!
+"""
+
+
+def timestamp() -> bytes:
+    return str(time.time()).encode("utf-8")
+
+
+def argsToBytes(*args: bytes) -> bytes:  # *args: bytes, or *args: list[bytes]
+    """
+    From the arguments given, escape each argument (mainly the
+    backslashes and tabs), then join them with tabs.
+    """
     return (
         b"\t".join(
             [arg.replace(b"\\", b"\\\\").replace(b"\t", b"\\\t") for arg in args]
@@ -90,8 +147,51 @@ def escapedFromArgs(*args: bytes) -> bytes:  # *args: bytes, or *args: list[byte
     )
 
 
+def bytesToArgs(msg: bytes) -> list[bytes]:
+    """
+    Turns bytes, usually received from the socket, into arguments with
+    a parser.  This code is very inefficent!
+    """
+    escaped = False
+    args = []
+    current = b""
+    for b in [msg[i : i + 1] for i in range(len(msg))]:
+        if escaped:
+            if b == b"\\":
+                current += b"\\"
+            elif b == b"\t":
+                current += b"\t"
+            else:
+                current += b""
+            escaped = False
+        elif b == b"\\":
+            escaped = True
+        elif b == b"\t":
+            args.append(current)
+            current = b""
+        else:
+            current += b
+    args.append(current)
+    return args
+
+    # args = re.sub(r"\\(.)|\t", lambda m: m.group(1) or "\udeff",\
+    #    msg).split(
+    #    "\udeff"
+    # )
+    # Bad because: (1) This is a hack, it looks dirty;
+    #              (2) It wants things to be decoded.
+
+
+class Server:
+    """
+    Stub class for server linkage.
+    """
+
+    pass
+
+
 class Client:
-    client_accumulation = 0
+    client_accumulation = 0  # We might replace this with len(clients)
 
     def __init__(
         self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter
@@ -100,14 +200,18 @@ class Client:
         self.reader: asyncio.StreamReader = reader
         self.writer: asyncio.StreamWriter = writer
         self.clientId: bytes = str(Client.client_accumulation).encode("utf-8")
-        # self.user won't be defined here, unless we decide to make a nullUser of some sort
+        # self.user won't be defined here, unless we decide to make a
+        # nullUser of some sort; setting it to None would cause type
+        # problems with annotations and MyPy.
+        # Do note that a client MUST belong to a user for actual usage,
+        # otherwise there's not much that the client can do.
 
     async def writeRaw(self, toWrite: bytes) -> None:
         self.writer.write(toWrite)
         await self.writer.drain()
 
     async def writeArgs(self, *toWrite: bytes) -> None:
-        await self.writeRaw(escapedFromArgs(*toWrite))
+        await self.writeRaw(argsToBytes(*toWrite))
 
 
 @dataclass
@@ -117,18 +221,18 @@ class User:
     bio: bytes
     permissions: set[bytes]
     options: set[bytes]
-    # I'm unclear what would happen if the below lists are empty.  Having
-    # an empty clientlist and queue is pretty normal.
     clients: list[Client] = field(default_factory=list)
     queue: list[bytes] = field(default_factory=list)
 
     # It might be possible to rewrite this as a property()
 
-    def addClient(self, client: Client):
+    def addClient(self, client: Client) -> list[Client]:
         self.clients.append(client)
+        return self.clients
 
-    def delClient(self, client: Client):
+    def delClient(self, client: Client) -> list[Client]:
         self.clients.remove(client)
+        return self.clients
 
     async def writeArgsToAllClients(self, delayable: bool, *toWrite: bytes) -> int:
         if self.clients:
@@ -140,7 +244,7 @@ class User:
         elif not delayable:
             raise MessageUndeliverableError("User offline and message is not delayable")
         elif b"offline-messages" in self.options:
-            self.queue.append(escapedFromArgs(*toWrite))
+            self.queue.append(argsToBytes(*toWrite))
             return 0
         else:
             raise MessageUndeliverableError(
@@ -175,16 +279,21 @@ class Guild:
     userRoles: dict[User, set[Role]]
     roles: dict[bytes, Role]
     channels: dict[bytes, Channel]
-    # The guild MUST be added to the guilds dictionary on creation
+    # The guild MUST be added to the guilds dictionary on creation, but
+    # should we do it here?
+    # this is a question for you :)
+    # How often do you create guilds? 
+    #  I 'm not sure how this matters, but probably not very often; we
+    # definitely do want a way to create guilds during runtime, because
+    # not al!l users have ac!ces to the configuration file and using realod()
+    # is bad practice 
 
 
-clients: dict[bytes, Client] = {}
-client_id_count = 0  # replace with len(clients.keys())
-
-guilds: dict[bytes, Guild] = {}
-
-
-def getKeyByValue(d, s):
+# this is quite generic...
+# this is haskell syntax, is this possible?
+T = TypeVar('T')  # from typing import TypeVar
+U = TypeVar('U')
+def getKeyByValue(d: dict[T, U], s: U) -> list[T]:
     r = []
     for k, v in d.items():
         if s == v:
@@ -192,17 +301,7 @@ def getKeyByValue(d, s):
     return r
 
 
-async def argWrite(writer, *args):
-    line = (
-        b"\t".join(arg.replace(b"\\", b"\\\\").replace(b"\t", b"\\\t") for arg in args)
-        + b"\r\n"
-    )
-    logging.info(getCidByWriter(writer) + " <<< " + repr(line))
-    writer.write(line)
-    del line
-    await writer.drain()
-
-
+# Don't delete this yet, we haven't put it in User/Client yet
 # async def checkedTimedOriginedMessageToUser(
 #     originUsername, targetUsername, command, text
 # ):
@@ -217,10 +316,12 @@ async def argWrite(writer, *args):
 #         return UserNotFoundError("User nonexistant")
 
 
-async def clientLoop(reader, writer):
-    addr = writer.get_extra_info("peername")
+# what are the classes for this again
+async def clientLoop(reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
+    # addr = writer.get_extra_info("peername")
+    # maybe use this for login allowmask checking?
     global client_id_count
-    clientId = str(client_id_count)
+    clientId = str(client_id_count).encode("utf-8")
     client_id_count += 1
     clients[clientId] = writer
     loggedIn = False
@@ -237,42 +338,12 @@ async def clientLoop(reader, writer):
         msg = lnSplt[0]
         ln = b""
 
-        # This needs a rewrite
-        # Also, about this escaping thing, why not use \t as tab
-        # representation rather than \<insert real tab here>
-        escaped = False
-        args = []
-        current = b""
-        for b in [msg[i : i + 1] for i in range(len(msg))]:
-            if escaped:
-                if b == b"\\":
-                    current += b"\\"
-                elif b == b"\t":
-                    current += b"\t"
-                else:
-                    current += b""
-                escaped = False
-            elif b == b"\\":
-                escaped = True
-            elif b == b"\t":
-                args.append(current)
-                current = b""
-            else:
-                current += b
-        del escaped
-        args.append(current)
-        del current
-
-        # args = re.sub(r"\\(.)|\t", lambda m: m.group(1) or "\udeff", msg).split(
-        #    "\udeff"
-        # )
-        # Bad because: (1) This is a hack, it looks dirty;
-        #              (2) It wants things to be decoded.
+        args = bytesToArgs(msg)
 
         if not args[0]:
             continue
 
-        logging.debug(clientId + " >>> " + repr(args))
+        logging.debug(clientId.decode("utf-8") + " >>> " + repr(args))
         cmd = args[0].upper()
 
         if cmd == b"SERVER":
@@ -297,8 +368,6 @@ async def clientLoop(reader, writer):
             else:
                 try:
                     goodPassword = users[args[1]].password
-                    # u to undo, dd is "delete line", 4dd is "delete this line and the next three", "cw" is change this word, "5cw" is "change this word and the next four"
-                    # redo: ^r
                 except KeyError:
                     await argWrite(
                         writer,
@@ -314,7 +383,7 @@ async def clientLoop(reader, writer):
                         )
                         loggedInAs = args[1]
                         loggedIn = True
-                        users[loggedInAs].clients.append(clientId)
+                        # users[loggedInAs].clients.append(Client())
                         queue = users[loggedInAs].queue
                         if queue:
                             await argWrite(writer, b"OFFLINE_MESSAGES\r\n")
@@ -365,7 +434,7 @@ async def clientLoop(reader, writer):
                     )
                 del r
         elif cmd == b"KILL":
-            if not "kill" in users[loggedInAs].permissions:
+            if "kill" not in users[loggedInAs].permissions:
                 await argWrite(
                     writer,
                     b"ERR_SERVER_PERMS",
@@ -409,7 +478,7 @@ async def clientLoop(reader, writer):
     del clients[clientId]
 
 
-async def main():
+async def main() -> None:
     server = await asyncio.start_server(clientLoop, "", 1025)
 
     async with server:
