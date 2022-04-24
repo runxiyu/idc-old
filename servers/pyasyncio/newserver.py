@@ -285,6 +285,7 @@ class Client:
         # TODO
         """
         Stub function, what do we do when a client disconnects?
+        Using a context manager is probably better than del.
         (1) Remove it from the clients list
         (2) Remove it from its user's client list (TODO)
         """
