@@ -28,15 +28,20 @@
 # OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
+#
+# This program requires Python 3.9 or later due to its extensive use of
+# type annotations.  Usage with an older version would likely cause
+# SyntaxErrors.  If mypy has problems detecting types on the Trio
+# library, install trio-typing.  Please mypy after every runnable edit.
 
 from __future__ import annotations
 
 from itertools import count
 import trio
-import secrets
 
 import entities
 import utils
+import minilog
 import config
 
 CONNECTION_COUNTER = count()
@@ -44,19 +49,19 @@ clients = dict[bytes, entities.Client]
 
 
 async def clientLoop(serverStream: trio.SocketStream) -> None:
-    clientId = str(int(next(CONNECTION_COUNTER)))
-    utils.logInfo(f"{clientId}: started")
     try:
+        clientId = str(int(next(CONNECTION_COUNTER)))
+        minilog.Info(f"{clientId}: started")
         async for data in serverStream:
+            minilog.Debug(f"{clientId} >> {data!r}")
             try:
-                utils.logDebug(f"{clientId} >> {data!r}")
                 await serverStream.send_all(data)
-                utils.logDebug(f"{clientId} << {data!r}")
+                minilog.Debug(f"{clientId} << {data!r}")
             except utils.IDCUserCausedException as exc:
-                utils.logNote(f"{clientId}: {exc!r}")
-        utils.logInfo(f"{clientId} EOF")
+                minilog.Note(f"{clientId}: {exc!r}")
+        minilog.Info(f"{clientId} EOF")
     except Exception as exc:
-        utils.logWarning(f"{clientId}: {exc!r}")
+        minilog.Warning(f"{clientId}: {exc!r}")
 
 
 async def main() -> None:
@@ -67,5 +72,5 @@ if __name__ == "__main__":
     try:
         trio.run(main)
     except KeyboardInterrupt:
-        utils.logError("KeyboardInterrupt")
+        minilog.Error("KeyboardInterrupt")
         utils.exit(0)

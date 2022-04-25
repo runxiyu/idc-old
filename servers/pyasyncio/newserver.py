@@ -9,6 +9,8 @@
 # opposed to plainly theoretical and purely functional programs),
 # this implementation won't be maintained by me anymore. -- Andrew
 #
+# FIXME: This is ALREADY DEPRECATED for pytrio/server.py.
+#
 # The Internet Delay Chat specifications and implementations are all
 # under heavy development.  No stability may be expected.
 #

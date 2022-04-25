@@ -31,23 +31,48 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 
 from __future__ import annotations
-from dataclasses import dataclass, field
-from typing import TypeVar
+from dataclasses import dataclass
+
+# from dataclasses import field
+# from typing import TypeVar
+
+import trio
 
 import utils
-import config
+
+# import config
 
 
 @dataclass
 class Server:
-    serverName: bytes
+    """
+    This Server class represents both the local ("this") server, and
+    remote servers.
+    """
+
+    name: bytes
+    users: dict[bytes, User]
 
 
 @dataclass
 class User:
-    userName: bytes
+    """
+    This User class handles both local and remote users.
+    """
+
+    name: bytes
 
 
 @dataclass
 class Client:
-    clientId: bytes
+    clientId: bytes  # The clientId is now specified by the main loop.
+    belongsToUser: User  # This should be None by default?
+    stream: trio.SocketStream
+
+    async def writeRaw(self, toWrite: bytes) -> None:  # None?
+        return await self.stream.send_all(toWrite)
+
+    async def writeStd(
+        self, std: tuple[bytes, dict[bytes, bytes]]
+    ) -> None:  # None?
+        pass
