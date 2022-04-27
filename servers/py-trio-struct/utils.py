@@ -55,14 +55,14 @@ _idc_escapes = {
 def _get_idc_args(
     command: bytes, kwdict: dict[str, Optional[bytes]]
 ) -> Iterator[bytes]:
-    # Working, passed manual testing
+    "Hey!  Saw that underscore?  Why are you even looking at this?"
     yield command.upper()
     seen = set()
     for key, value in kwdict.items():
         key = key.upper()
         if key in seen:
             raise exceptions.KeyCollisionError(
-                f"{key!r} was already seen in the arguments."
+                key.encode("ascii") + b" was already seen in the arguments."
             )
         seen.add(key)
         if value is not None:
@@ -74,9 +74,9 @@ def _get_idc_args(
 def stdToBytes(command: bytes, **kwargs: Optional[bytes]) -> bytes:
     """
     Turns a standard tuple into a raw IDC message, adding the final
-    CR-LF
+    CR-LF.
+        "Hey!  Saw that underscore?  Why are you even looking at this?"
     """
-    # Working, passed manual testing
     return b"\t".join(_get_idc_args(command, kwargs)) + b"\r\n"
 
 
@@ -87,7 +87,6 @@ def bytesToStd(msg: bytes) -> tuple[bytes, dict[str, bytes]]:
     Example: PRIVMSG TARGET:yay MESSAGE:Hi
     (b'PRIVMSG', {b'TARGET': b'yay', b'MESSAGE': b'Hi'})
     """
-    # Working with errors
     cmd = b""
     args = {}
     for arg in msg.split(b"\t"):
@@ -98,12 +97,12 @@ def bytesToStd(msg: bytes) -> tuple[bytes, dict[str, bytes]]:
                 key_str = key.decode("ascii")
             except UnicodeDecodeError:
                 raise exceptions.NonAlphaKeyError(
-                    "The key of every argument must be an ASCII letter-only sequence."
+                    b"The key of every argument must be an ASCII letter-only sequence."
                 )
             else:
                 if not key_str.isalpha():
                     raise exceptions.NonAlphaKeyError(
-                        "The key of every argument must be an ASCII letter-only sequence."
+                        b"The key of every argument must be an ASCII letter-only sequence."
                     )
 
             def s(m: re.Match[bytes]) -> bytes:
@@ -111,8 +110,7 @@ def bytesToStd(msg: bytes) -> tuple[bytes, dict[str, bytes]]:
                     return _idc_escapes[m.group(1)]
                 except KeyError:
                     raise exceptions.EscapeSequenceError(
-                        "%s is an invalid escape sequence"  # FIXME 2
-                        % ("\\" + repr(m.group(1))[2:-1])
+                        b"\\" + m.group(1) + b"is an invalid escape sequence."
                     )
 
             args[key_str] = _esc_re.sub(
@@ -120,7 +118,7 @@ def bytesToStd(msg: bytes) -> tuple[bytes, dict[str, bytes]]:
                 value,
             )
         elif cmd is not None:
-            raise exceptions.MultiCommandError()  # FIXME 2
+            raise exceptions.MultiCommandError(b"You can't use multiple commands inside one line!")
         else:
             cmd = arg
     return cmd, args
