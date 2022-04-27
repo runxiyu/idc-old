@@ -1,0 +1,16 @@
+okay im jsut saying that those specifications are really outdated
+once we test things out and find something good implementation-wise,
+i'll restart writing the docs
+
+but here's the general message format
+
+
+COMMAND	KEY1:ARG1	KEY2:ARG2 contains some spaces, a tab (\t), and a CR-LF (\r\n)
+
+Here's an escape lookup table:
+
+Thing    How-to-put-in-an-argument    Oringinal use
+\        \\                           escaping
+<Tab>    \t                           delimiting arguments
+<CR>     \r                           part of CR-LF delimiting messages
+<LF>     \n                           part of CR-LF delimiting messages
