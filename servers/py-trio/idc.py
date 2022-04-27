@@ -39,25 +39,33 @@ from __future__ import annotations
 from itertools import count
 import trio
 
+import exceptions
 import entities
 import utils
 import minilog
 import config
 
 CONNECTION_COUNTER = count()
-clients = dict[bytes, entities.Client]
+clients: dict[bytes, entities.Client]
 
 
 async def clientLoop(serverStream: trio.SocketStream) -> None:
     try:
-        clientId = str(int(next(CONNECTION_COUNTER)))
+        clientId = str(next(CONNECTION_COUNTER))
         minilog.Info(f"{clientId}: started")
-        async for data in serverStream:
-            minilog.Debug(f"{clientId} >> {data!r}")
+        async for raw_msg in serverStream:
             try:
-                await serverStream.send_all(data)
-                minilog.Debug(f"{clientId} << {data!r}")
-            except utils.IDCUserCausedException as exc:
+                cmd, args = utils.bytesToStd(raw_msg)
+            except IDCError as exc:
+                await serverStream.send_all(
+                    exc.errorType.encode("ascii") + b"\r\n"
+                )
+                continue
+            minilog.Debug(f"{clientId} >> {cmd!r} >> {args!r}")
+            try:
+                await serverStream.send_all(utils.stdToBytes(cmd, args))
+                minilog.Debug(f"{clientId} << {123!r}")
+            except exceptions.IDCUserCausedException as exc:
                 minilog.Note(f"{clientId}: {exc!r}")
         minilog.Info(f"{clientId} EOF")
     except Exception as exc:

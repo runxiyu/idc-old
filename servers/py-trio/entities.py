@@ -35,12 +35,11 @@ from dataclasses import dataclass
 
 # from dataclasses import field
 # from typing import TypeVar
+from typing import Optional
 
 import trio
 
 import utils
-
-# import config
 
 
 @dataclass
@@ -52,6 +51,14 @@ class Server:
 
     name: bytes
     users: dict[bytes, User]
+    clients: Optional(dict[bytes, User])
+    guilds: dict[bytes, Guild]
+
+    def topologyLink(self, srv: Server):
+        pass
+
+    def topologyDelink(self, srv: Server):
+        pass
 
 
 @dataclass
@@ -65,7 +72,11 @@ class User:
 
 @dataclass
 class Client:
-    clientId: bytes  # The clientId is now specified by the main loop.
+    clientId: bytes
+    # The clientId is now specified by the main loop.  Therefore the
+    # class itself doesn't care about  what ID it gets and about putting
+    # itself into the global clients dictionary.
+
     belongsToUser: User  # This should be None by default?
     stream: trio.SocketStream
 
@@ -74,5 +85,32 @@ class Client:
 
     async def writeStd(
         self, std: tuple[bytes, dict[bytes, bytes]]
-    ) -> None:  # None?
+    ) -> None:
+        await self.writeRaw(utils.stdToBytes(std[0], **std[1]))
+
+    async def send(
+        self, command: bytes, **kwargs: Optional[bytes]
+    ) -> None:
+        await self.writeRaw(utils.stdToBytes(command, **kwargs))
+
+    async def destroy(self):
+        """
+        Note that this function only stops the stream, it doesn't remove
+        itself from its user's client list or anything; the User should
+        have a method to do that.
+
+        OO is yay!
+        Also why do you need a method in User to do that? What's wrong
+        with removing it from here?
+
+        Beause our current way of doing this is, the thing that contains
+        the more minor thing removes it; i mean the client doesn't
+        assign its own client id, it's assigned by the mainloop, we need
+        some consistency otherwise this OO gets into a big mess
+        """
         pass
+
+
+@dataclass
+class Guild:
+    pass
