@@ -70,37 +70,40 @@ async def connection_loop(stream: trio.SocketStream) -> None:
                 cmd = cmd.upper()
                 # Begin main actions
                 if cmd == b"LOGIN":
-                    attempting_username = utils.carg(
-                        args, "USERNAME", b"LOGIN"
-                    )
-                    attempting_password = utils.carg(
-                        args, "PASSWORD", b"LOGIN"
-                    )
-                    try:
-                        if (
-                            local_users[attempting_username].password
-                            == attempting_password
-                        ):
-                            utils.add_client_to_user(
-                                client, local_users[attempting_username]
-                            )
-                            await utils.send(
-                                client,
-                                b"LOGIN_GOOD",
-                                USERNAME=attempting_username,
-                                COMMENT=b"Login is good.",
-                            )
-                        else:
-                            raise exceptions.LoginFailed(
-                                b"Invalid password for "
-                                + attempting_username
-                                + b"."
-                            )
-                    except KeyError:
-                        raise exceptions.LoginFailed(
-                            attempting_username
-                            + b" is not a registered username."
+                    if client.user:
+                        raise exceptions.AlreadyLoggedIn(b"You are already logged in as " + client.user.username + b".")
+                    else:
+                        attempting_username = utils.carg(
+                            args, "USERNAME", b"LOGIN"
                         )
+                        attempting_password = utils.carg(
+                            args, "PASSWORD", b"LOGIN"
+                        )
+                        try:
+                            if (
+                                local_users[attempting_username].password
+                                == attempting_password
+                            ):
+                                utils.add_client_to_user(
+                                    client, local_users[attempting_username]
+                                )
+                                await utils.send(
+                                    client,
+                                    b"LOGIN_GOOD",
+                                    USERNAME=attempting_username,
+                                    COMMENT=b"Login is good.",
+                                )
+                            else:
+                                raise exceptions.LoginFailed(
+                                    b"Invalid password for "
+                                    + attempting_username
+                                    + b"."
+                                )
+                        except KeyError:
+                            raise exceptions.LoginFailed(
+                                attempting_username
+                                + b" is not a registered username."
+                            )
                 else:
                     raise exceptions.UnknownCommand(cmd + b" is an unknown command.")
                 # End main actions

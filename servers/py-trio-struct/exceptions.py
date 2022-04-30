@@ -64,6 +64,8 @@ class UnknownCommand(IDCUserCausedException):
     error_type = b"ERR_UNKNOWN_COMMAND"
 class MissingArgumentError(IDCUserCausedException):
     error_type = b"ERR_MISSING_ARGUMENT"
+class AlreadyLoggedIn(IDCUserCausedException):
+    error_type = b"ERR_REDUNDENT_LOGIN"
 
 
 class LoginFailed(IDCUserCausedException):
