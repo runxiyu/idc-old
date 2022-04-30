@@ -47,7 +47,7 @@ class Severity:
 
 class IDCException(Exception):
     severity = Severity.UNKNOWN
-    error_type = "ERR_UNKNOWN"
+    error_type = b"ERR_UNKNOWN"
 
 
 class IDCUserCausedException(IDCException):
@@ -56,7 +56,7 @@ class IDCUserCausedException(IDCException):
     """
 
     severity = Severity.ERROR
-    error_type = "ERR_USER_ERROR"
+    error_type = b"ERR_USER_ERROR"
     pass
 
 
@@ -65,7 +65,7 @@ class NonAlphaKeyError(IDCUserCausedException):
     Putting non-letters into keywords
     """
 
-    error_type = "ERR_INVALID_KEYWORD"
+    error_type = b"ERR_INVALID_KEYWORD"
 
 
 class EscapeSequenceError(IDCUserCausedException):
@@ -73,7 +73,7 @@ class EscapeSequenceError(IDCUserCausedException):
     I don't know this escape sequence
     """
 
-    error_type = "ERR_DONT_KNOW"
+    error_type = b"ERR_DONT_KNOW"
 
 
 class MultiCommandError(IDCUserCausedException):
@@ -81,7 +81,7 @@ class MultiCommandError(IDCUserCausedException):
     Multiple commands in one line
     """
 
-    error_type = "ERR_MULTIPLE_CMDS"
+    error_type = b"ERR_MULTIPLE_CMDS"
 
 
 class MessageUndeliverableError(IDCUserCausedException):
@@ -90,7 +90,7 @@ class MessageUndeliverableError(IDCUserCausedException):
     offline-messages option.
     """
 
-    error_type = "ERR_MSG_UNDELIVERABLE"
+    error_type = b"ERR_MSG_UNDELIVERABLE"
 
 
 class UserNotFoundError(IDCUserCausedException):
@@ -99,7 +99,7 @@ class UserNotFoundError(IDCUserCausedException):
     interact with a nonexistant user.
     """
 
-    error_type = "ERR_USER_NOT_FOUND"
+    error_type = b"ERR_USER_NOT_FOUND"
 
 
 class StrangeError(IDCException):
@@ -108,7 +108,7 @@ class StrangeError(IDCException):
     either the hardware blowing up or huge bugs.
     """
 
-    error_type = "ERR_DONT_KNOW"
+    error_type = b"ERR_DONT_KNOW"
 
 
 class KeyCollisionError(IDCUserCausedException):
@@ -116,4 +116,4 @@ class KeyCollisionError(IDCUserCausedException):
     Raise when there are redundent keys in a line.
     """
 
-    error_type = "ERR_REDUNDENT_KEYS"
+    error_type = b"ERR_REDUNDENT_KEYS"

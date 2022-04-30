@@ -34,9 +34,7 @@
 from __future__ import annotations
 from typing import Optional, Union
 from dataclasses import dataclass
-import utils
 import trio
-
 
 
 @dataclass
@@ -58,8 +56,4 @@ class User:
 class Client:
     cid: bytes
     stream: trio.SocketStream
-    user: Optional(User) = None
-
-
-if __name__ == "__main__":
-    utils.exit(65535)
+    user: Optional[User] = None

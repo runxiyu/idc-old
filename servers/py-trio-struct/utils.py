@@ -36,12 +36,13 @@
 #
 
 from __future__ import annotations
-from typing import TypeVar, Iterator, Optional, Union, Callable
+from typing import TypeVar, Iterator, Optional, Union
 
 import sys
 import re
 import time
 
+import minilog
 import exceptions
 import entities
 
@@ -63,8 +64,7 @@ def _get_idc_args(
         key = key.upper()
         if key in seen:
             raise exceptions.KeyCollisionError(
-                key.encode("ascii")
-                + b" was already seen in the arguments."
+                key.encode("ascii") + b" was already seen in the arguments."
             )
         seen.add(key)
         if value is not None:
@@ -79,7 +79,8 @@ def stdToBytes(command: bytes, **kwargs: Optional[bytes]) -> bytes:
     CR-LF.
         "Hey!  Saw that underscore?  Why are you even looking at this?"
     """
-    return b"\t".join(_get_idc_args(command, kwargs)) + b"\r\n"
+    r = b"\t".join(_get_idc_args(command, kwargs)) + b"\r\n"
+    return r
 
 
 def bytesToStd(msg: bytes) -> tuple[bytes, dict[str, bytes]]:
@@ -89,6 +90,10 @@ def bytesToStd(msg: bytes) -> tuple[bytes, dict[str, bytes]]:
     Example: PRIVMSG TARGET:yay MESSAGE:Hi
     (b'PRIVMSG', {b'TARGET': b'yay', b'MESSAGE': b'Hi'})
     """
+    if msg.endswith(b"\n"):
+        msg = msg[:-1]
+    if msg.endswith(b"\r"):
+        msg = msg[:-1]
     cmd = b""
     args = {}
     for arg in msg.split(b"\t"):
@@ -112,16 +117,14 @@ def bytesToStd(msg: bytes) -> tuple[bytes, dict[str, bytes]]:
                     return _idc_escapes[m.group(1)]
                 except KeyError:
                     raise exceptions.EscapeSequenceError(
-                        b"\\"
-                        + m.group(1)
-                        + b"is an invalid escape sequence."
+                        b"\\" + m.group(1) + b"is an invalid escape sequence."
                     )
 
             args[key_str] = _esc_re.sub(
                 s,
                 value,
             )
-        elif cmd is not None:
+        elif cmd != b"":
             raise exceptions.MultiCommandError(
                 b"You can't use multiple commands inside one line!"
             )
@@ -156,20 +159,11 @@ def getKeyByValue(d: dict[T, U], s: U) -> list[T]:
 V = Union[entities.Client, entities.User]
 
 
-def send(thing: V, command: bytes, **kwargs: Optional[bytes]) -> None:
+async def send(thing: V, command: bytes, **kwargs: Optional[bytes]) -> None:
     if isinstance(thing, entities.Client):
-        thing.stream.send_all(stdToBytes(command, **kwargs))
+        await thing.stream.send_all(stdToBytes(command, **kwargs))
     elif isinstance(thing, entities.User):
         pass  # TODO
-
-
-def send_etch(
-    thing: V, command: bytes, **kwargs: Optional[bytes]
-) -> Callable[[], None]:
-    # Random Haskell stuff
-    def _() -> None:
-        return send(thing, command, **kwargs)
-    return _
 
 
 def exit(i: int) -> None:

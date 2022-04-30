@@ -49,29 +49,29 @@ PORT = 6835
 client_id_counter = count()
 
 
-async def connection_loop(stream):
+async def connection_loop(stream: trio.SocketStream) -> None:
     ident = bytes(next(client_id_counter))
     minilog.note(f"Connection {str(ident)} has started.")
     client = entities.Client(cid=ident, stream=stream)
     try:
         async for data in stream:
+            minilog.debug(f"I got {data!r} from {ident!r}")
             try:
-                await utils.write(client, b"GOT", data=data)
+                cmd, args = utils.bytesToStd(data)
+                await utils.send(client, cmd, **args)
             except exceptions.IDCUserCausedException as e:
-                await utils.write(
-                    client, e.severity, E=e.error_type, COMMENT=e[0]
-                )
+                await utils.send(client, e.severity, E=e.error_type, COMMENT=e.args[0])
     except Exception as exc:
-        minilog.warning(f"{ident}: crashed: {exc!r}")
+        minilog.warning(f"{ident!r}: crashed: {exc!r}")
 
 
-async def main():
+async def main() -> None:
     await trio.serve_tcp(connection_loop, PORT)
 
 
 if __name__ == "__main__":
     try:
-        minilog.info("Definitions complete.  Establishing listener.")
+        minilog.note("Definitions complete.  Establishing listener.")
         trio.run(main)
     except KeyboardInterrupt:
         minilog.error("KeyboardInterrupt!")
