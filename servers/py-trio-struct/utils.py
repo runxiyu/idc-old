@@ -64,7 +64,8 @@ def _get_idc_args(
         key = key.upper()
         if key in seen:
             raise exceptions.KeyCollisionError(
-                key.encode("ascii") + b" was already seen in the arguments."
+                key.encode("ascii")
+                + b" was already seen in the arguments."
             )
         seen.add(key)
         if value is not None:
@@ -99,6 +100,7 @@ def bytesToStd(msg: bytes) -> tuple[bytes, dict[str, bytes]]:
     for arg in msg.split(b"\t"):
         if b":" in arg:
             key, value = arg.split(b":", 1)
+            key = key.upper()
 
             try:
                 key_str = key.decode("ascii")
@@ -117,7 +119,9 @@ def bytesToStd(msg: bytes) -> tuple[bytes, dict[str, bytes]]:
                     return _idc_escapes[m.group(1)]
                 except KeyError:
                     raise exceptions.EscapeSequenceError(
-                        b"\\" + m.group(1) + b"is an invalid escape sequence."
+                        b"\\"
+                        + m.group(1)
+                        + b"is an invalid escape sequence."
                     )
 
             args[key_str] = _esc_re.sub(
@@ -144,6 +148,20 @@ T = TypeVar("T")
 U = TypeVar("U")
 
 
+def carg(
+    adict: dict[str, bytes], key: str, cmd:bytes=b"This command"
+) -> bytes:
+    try:
+        return adict[key]
+    except KeyError:
+        raise exceptions.MissingArgumentError(
+            cmd
+            + b" requires an argument with the key "
+            + key.encode("utf-8")
+            + b" but was not provided."
+        )
+
+
 def getKeyByValue(d: dict[T, U], s: U) -> list[T]:
     """
     From a dictionary d, retreive all keys that have value s, returned
@@ -159,7 +177,9 @@ def getKeyByValue(d: dict[T, U], s: U) -> list[T]:
 V = Union[entities.Client, entities.User]
 
 
-async def send(thing: V, command: bytes, **kwargs: Optional[bytes]) -> None:
+async def send(
+    thing: V, command: bytes, **kwargs: Optional[bytes]
+) -> None:
     if isinstance(thing, entities.Client):
         await thing.stream.send_all(stdToBytes(command, **kwargs))
     elif isinstance(thing, entities.User):
@@ -168,3 +188,7 @@ async def send(thing: V, command: bytes, **kwargs: Optional[bytes]) -> None:
 
 def exit(i: int) -> None:
     sys.exit(i)
+
+def add_client_to_user(c: entities.Client, u: entities.User) -> None:
+    u.connected_clients.append(c)
+    c.user = u

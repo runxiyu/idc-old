@@ -43,10 +43,19 @@ import minilog
 import exceptions
 import entities
 import utils
+import config
 
 PORT = 6835
 
 client_id_counter = count()
+local_users: dict[bytes, entities.User] = {}
+
+for username in config.users:
+    local_users[username] = entities.User(
+        username=username,
+        password=config.users[username]["password"],
+        options=config.users[username]["options"],
+    )
 
 
 async def connection_loop(stream: trio.SocketStream) -> None:
@@ -58,9 +67,50 @@ async def connection_loop(stream: trio.SocketStream) -> None:
             minilog.debug(f"I got {data!r} from {ident!r}")
             try:
                 cmd, args = utils.bytesToStd(data)
-                await utils.send(client, cmd, **args)
+                cmd = cmd.upper()
+                # Begin main actions
+                if cmd == b"LOGIN":
+                    attempting_username = utils.carg(
+                        args, "USERNAME", b"LOGIN"
+                    )
+                    attempting_password = utils.carg(
+                        args, "PASSWORD", b"LOGIN"
+                    )
+                    try:
+                        if (
+                            local_users[attempting_username].password
+                            == attempting_password
+                        ):
+                            utils.add_client_to_user(
+                                client, local_users[attempting_username]
+                            )
+                            await utils.send(
+                                client,
+                                b"LOGIN_GOOD",
+                                USERNAME=attempting_username,
+                                COMMENT=b"Login is good.",
+                            )
+                        else:
+                            raise exceptions.LoginFailed(
+                                b"Invalid password for "
+                                + attempting_username
+                                + b"."
+                            )
+                    except KeyError:
+                        raise exceptions.LoginFailed(
+                            attempting_username
+                            + b" is not a registered username."
+                        )
+                else:
+                    raise exceptions.UnknownCommand(cmd + b" is an unknown command.")
+                # End main actions
             except exceptions.IDCUserCausedException as e:
-                await utils.send(client, e.severity, E=e.error_type, COMMENT=e.args[0])
+                await utils.send(
+                    client,
+                    e.severity,
+                    E=e.error_type,
+                    COMMENT=e.args[0],
+                )
     except Exception as exc:
         minilog.warning(f"{ident!r}: crashed: {exc!r}")
 

@@ -33,7 +33,7 @@
 
 from __future__ import annotations
 from typing import Optional, Union
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import trio
 
 
@@ -47,9 +47,10 @@ class Server:
 
 @dataclass
 class User:
-    name: bytes
-    connected_clients: list[Client]
+    username: bytes
     password: bytes
+    options: list[str]
+    connected_clients: list[Client] = field(default_factory=list)
 
 
 @dataclass

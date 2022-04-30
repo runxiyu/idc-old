@@ -68,7 +68,9 @@ class textStyle:
 
 
 def debug(s: str) -> None:
-    print(textStyle.reset + "[D] " + s + textStyle.reset, file=sys.stdout)
+    print(
+        textStyle.reset + "[D] " + s + textStyle.reset, file=sys.stdout
+    )
 
 
 def info(s: str) -> None:
@@ -100,4 +102,6 @@ def warning(s: str) -> None:
 
 
 def error(s: str) -> None:
-    print(textStyle.fgRed + "[E] " + s + textStyle.reset, file=sys.stdout)
+    print(
+        textStyle.fgRed + "[E] " + s + textStyle.reset, file=sys.stdout
+    )

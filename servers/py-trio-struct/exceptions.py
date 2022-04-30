@@ -60,6 +60,17 @@ class IDCUserCausedException(IDCException):
     pass
 
 
+class UnknownCommand(IDCUserCausedException):
+    error_type = b"ERR_UNKNOWN_COMMAND"
+class MissingArgumentError(IDCUserCausedException):
+    error_type = b"ERR_MISSING_ARGUMENT"
+
+
+class LoginFailed(IDCUserCausedException):
+    severity = Severity.FAIL
+    error_type = b"ERR_LOGIN_FAILED"
+
+
 class NonAlphaKeyError(IDCUserCausedException):
     """
     Putting non-letters into keywords
