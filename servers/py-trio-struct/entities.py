@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 #
-# Internet Delay Chat server written in Python Trio.
+# Entities library for Internet Delay Chat server written in Python
+# Trio.  Don't run this.
 #
 # Written by: Andrew <https://www.andrewyu.org>
 #             luk3yx <https://luk3yx.github.io>
@@ -29,49 +30,36 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 #
-# This program requires Python 3.9 or later due to its extensive use of
-# type annotations.  Usage with an older version would likely cause
-# SyntaxErrors.  If mypy has problems detecting types on the Trio
-# library, install trio-typing.  Please mypy after every runnable edit.
-#
 
 from __future__ import annotations
-from itertools import count
-import trio
-import minilog
-
-import exceptions
-import entities
+from typing import Optional, Union
+from dataclasses import dataclass
 import utils
-
-PORT = 6835
-
-client_id_counter = count()
+import trio
 
 
-async def connection_loop(stream):
-    ident = bytes(next(client_id_counter))
-    minilog.note(f"Connection {str(ident)} has started.")
-    client = entities.Client(cid=ident, stream=stream)
-    try:
-        async for data in stream:
-            try:
-                await utils.write(client, b"GOT", data=data)
-            except exceptions.IDCUserCausedException as e:
-                await utils.write(
-                    client, e.severity, E=e.error_type, COMMENT=e[0]
-                )
-    except Exception as exc:
-        minilog.warning(f"{ident}: crashed: {exc!r}")
+
+@dataclass
+class Server:
+    # stub, we're not using it just yet
+    rvalue: bytes
+    domain: bytes
+    users: dict[bytes, User]
 
 
-async def main():
-    await trio.serve_tcp(connection_loop, PORT)
+@dataclass
+class User:
+    name: bytes
+    connected_clients: list[Client]
+    password: bytes
+
+
+@dataclass
+class Client:
+    cid: bytes
+    stream: trio.SocketStream
+    user: Optional(User) = None
 
 
 if __name__ == "__main__":
-    try:
-        minilog.info("Definitions complete.  Establishing listener.")
-        trio.run(main)
-    except KeyboardInterrupt:
-        minilog.error("KeyboardInterrupt!")
+    utils.exit(65535)

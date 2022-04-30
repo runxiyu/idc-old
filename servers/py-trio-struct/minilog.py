@@ -67,41 +67,41 @@ class textStyle:
     bgBrightWhite = "\033[47;1m"
 
 
-def Debug(s: str) -> None:
+def debug(s: str) -> None:
     print(
         textStyle.reset + "[D] " + s + textStyle.reset, file=sys.stdout
     )
 
 
-def Info(s: str) -> None:
+def info(s: str) -> None:
     print(
         textStyle.fgGreen + "[I] " + s + textStyle.reset,
         file=sys.stdout,
     )
 
 
-def Note(s: str) -> None:
+def note(s: str) -> None:
     print(
         textStyle.fgBrightBlue + "[N] " + s + textStyle.reset,
         file=sys.stdout,
     )
 
 
-def Caution(s: str) -> None:
+def caution(s: str) -> None:
     print(
         textStyle.fgBrightYellow + "[C] " + s + textStyle.reset,
         file=sys.stdout,
     )
 
 
-def Warning(s: str) -> None:
+def warning(s: str) -> None:
     print(
         textStyle.fgYellow + "[W] " + s + textStyle.reset,
         file=sys.stdout,
     )
 
 
-def Error(s: str) -> None:
+def error(s: str) -> None:
     print(
         textStyle.fgRed + "[E] " + s + textStyle.reset, file=sys.stdout
     )

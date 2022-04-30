@@ -33,24 +33,21 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-import enum
 
-
-class Severity(enum.Enum):
-    # nah
-    UNKNOWN = enum.auto()
-    YAY = enum.auto()
-    NORM = enum.auto()
-    FAIL = enum.auto()
-    WARN = enum.auto()
-    ERROR = enum.auto()
-    SECURITY = enum.auto()
-    FATAL = enum.auto()
+class Severity:
+    UNKNOWN = b"UNKNOWN"
+    YAY = b"YAY"
+    NORM = b"NORM"
+    FAIL = b"FAIL"
+    WARN = b"WARN"
+    ERROR = b"ERROR"
+    SECURITY = b"SECURITY"
+    FATAL = b"FATAL"
 
 
 class IDCException(Exception):
     severity = Severity.UNKNOWN
-    errorType = "ERR_UNKNOWN"
+    error_type = "ERR_UNKNOWN"
 
 
 class IDCUserCausedException(IDCException):
@@ -59,7 +56,7 @@ class IDCUserCausedException(IDCException):
     """
 
     severity = Severity.ERROR
-    errorType = "ERR_USER_ERROR"
+    error_type = "ERR_USER_ERROR"
     pass
 
 
@@ -68,7 +65,7 @@ class NonAlphaKeyError(IDCUserCausedException):
     Putting non-letters into keywords
     """
 
-    errorType = "ERR_INVALID_KEYWORD"
+    error_type = "ERR_INVALID_KEYWORD"
 
 
 class EscapeSequenceError(IDCUserCausedException):
@@ -76,7 +73,7 @@ class EscapeSequenceError(IDCUserCausedException):
     I don't know this escape sequence
     """
 
-    errorType = "ERR_DONT_KNOW"
+    error_type = "ERR_DONT_KNOW"
 
 
 class MultiCommandError(IDCUserCausedException):
@@ -84,7 +81,7 @@ class MultiCommandError(IDCUserCausedException):
     Multiple commands in one line
     """
 
-    errorType = "ERR_MULTIPLE_CMDS"
+    error_type = "ERR_MULTIPLE_CMDS"
 
 
 class MessageUndeliverableError(IDCUserCausedException):
@@ -93,7 +90,7 @@ class MessageUndeliverableError(IDCUserCausedException):
     offline-messages option.
     """
 
-    errorType = "ERR_MSG_UNDELIVERABLE"
+    error_type = "ERR_MSG_UNDELIVERABLE"
 
 
 class UserNotFoundError(IDCUserCausedException):
@@ -102,7 +99,7 @@ class UserNotFoundError(IDCUserCausedException):
     interact with a nonexistant user.
     """
 
-    errorType = "ERR_USER_NOT_FOUND"
+    error_type = "ERR_USER_NOT_FOUND"
 
 
 class StrangeError(IDCException):
@@ -111,7 +108,7 @@ class StrangeError(IDCException):
     either the hardware blowing up or huge bugs.
     """
 
-    errorType = "ERR_DONT_KNOW"
+    error_type = "ERR_DONT_KNOW"
 
 
 class KeyCollisionError(IDCUserCausedException):
@@ -119,4 +116,4 @@ class KeyCollisionError(IDCUserCausedException):
     Raise when there are redundent keys in a line.
     """
 
-    errorType = "ERR_REDUNDENT_KEYS"
+    error_type = "ERR_REDUNDENT_KEYS"

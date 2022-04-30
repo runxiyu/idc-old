@@ -45,7 +45,7 @@ users = {
 guilds = {
     b"Haxxors": {
         "description": b"Haxxors guild",
-        "userRoles": [],
+        "user_roles": [],
         "channels": [],
         "users": {b"Andrew", b"lurk"},
         "roles": [],

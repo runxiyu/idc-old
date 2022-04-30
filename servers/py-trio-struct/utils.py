@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 #
-# This program is made by the World Sus Foundation by luky3x.
+# This program is made by the World Sus Foundation by luky3x.  No rights
+# reserved.
 #
 # Various utility functions for the Internet Delay Chat server written
 # in Python Trio.  This library is not intended to be used outside of
@@ -35,13 +36,14 @@
 #
 
 from __future__ import annotations
-from typing import TypeVar, Iterator, Optional
+from typing import TypeVar, Iterator, Optional, Union, Callable
 
 import sys
 import re
 import time
 
 import exceptions
+import entities
 
 _esc_re = re.compile(rb"\\(.)")
 _idc_escapes = {
@@ -55,14 +57,14 @@ _idc_escapes = {
 def _get_idc_args(
     command: bytes, kwdict: dict[str, Optional[bytes]]
 ) -> Iterator[bytes]:
-    "Hey!  Saw that underscore?  Why are you even looking at this?"
     yield command.upper()
     seen = set()
     for key, value in kwdict.items():
         key = key.upper()
         if key in seen:
             raise exceptions.KeyCollisionError(
-                key.encode("ascii") + b" was already seen in the arguments."
+                key.encode("ascii")
+                + b" was already seen in the arguments."
             )
         seen.add(key)
         if value is not None:
@@ -97,12 +99,12 @@ def bytesToStd(msg: bytes) -> tuple[bytes, dict[str, bytes]]:
                 key_str = key.decode("ascii")
             except UnicodeDecodeError:
                 raise exceptions.NonAlphaKeyError(
-                    b"The key of every argument must be an ASCII letter-only sequence."
+                    b"Argument keys must be ASCII aplphabet sequences."
                 )
             else:
                 if not key_str.isalpha():
                     raise exceptions.NonAlphaKeyError(
-                        b"The key of every argument must be an ASCII letter-only sequence."
+                        b"Argument keys must be ASCII aplphabet sequences."
                     )
 
             def s(m: re.Match[bytes]) -> bytes:
@@ -110,7 +112,9 @@ def bytesToStd(msg: bytes) -> tuple[bytes, dict[str, bytes]]:
                     return _idc_escapes[m.group(1)]
                 except KeyError:
                     raise exceptions.EscapeSequenceError(
-                        b"\\" + m.group(1) + b"is an invalid escape sequence."
+                        b"\\"
+                        + m.group(1)
+                        + b"is an invalid escape sequence."
                     )
 
             args[key_str] = _esc_re.sub(
@@ -118,7 +122,9 @@ def bytesToStd(msg: bytes) -> tuple[bytes, dict[str, bytes]]:
                 value,
             )
         elif cmd is not None:
-            raise exceptions.MultiCommandError(b"You can't use multiple commands inside one line!")
+            raise exceptions.MultiCommandError(
+                b"You can't use multiple commands inside one line!"
+            )
         else:
             cmd = arg
     return cmd, args
@@ -147,4 +153,24 @@ def getKeyByValue(d: dict[T, U], s: U) -> list[T]:
     return r
 
 
-exit = sys.exit
+V = Union[entities.Client, entities.User]
+
+
+def send(thing: V, command: bytes, **kwargs: Optional[bytes]) -> None:
+    if isinstance(thing, entities.Client):
+        thing.stream.send_all(stdToBytes(command, **kwargs))
+    elif isinstance(thing, entities.User):
+        pass  # TODO
+
+
+def send_etch(
+    thing: V, command: bytes, **kwargs: Optional[bytes]
+) -> Callable[[], None]:
+    # Random Haskell stuff
+    def _() -> None:
+        return send(thing, command, **kwargs)
+    return _
+
+
+def exit(i: int) -> None:
+    sys.exit(i)
