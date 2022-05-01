@@ -106,12 +106,12 @@ def bytesToStd(msg: bytes) -> tuple[bytes, dict[str, bytes]]:
                 key_str = key.decode("ascii")
             except UnicodeDecodeError:
                 raise exceptions.NonAlphaKeyError(
-                    b"Argument keys must be ASCII aplphabet sequences."
+                    b"Argument keys must be ASCII aplphabet sequences.  (decode error)"
                 )
             else:
                 if not key_str.isalpha():
                     raise exceptions.NonAlphaKeyError(
-                        b"Argument keys must be ASCII aplphabet sequences."
+                        b"Argument keys must be ASCII aplphabet sequences. (not isalpha)"
                     )
 
             def s(m: re.Match[bytes]) -> bytes:
@@ -149,7 +149,7 @@ U = TypeVar("U")
 
 
 def carg(
-    adict: dict[str, bytes], key: str, cmd:bytes=b"This command"
+    adict: dict[str, bytes], key: str, cmd: bytes = b"This command"
 ) -> bytes:
     try:
         return adict[key]
@@ -188,6 +188,7 @@ async def send(
 
 def exit(i: int) -> None:
     sys.exit(i)
+
 
 def add_client_to_user(c: entities.Client, u: entities.User) -> None:
     u.connected_clients.append(c)

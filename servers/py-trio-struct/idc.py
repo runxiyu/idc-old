@@ -37,6 +37,7 @@
 
 from __future__ import annotations
 from itertools import count
+from typing import Awaitable, Callable
 import trio
 import minilog
 
@@ -58,54 +59,102 @@ for username in config.users:
     )
 
 
+_CMD_HANDLER = Callable[
+    [entities.Client, "dict[str, bytes]"], Awaitable[None]
+]
+_registered_commands: dict[bytes, _CMD_HANDLER] = {}
+
+
+def register_command(
+    command: str,
+) -> Callable[[_CMD_HANDLER], _CMD_HANDLER]:
+    def register_inner(func: _CMD_HANDLER) -> _CMD_HANDLER:
+        _registered_commands[command.encode("ascii")] = func
+        return func
+
+    return register_inner
+
+
+@register_command("LOGIN")
+async def _login_cmd(
+    client: entities.Client, args: dict[str, bytes]
+) -> None:
+    if client.user:
+        raise exceptions.AlreadyLoggedIn(
+            b"You are already logged in as "
+            + client.user.username
+            + b"."
+        )
+
+    attempting_username = utils.carg(args, "USERNAME", b"LOGIN")
+    attempting_password = utils.carg(args, "PASSWORD", b"LOGIN")
+    try:
+        if (
+            local_users[attempting_username].password
+            == attempting_password
+        ):
+            utils.add_client_to_user(
+                client, local_users[attempting_username]
+            )
+            await utils.send(
+                client,
+                b"LOGIN_GOOD",
+                USERNAME=attempting_username,
+                COMMENT=b"Login is good.",
+            )
+        else:
+            raise exceptions.LoginFailed(
+                b"Invalid password for " + attempting_username + b"."
+            )
+    except KeyError:
+        raise exceptions.LoginFailed(
+            attempting_username + b" is not a registered username."
+        )
+
+
+@register_command("PING")
+async def _ping_cmd(
+    client: entities.Client, args: dict[str, bytes]
+) -> None:
+    await utils.send(client, b"PONG", cookie=utils.carg(args, "COOKIE"))
+
+
+@register_command("PRIVMSG")
+async def _privmsg_cmd(
+    client: entities.Client, args: dict[str, bytes]
+) -> None:  # in the future this should return the raw line sent to the target client
+    if not client.user:
+        raise exceptions.NotLoggedIn(b"You can't use PRIVMSG before logging in!")
+    else:
+        await utils.send(
+            local_users[utils.carg(args, "TARGET")],
+            b"PRIVMSG",
+            source=client.user.username,
+            target=utils.carg(args, "TARGET"),
+            message=utils.carg(args, "MESSAGE"),
+        )
+        # Do you think that we should put echo-message here, or in utils.send()?
+
+
 async def connection_loop(stream: trio.SocketStream) -> None:
     ident = bytes(next(client_id_counter))
     minilog.note(f"Connection {str(ident)} has started.")
     client = entities.Client(cid=ident, stream=stream)
     try:
         async for data in stream:
+            if data == b"\r\n":
+                continue
             minilog.debug(f"I got {data!r} from {ident!r}")
             try:
                 cmd, args = utils.bytesToStd(data)
                 cmd = cmd.upper()
                 # Begin main actions
-                if cmd == b"LOGIN":
-                    if client.user:
-                        raise exceptions.AlreadyLoggedIn(b"You are already logged in as " + client.user.username + b".")
-                    else:
-                        attempting_username = utils.carg(
-                            args, "USERNAME", b"LOGIN"
-                        )
-                        attempting_password = utils.carg(
-                            args, "PASSWORD", b"LOGIN"
-                        )
-                        try:
-                            if (
-                                local_users[attempting_username].password
-                                == attempting_password
-                            ):
-                                utils.add_client_to_user(
-                                    client, local_users[attempting_username]
-                                )
-                                await utils.send(
-                                    client,
-                                    b"LOGIN_GOOD",
-                                    USERNAME=attempting_username,
-                                    COMMENT=b"Login is good.",
-                                )
-                            else:
-                                raise exceptions.LoginFailed(
-                                    b"Invalid password for "
-                                    + attempting_username
-                                    + b"."
-                                )
-                        except KeyError:
-                            raise exceptions.LoginFailed(
-                                attempting_username
-                                + b" is not a registered username."
-                            )
+                if cmd in _registered_commands:
+                    await _registered_commands[cmd](client, args)
                 else:
-                    raise exceptions.UnknownCommand(cmd + b" is an unknown command.")
+                    raise exceptions.UnknownCommand(
+                        cmd + b" is an unknown command."
+                    )
                 # End main actions
             except exceptions.IDCUserCausedException as e:
                 await utils.send(

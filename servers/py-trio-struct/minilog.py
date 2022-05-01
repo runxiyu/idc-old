@@ -67,9 +67,16 @@ class textStyle:
     bgBrightWhite = "\033[47;1m"
 
 
+def parser(s: str) -> None:
+    print(
+        textStyle.reset + "[P] " + s + textStyle.reset, file=sys.stdout
+    )
+
+
 def debug(s: str) -> None:
     print(
-        textStyle.reset + "[D] " + s + textStyle.reset, file=sys.stdout
+        textStyle.fgBrightWhite + "[D] " + s + textStyle.reset,
+        file=sys.stdout,
     )
 
 
