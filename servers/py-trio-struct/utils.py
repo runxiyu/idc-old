@@ -71,7 +71,7 @@ def _get_idc_args(
         if value is not None:
             for escape_char, char in _idc_escapes.items():
                 value = value.replace(char, b"\\" + escape_char)
-            yield key.encode("ascii") + b":" + value
+            yield key.encode("ascii") + b"=" + value
 
 
 def stdToBytes(command: bytes, **kwargs: Optional[bytes]) -> bytes:
@@ -98,8 +98,8 @@ def bytesToStd(msg: bytes) -> tuple[bytes, dict[str, bytes]]:
     cmd = b""
     args = {}
     for arg in msg.split(b"\t"):
-        if b":" in arg:
-            key, value = arg.split(b":", 1)
+        if b"=" in arg:
+            key, value = arg.split(b"=", 1)
             key = key.upper()
 
             try:
@@ -174,16 +174,23 @@ def getKeyByValue(d: dict[T, U], s: U) -> list[T]:
     return r
 
 
-V = Union[entities.Client, entities.User]
+V = Union[entities.Client, entities.User, list[entities.User], list[entities.Client]]
 
 
 async def send(
     thing: V, command: bytes, **kwargs: Optional[bytes]
 ) -> None:
-    if isinstance(thing, entities.Client):
+    if isinstance(thing, list):
+        for t in thing:
+            await send(t, command, **kwargs)
+    elif isinstance(thing, entities.Client):
         await thing.stream.send_all(stdToBytes(command, **kwargs))
     elif isinstance(thing, entities.User):
-        pass  # TODO
+        if thing.connected_clients:
+            for c in thing.connected_clients:
+                await send(c, command, **kwargs)
+        else:
+            thing.queue.append(stdToBytes(command, **kwargs))
 
 
 def exit(i: int) -> None:

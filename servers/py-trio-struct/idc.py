@@ -133,6 +133,13 @@ async def _privmsg_cmd(
             target=utils.carg(args, "TARGET"),
             message=utils.carg(args, "MESSAGE"),
         )
+        await utils.send(
+            client.user,
+            b"PRIVMSG",
+            source=client.user.username,
+            target=utils.carg(args, "TARGET"),
+            message=utils.carg(args, "MESSAGE"),
+        )
         # Do you think that we should put echo-message here, or in utils.send()?
 
 
