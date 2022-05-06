@@ -1,4 +1,0 @@
-#!/bin/sh
-black -l 72 *.py
-flake8 *.py
-mypy --strict server.py
