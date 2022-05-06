@@ -106,12 +106,12 @@ def bytesToStd(msg: bytes) -> tuple[bytes, dict[str, bytes]]:
                 key_str = key.decode("ascii")
             except UnicodeDecodeError:
                 raise exceptions.NonAlphaKeyError(
-                    b"Argument keys must be ASCII aplphabet sequences.  (decode error)"
+                    b"Argument keys must be ASCII alphabet sequences.  (decode error)"
                 )
             else:
                 if not key_str.isalpha():
                     raise exceptions.NonAlphaKeyError(
-                        b"Argument keys must be ASCII aplphabet sequences. (not isalpha)"
+                        b"Argument keys must be ASCII alphabet sequences. (not isalpha)"
                     )
 
             def s(m: re.Match[bytes]) -> bytes:
