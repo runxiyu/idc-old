@@ -192,6 +192,11 @@ async def send(
         else:
             thing.queue.append(stdToBytes(command, **kwargs))
 
+async def quote(c: entities.Client, line: bytes) -> None:
+    await c.stream.send_all(line)
+
+
+
 
 def exit(i: int) -> None:
     sys.exit(i)

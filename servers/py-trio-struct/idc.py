@@ -90,8 +90,7 @@ async def _login_cmd(
     attempting_password = utils.carg(args, "PASSWORD", b"LOGIN")
     try:
         if (
-            local_users[attempting_username].password
-            == attempting_password
+            local_users[attempting_username].password == attempting_password
         ):
             utils.add_client_to_user(
                 client, local_users[attempting_username]
@@ -102,6 +101,9 @@ async def _login_cmd(
                 USERNAME=attempting_username,
                 COMMENT=b"Login is good.",
             )
+            if client.user.queue:
+                for q in client.user.queue[-1::-1]:
+                    await utils.quote(client, q)
         else:
             raise exceptions.LoginFailed(
                 b"Invalid password for " + attempting_username + b"."
@@ -155,14 +157,12 @@ async def connection_loop(stream: trio.SocketStream) -> None:
             try:
                 cmd, args = utils.bytesToStd(data)
                 cmd = cmd.upper()
-                # Begin main actions
                 if cmd in _registered_commands:
                     await _registered_commands[cmd](client, args)
                 else:
                     raise exceptions.UnknownCommand(
                         cmd + b" is an unknown command."
                     )
-                # End main actions
             except exceptions.IDCUserCausedException as e:
                 await utils.send(
                     client,
