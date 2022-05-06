@@ -211,7 +211,10 @@ async def connection_loop(stream: trio.SocketStream) -> None:
         traceback.print_exc()
         minilog.warning(f"{ident!r}: crashed: {exc!r}")
     finally:
-        # Bad Andrew good andrew always gonna give you down
+        if client.user:
+            client.user.connected_clients.remove(client)
+        del client.stream
+        del client
         minilog.note(f"Connection {str(ident)} has ended.")
 
 
