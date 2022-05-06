@@ -5,7 +5,7 @@
 # © 2022 by luk3yx
 #
 
-import miniirc, socket, threading, miniirc_idc
+import miniirc, socket, threading, miniirc_idc, sys
 from miniirc_extras.utils import ircv2_message_unparser, ircv3_message_parser
 
 # A single network
@@ -171,7 +171,7 @@ class Bouncer:
 
 # Debugging
 def main():
-    return Bouncer('127.0.0.1', 6835, 'luk3yx', debug=True, ns_identity='luk3yx billy')
+    return Bouncer('127.0.0.1', 6835, 'luk3yx', debug=True, ns_identity=sys.argv[1] + sys.argv[2])
 
 if __name__ == '__main__':
     main()
