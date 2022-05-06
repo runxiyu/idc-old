@@ -40,6 +40,7 @@ from itertools import count
 from typing import Awaitable, Callable
 import trio
 import minilog
+import traceback
 
 import exceptions
 import entities
@@ -207,7 +208,11 @@ async def connection_loop(stream: trio.SocketStream) -> None:
                     COMMENT=e.args[0],
                 )
     except Exception as exc:
+        traceback.print_exc()
         minilog.warning(f"{ident!r}: crashed: {exc!r}")
+    finally:
+        # Bad Andrew good andrew always gonna give you down
+        minilog.note(f"Connection {str(ident)} has ended.")
 
 
 async def main() -> None:
