@@ -75,6 +75,17 @@ def register_command(
     return register_inner
 
 
+@register_command("HELP")
+async def _help_cmd(
+    client: entities.Client, args: dict[str, bytes]
+) -> None:
+    await utils.send(
+        client,
+        b"HELP",
+        available_commands=b",".join(_registered_commands),
+    )
+
+
 @register_command("LOGIN")
 async def _login_cmd(
     client: entities.Client, args: dict[str, bytes]
@@ -90,7 +101,8 @@ async def _login_cmd(
     attempting_password = utils.carg(args, "PASSWORD", b"LOGIN")
     try:
         if (
-            local_users[attempting_username].password == attempting_password
+            local_users[attempting_username].password
+            == attempting_password
         ):
             utils.add_client_to_user(
                 client, local_users[attempting_username]
@@ -101,9 +113,11 @@ async def _login_cmd(
                 USERNAME=attempting_username,
                 COMMENT=b"Login is good.",
             )
+            assert client.user is not None
             if client.user.queue:
                 for q in client.user.queue[-1::-1]:
                     await utils.quote(client, q)
+                client.user.queue = []
         else:
             raise exceptions.LoginFailed(
                 b"Invalid password for " + attempting_username + b"."
@@ -121,27 +135,49 @@ async def _ping_cmd(
     await utils.send(client, b"PONG", cookie=utils.carg(args, "COOKIE"))
 
 
+@register_command("EGG")
+async def _egg_cmd(
+    client: entities.Client, args: dict[str, bytes]
+) -> None:
+    await utils.send(
+        client,
+        b"EASTER_EGG",
+        moocow=b"MOOCOWS ARE OFTC",
+        cat=b"LIBERACHAT LOL",
+    )
+
+
 @register_command("PRIVMSG")
 async def _privmsg_cmd(
     client: entities.Client, args: dict[str, bytes]
 ) -> None:  # in the future this should return the raw line sent to the target client
     if not client.user:
-        raise exceptions.NotLoggedIn(b"You can't use PRIVMSG before logging in!")
+        raise exceptions.NotLoggedIn(
+            b"You can't use PRIVMSG before logging in!"
+        )
     else:
-        await utils.send(
-            local_users[utils.carg(args, "TARGET")],
-            b"PRIVMSG",
-            source=client.user.username,
-            target=utils.carg(args, "TARGET"),
-            message=utils.carg(args, "MESSAGE"),
-        )
-        await utils.send(
-            client.user,
-            b"PRIVMSG",
-            source=client.user.username,
-            target=utils.carg(args, "TARGET"),
-            message=utils.carg(args, "MESSAGE"),
-        )
+        target_name = utils.carg(args, "TARGET")
+        try:
+            target_user = local_users[target_name]
+        except KeyError:
+            raise exceptions.NonexistantTargetError(
+                b"The target " + target_name + b" is nonexistant."
+            )
+        else:
+            await utils.send(
+                local_users[utils.carg(args, "TARGET")],
+                b"PRIVMSG",
+                source=client.user.username,
+                target=utils.carg(args, "TARGET"),
+                message=utils.carg(args, "MESSAGE"),
+            )
+            await utils.send(
+                client.user,
+                b"PRIVMSG",
+                source=client.user.username,
+                target=utils.carg(args, "TARGET"),
+                message=utils.carg(args, "MESSAGE"),
+            )
         # Do you think that we should put echo-message here, or in utils.send()?
 
 
@@ -167,7 +203,7 @@ async def connection_loop(stream: trio.SocketStream) -> None:
                 await utils.send(
                     client,
                     e.severity,
-                    E=e.error_type,
+                    PROBLEM=e.error_type,
                     COMMENT=e.args[0],
                 )
     except Exception as exc:

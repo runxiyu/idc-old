@@ -36,7 +36,7 @@
 #
 
 from __future__ import annotations
-from typing import TypeVar, Iterator, Optional, Union
+from typing import TypeVar, Iterator, Optional, Union, List
 
 import sys
 import re
@@ -174,7 +174,12 @@ def getKeyByValue(d: dict[T, U], s: U) -> list[T]:
     return r
 
 
-V = Union[entities.Client, entities.User, list[entities.User], list[entities.Client]]
+V = Union[
+    entities.Client,
+    entities.User,
+    List[entities.User],
+    List[entities.Client],
+]
 
 
 async def send(
@@ -192,10 +197,9 @@ async def send(
         else:
             thing.queue.append(stdToBytes(command, **kwargs))
 
+
 async def quote(c: entities.Client, line: bytes) -> None:
     await c.stream.send_all(line)
-
-
 
 
 def exit(i: int) -> None:

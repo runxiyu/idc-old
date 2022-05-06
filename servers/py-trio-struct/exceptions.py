@@ -47,7 +47,7 @@ class Severity:
 
 class IDCException(Exception):
     severity = Severity.UNKNOWN
-    error_type = b"ERR_UNKNOWN"
+    error_type = b"UNKNOWN"
 
 
 class IDCUserCausedException(IDCException):
@@ -56,27 +56,29 @@ class IDCUserCausedException(IDCException):
     """
 
     severity = Severity.ERROR
-    error_type = b"ERR_USER_ERROR"
+    error_type = b"USER_ERROR"
     pass
 
 
 class UnknownCommand(IDCUserCausedException):
-    error_type = b"ERR_UNKNOWN_COMMAND"
+    error_type = b"UNKNOWN_COMMAND"
 
 
 class MissingArgumentError(IDCUserCausedException):
-    error_type = b"ERR_MISSING_ARGUMENT"
+    error_type = b"MISSING_ARGUMENT"
 
 
 class NotLoggedIn(IDCUserCausedException):
-    error_type = b"ERR_NOT_LOGGED_IN"
+    error_type = b"NOT_LOGGED_IN"
+
+
 class AlreadyLoggedIn(IDCUserCausedException):
-    error_type = b"ERR_REDUNDENT_LOGIN"
+    error_type = b"REDUNDENT_LOGIN"
 
 
 class LoginFailed(IDCUserCausedException):
     severity = Severity.FAIL
-    error_type = b"ERR_LOGIN_FAILED"
+    error_type = b"LOGIN_FAILED"
 
 
 class NonAlphaKeyError(IDCUserCausedException):
@@ -84,7 +86,7 @@ class NonAlphaKeyError(IDCUserCausedException):
     Putting non-letters into keywords
     """
 
-    error_type = b"ERR_INVALID_KEYWORD"
+    error_type = b"INVALID_KEYWORD"
 
 
 class EscapeSequenceError(IDCUserCausedException):
@@ -92,7 +94,7 @@ class EscapeSequenceError(IDCUserCausedException):
     I don't know this escape sequence
     """
 
-    error_type = b"ERR_DONT_KNOW"
+    error_type = b"DONT_KNOW"
 
 
 class MultiCommandError(IDCUserCausedException):
@@ -100,7 +102,7 @@ class MultiCommandError(IDCUserCausedException):
     Multiple commands in one line
     """
 
-    error_type = b"ERR_MULTIPLE_CMDS"
+    error_type = b"MULTIPLE_CMDS"
 
 
 class MessageUndeliverableError(IDCUserCausedException):
@@ -109,7 +111,7 @@ class MessageUndeliverableError(IDCUserCausedException):
     offline-messages option.
     """
 
-    error_type = b"ERR_MSG_UNDELIVERABLE"
+    error_type = b"MSG_UNDELIVERABLE"
 
 
 class UserNotFoundError(IDCUserCausedException):
@@ -118,7 +120,7 @@ class UserNotFoundError(IDCUserCausedException):
     interact with a nonexistant user.
     """
 
-    error_type = b"ERR_USER_NOT_FOUND"
+    error_type = b"USER_NOT_FOUND"
 
 
 class StrangeError(IDCException):
@@ -127,7 +129,7 @@ class StrangeError(IDCException):
     either the hardware blowing up or huge bugs.
     """
 
-    error_type = b"ERR_DONT_KNOW"
+    error_type = b"DONT_KNOW"
 
 
 class KeyCollisionError(IDCUserCausedException):
@@ -135,4 +137,12 @@ class KeyCollisionError(IDCUserCausedException):
     Raise when there are redundent keys in a line.
     """
 
-    error_type = b"ERR_REDUNDENT_KEYS"
+    error_type = b"REDUNDENT_KEYS"
+
+
+class NonexistantTargetError(IDCUserCausedException):
+    """
+    target doesnt exist
+    """
+
+    error_type = b"NONEXISTANT_TARGET"
