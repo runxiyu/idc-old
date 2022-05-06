@@ -28,6 +28,12 @@ users = {
         "permissions": {"kill", "new-guild"},
         "options": ["offline-messages", "eat-cookies"],
     },
+    b"idcbot": {
+        "password": b"",
+        "bio": b"Nice person",
+        "permissions": {"kill", "new-guild"},
+        "options": ["offline-messages", "eat-cookies"],
+    },
     b"vitali64": {
         "password": b"hello",
         "bio": b"Nice person",
