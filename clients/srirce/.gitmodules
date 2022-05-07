@@ -1,0 +1,3 @@
+[submodule "miniirc_idc"]
+	path = miniirc_idc
+	url = git://git.andrewyu.org/miniirc_idc.git
