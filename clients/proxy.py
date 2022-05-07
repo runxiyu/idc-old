@@ -5,8 +5,10 @@
 # © 2022 by luk3yx
 #
 
-import miniirc, socket, threading, miniirc_idc, sys
+import miniirc, socket, threading, miniirc_idc
 from miniirc_extras.utils import ircv2_message_unparser, ircv3_message_parser
+from concurrent.futures import ThreadPoolExecutor
+miniirc.version = None
 
 # A single network
 class Network:
@@ -25,6 +27,7 @@ class Network:
     def send(self, cmd, hostmask, tags, args):
         raw = ircv2_message_unparser(cmd, hostmask or (cmd, cmd, cmd), tags,
             args, colon=False, encoding=self.encoding)
+        print('->', raw)
         self.sock.sendall(raw[:510] + b'\r\n')
 
     # Receive messages
@@ -142,17 +145,19 @@ class Network:
         self.irc.CmdHandler(ircv3=True, colon=False)(self._miniirc_handler)
 
         # Start the main loop
-        threading.Thread(target=self._init_thread).start()
+        self.thread = threading.Thread(target=self._init_thread)
+        self.thread.start()
 
     # Create the IRC object
     def __init__(self, conn, *args, bad_cmds=None, **kwargs):
         if bad_cmds is not None:
             self.bad_cmds = bad_cmds
-        self._init(conn, self.IRC(*args, auto_connect=False, **kwargs))
+        self._init(conn, self.IRC(*args, auto_connect=False,
+                                  executor=ThreadPoolExecutor(1), **kwargs))
 
 # The bouncer class
 class Bouncer:
-    addr = ('127.0.0.1', 1025)
+    addr = ('', 1025)
     Network = Network
 
     # Main loop
@@ -162,16 +167,17 @@ class Bouncer:
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             sock.bind(self.addr)
             sock.listen(1)
-            self.Network(sock.accept(), *self.args, **self.kwargs)
+            net = self.Network(sock.accept(), *self.args, **self.kwargs)
+            net.thread.join()
+            net.irc.wait_until_disconnected()
 
     # The main init
     def __init__(self, *args, **kwargs):
         self.args, self.kwargs = args, kwargs
-        self.main()
 
 # Debugging
 def main():
-    return Bouncer('127.0.0.1', 6835, 'luk3yx', debug=True, ns_identity=sys.argv[1] + sys.argv[2])
+    Bouncer('127.0.0.1', 6835, 'luk3yx', debug=True, ns_identity='luk3yx billy').main()
 
 if __name__ == '__main__':
     main()

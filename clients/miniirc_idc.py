@@ -2,7 +2,6 @@
 #
 # This is very horrible and quickly written
 # But it works
-# You need to specify that this program is covered under the LICENSE file in this exact file
 #
 # Copyright © 2022 by luk3yx
 #
@@ -28,7 +27,7 @@
 from __future__ import annotations
 from collections.abc import Iterator, Mapping, Sequence
 from typing import Optional
-import datetime, miniirc, re  # type: ignore
+import datetime, miniirc, re, traceback  # type: ignore
 assert miniirc.ver >= (1,8,1)
 
 
@@ -50,7 +49,48 @@ def _get_idc_args(command: str, kwargs: Mapping[str, Optional[str | float]]
             yield f'{key.upper()}={value}'
 
 
+def _parse_join(irc: IDC, hostmask: tuple[str, str, str],
+                tags: Mapping[str, str], args: list[str]) -> None:
+    users = tags.get('=idc-join-users')
+    if isinstance(users, str):
+        irc._dispatch('353', '', [irc.current_nick, '=', args[0], users])
+        irc._dispatch('366', '', [irc.current_nick, args[0],
+                                  'End of /NAMES list'])
+
+
 class IDC(miniirc.IRC):
+    if miniirc.ver[0] >= 2:
+        def _dispatch(self, command: str, user: str, args: list[str]) -> None:
+            self.handle_msg(miniirc.IRCMessage(
+                command,
+                (user, '~u', f'idc/{user}') if user else ('', '', ''),
+                {},
+                args,
+            ))
+    else:
+        def _dispatch(self, command: str, user: str, args: list[str]) -> None:
+            if args:
+                args[-1] = _LEADING_COLON + args[-1]
+            self._handle(
+                command,
+                (user, '~u', f'idc/{user}') if user else ('', '', ''),
+                {},
+                args,
+            )
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.Handler('JOIN', colon=False, ircv3=True)(_parse_join)
+
+    def _idc_message_parser_no_exc(
+        self, msg: str
+    ) -> Optional[tuple[str, tuple[str, str, str], dict[str, str], list[str]]]:
+        try:
+            return self.idc_message_parser(msg)
+        except Exception:
+            traceback.print_exc()
+            return None
+
     def idc_message_parser(
         self, msg: str
     ) -> Optional[tuple[str, tuple[str, str, str], dict[str, str], list[str]]]:
@@ -67,40 +107,52 @@ class IDC(miniirc.IRC):
                 idc_cmd = arg
 
         # Translate IDC keyword arguments into IRC positional ones
+        tags = {}
         if idc_cmd == 'PRIVMSG':
-            msg = idc_args['MESSAGE']
             command = 'PRIVMSG'
-            msg_type = idc_args.get('TYPE')
-            if msg_type == 'NOTICE':
-                command = 'NOTICE'
-            elif msg_type == 'ACTION':
-                msg = f'\x01ACTION {msg}\x01'
-            args = [self.current_nick, msg]
+            args = [self.current_nick, idc_args['MESSAGE']]
         elif idc_cmd == 'CHANMSG':
             command = 'PRIVMSG'
-            args = [idc_args['CHAN'], idc_args['MESSAGE']]
+            args = ['#' + idc_args['TARGET'], idc_args['MESSAGE']]
         elif idc_cmd == 'LOGIN_GOOD':
             command = '001'
             args = [self.current_nick, f'Welcome to IDC {self.current_nick}']
         elif idc_cmd == 'PONG':
             command = 'PONG'
-            args = [idc_args.get('COOKIE', '')]
+            args = [self.ip, idc_args.get('COOKIE', '')]
+        elif idc_cmd == 'JOIN':
+            command = 'JOIN'
+            idc_args['SOURCE'] = self.current_nick
+            args = ['#' + idc_args['CHANNEL']]
+
+            # HACK: Add a message tag and fire other events later rather than
+            # firing events from the parser function which feels worse.
+            # The tag name starts with = so that it doesn't conflict with any
+            # actual IRC tags.
+            tags['=idc-join-users'] = idc_args['USERS']
         else:
             return None
 
         # Add generic parameters
-        tags = {}
         if 'SOURCE' in idc_args:
             user = idc_args['SOURCE']
-            hostmask = (user, user, user)
+            hostmask = (user, '~u', f'idc/{user}')
             tags['account'] = user
         else:
             hostmask = ('', '', '')
 
-        # If echo-message wasn't requested then don't send self messages
-        if (command == 'PRIVMSG' and hostmask[0] == self.current_nick and
-                'echo-message' not in self.active_caps):
-            return None
+        if command == 'PRIVMSG':
+            # If echo-message wasn't requested then don't send self messages
+            if (hostmask[0] == self.current_nick and
+                    'echo-message' not in self.active_caps):
+                return None
+
+            # Parse the message type
+            msg_type = idc_args.get('TYPE', '').upper()
+            if msg_type == 'NOTICE':
+                command = 'NOTICE'
+            elif msg_type == 'ACTION':
+                args[1] = f'\x01ACTION {args[1]}\x01'
 
         if 'TS' in idc_args:
             dt = datetime.datetime.utcfromtimestamp(float(idc_args['TS']))
@@ -109,9 +161,12 @@ class IDC(miniirc.IRC):
         if 'LABEL' in idc_args:
             tags['label'] = idc_args['LABEL']
 
-        if args and _LEADING_COLON:
-            args[-1] = _LEADING_COLON + args[-1]
-        return command, hostmask, tags, args
+        if miniirc.ver[0] >= 2:
+            return miniirc.IRCMessage(command, hostmask, tags, args)
+        else:
+            if args:
+                args[-1] = _LEADING_COLON + args[-1]
+            return command, hostmask, tags, args
 
     # Send raw messages
     def idc_send(self, command: str, **kwargs: Optional[str | float]):
@@ -155,8 +210,13 @@ class IDC(miniirc.IRC):
             else:
                 msg_type = None
 
-            self.idc_send('CHANMSG' if target.startswith('#') else 'PRIVMSG',
-                          target=target, type=msg_type, message=msg,
+            if target.startswith('#'):
+                idc_cmd = 'CHANMSG'
+                target = target[1:]
+            else:
+                idc_cmd = 'PRIVMSG'
+
+            self.idc_send(idc_cmd, target=target, type=msg_type, message=msg,
                           label=label)
         elif cmd == 'PING':
             self.idc_send('PING', cookie=args[0], label=label)
@@ -170,4 +230,4 @@ class IDC(miniirc.IRC):
 
     # Override the message parser to change the default parser.
     def change_parser(self, parser=None):
-        super().change_parser(parser or self.idc_message_parser)
+        super().change_parser(parser or self._idc_message_parser_no_exc)
