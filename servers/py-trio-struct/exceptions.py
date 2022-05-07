@@ -43,11 +43,17 @@ class Severity:
     ERROR = b"ERROR"
     SECURITY = b"SECURITY"
     FATAL = b"FATAL"
+    THE_PROGRAMMER_IS_DUMB = b"THE_PROGRAMMER_IS_DUMB"
 
 
 class IDCException(Exception):
     severity = Severity.UNKNOWN
     error_type = b"UNKNOWN"
+
+
+class IdiotError(IDCException):
+    severity = Severity.THE_PROGRAMMER_IS_DUMB
+    error_type = b"YOU_DUMB_DEVELOPER"
 
 
 class IDCUserCausedException(IDCException):
@@ -154,3 +160,11 @@ class NoExternalMessagesError(IDCUserCausedException):
     """
 
     error_type = b"NO_EXTERNAL_MESSAGES"
+
+
+class TargetOfflineError(IDCUserCausedException):
+    """
+    Target offline
+    """
+
+    error_type = b"TARGET_OFFLINE"

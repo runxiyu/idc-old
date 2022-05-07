@@ -36,7 +36,8 @@
 #
 
 from __future__ import annotations
-from itertools import count
+import time
+
 from typing import Awaitable, Callable
 import trio
 import minilog
@@ -46,6 +47,8 @@ import exceptions
 import entities
 import utils
 import config
+
+starttime = time.time()
 
 PORT = 6835
 
@@ -96,7 +99,7 @@ async def _help_cmd(
     await utils.send(
         client,
         b"HELP",
-        available_commands=b" ".join(_registered_commands),
+        AVAILABLE_COMMANDS=b" ".join(_registered_commands),
     )
 
 
@@ -146,7 +149,15 @@ async def _login_cmd(
             if client.user.queue:
                 for q in client.user.queue:
                     await utils.quote(client, q)
-                client.user.queue = []
+                    client.user.queue.remove(q)
+            for channel in client.user.in_channels:
+                if channel.queue:
+                    for mqm in channel.queue:
+                        if client.user in mqm.targets:
+                            await utils.quote(client, mqm.data)
+                            mqm.targets.remove(client.user)
+                            if len(mqm.targets) == 1:
+                                channel.queue.remove(mqm)
             await utils.send(
                 client,
                 b"END_OFFLINE_MESSAGES",
@@ -166,7 +177,7 @@ async def _login_cmd(
 async def _ping_cmd(
     client: entities.Client, args: dict[str, bytes]
 ) -> None:
-    await utils.send(client, b"PONG", cookie=utils.carg(args, "COOKIE"))
+    await utils.send(client, b"PONG", COOKIE=utils.carg(args, "COOKIE"))
 
 
 @register_command("EGG")
@@ -176,7 +187,7 @@ async def _egg_cmd(
     await utils.send(
         client,
         b"EASTER_EGG",
-        yay=b"luk3yx: Never gonna give you up\nnever gonna let you down\nnever gonna run around and desert you\nnever gonna make you cry\nnever gonna say goodbye\nnever gonna tell a lie and hurt you",
+        YAY=b"luk3yx: Never gonna give you up\nnever gonna let you down\nnever gonna run around and desert you\nnever gonna make you cry\nnever gonna say goodbye\nnever gonna tell a lie and hurt you",
     )
 
 
@@ -200,19 +211,19 @@ async def _privmsg_cmd(
             await utils.send(
                 target_user,
                 b"PRIVMSG",
-                source=client.user.username,
-                type=args.get("TYPE", b"NORMAL"),
-                target=utils.carg(args, "TARGET"),
-                message=utils.carg(args, "MESSAGE"),
+                SOURCE=client.user.username,
+                TYPE=args.get("TYPE", b"NORMAL"),
+                TARGET=utils.carg(args, "TARGET"),
+                MESSAGE=utils.carg(args, "MESSAGE"),
             )
             if target_user is not client.user:
                 await utils.send(
                     client.user,
                     b"PRIVMSG",
-                    source=client.user.username,
-                    type=args.get("TYPE", b"NORMAL"),
-                    target=utils.carg(args, "TARGET"),
-                    message=utils.carg(args, "MESSAGE"),
+                    SOURCE=client.user.username,
+                    TYPE=args.get("TYPE", b"NORMAL"),
+                    TARGET=utils.carg(args, "TARGET"),
+                    MESSAGE=utils.carg(args, "MESSAGE"),
                 )
         # Do you think that we should put echo-message here, or in utils.send()?
 
@@ -240,10 +251,10 @@ async def _chanmsg_cmd(
             await utils.send(
                 target_channel,
                 b"CHANMSG",
-                source=client.user.username,
-                type=args.get("TYPE", b"NORMAL"),
-                target=target_channel_name,
-                message=utils.carg(args, "MESSAGE"),
+                SOURCE=client.user.username,
+                TYPE=args.get("TYPE", b"NORMAL"),
+                TARGET=target_channel_name,
+                MESSAGE=utils.carg(args, "MESSAGE"),
             )
 
 
@@ -311,3 +322,5 @@ if __name__ == "__main__":
         trio.run(main)
     except KeyboardInterrupt:
         minilog.error("KeyboardInterrupt!")
+    finally:
+        minilog.note(f"I've ran for {str(time.time() - starttime)} seconds!")

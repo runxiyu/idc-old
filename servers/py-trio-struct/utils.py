@@ -61,7 +61,8 @@ def _get_idc_args(
     yield command.upper()
     seen = set()
     for key, value in kwdict.items():
-        key = key.upper()
+        if key != key.upper():
+            raise exceptions.IdiotError("Why are you using lowercase keys in the code?")
         if key in seen:
             raise exceptions.KeyCollisionError(
                 key.encode("ascii")
@@ -185,24 +186,34 @@ V = Union[
 
 
 async def send(
-    thing: V, command: bytes, **kwargs: Optional[bytes]
+    wheretosend: V, command: bytes, delayable: bool=True, **kwargs: Optional[bytes]
 ) -> None:
     minilog.debug(
-        f"send called: thing {thing!r} command {command!r} kwargs {kwargs!r}"
+        f"send called: wheretosend {wheretosend!r} command {command!r} kwargs {kwargs!r}"
     )
-    if isinstance(thing, list):
-        for t in thing:
-            await send(t, command, **kwargs)
-    elif isinstance(thing, entities.Client):
-        await thing.stream.send_all(stdToBytes(command, **kwargs))
-    elif isinstance(thing, entities.User):
-        if thing.connected_clients:
-            for c in thing.connected_clients:
-                await send(c, command, **kwargs)
+    if isinstance(wheretosend, list):
+        for t in wheretosend:
+            await send(t, command, delayable, **kwargs)
+    elif isinstance(wheretosend, entities.Client):
+        await wheretosend.stream.send_all(stdToBytes(command, **kwargs))
+    elif isinstance(wheretosend, entities.User):
+        if wheretosend.connected_clients:
+            for c in wheretosend.connected_clients:
+                await send(c, command, delayable, **kwargs)
+        elif delayable:
+            wheretosend.queue.append(stdToBytes(command, **kwargs))
         else:
-            thing.queue.append(stdToBytes(command, **kwargs))
-    elif isinstance(thing, entities.Channel):
-        await send(thing.broadcast_to, command, **kwargs)
+            raise exceptions.TargetOfflineError(wheretosend.username + b" is offline and this action requires them to be online.")
+    elif isinstance(wheretosend, entities.Channel):
+        queue_needers: list[entities.User] = []
+        for t in wheretosend.broadcast_to:
+            if t.connected_clients:
+                await send(t, command, delayable, **kwargs)
+            elif delayable:
+                queue_needers.append(t)
+        if queue_needers:
+            wheretosend.queue.append(entities.MultitargetQueuedMessage(data=stdToBytes(command, **kwargs), targets=queue_needers))
+
     else:
         raise Exception("1")
 
