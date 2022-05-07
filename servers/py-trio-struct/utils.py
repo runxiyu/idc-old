@@ -38,6 +38,7 @@
 from __future__ import annotations
 from typing import TypeVar, Iterator, Optional, Union, List
 
+import pprint
 import sys
 import re
 import time
@@ -188,9 +189,6 @@ V = Union[
 async def send(
     wheretosend: V, command: bytes, delayable: bool=True, **kwargs: Optional[bytes]
 ) -> None:
-    minilog.debug(
-        f"send called: wheretosend {wheretosend!r} command {command!r} kwargs {kwargs!r}"
-    )
     if isinstance(wheretosend, list):
         for t in wheretosend:
             await send(t, command, delayable, **kwargs)
@@ -205,14 +203,20 @@ async def send(
         else:
             raise exceptions.TargetOfflineError(wheretosend.username + b" is offline and this action requires them to be online.")
     elif isinstance(wheretosend, entities.Channel):
+        minilog.debug(f"sending stuff to channel {wheretosend.channelname}")
         queue_needers: list[entities.User] = []
         for t in wheretosend.broadcast_to:
             if t.connected_clients:
+                minilog.debug(f"i think {t.username} is connected, lemme just send it to them")
                 await send(t, command, delayable, **kwargs)
             elif delayable:
+                minilog.debug(f"i think {t.username} is not connected, lemme just send it to the channel queue")
                 queue_needers.append(t)
         if queue_needers:
             wheretosend.queue.append(entities.MultitargetQueuedMessage(data=stdToBytes(command, **kwargs), targets=queue_needers))
+            minilog.debug(f"the channel queue now looks like")
+            for well in wheretosend.queue:
+                minilog.debug(f"{well.data!r} is for {b', '.join([u.username for u in well.targets])}")
 
     else:
         raise Exception("1")
