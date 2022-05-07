@@ -49,7 +49,7 @@ import config
 
 PORT = 6835
 
-client_id_counter = 1
+client_id_counter = -1
 local_users: dict[bytes, entities.User] = {}
 local_channels: dict[bytes, entities.Channel] = {}
 
@@ -259,31 +259,37 @@ async def _chanmsg_cmd(
 async def connection_loop(stream: trio.SocketStream) -> None:
     global client_id_counter
     client_id_counter += 1
-    ident = bytes(client_id_counter)
+    ident = str(client_id_counter).encode("ascii")
     minilog.note(f"Connection {str(ident)} has started.")
     client = entities.Client(cid=ident, stream=stream)
     await utils.send(client, b"MOTD", MESSAGE=config.motd)
     try:
-        async for data in stream:
-            if data == b"\r\n":
+        msg = b""
+        async for newmsg in stream:
+            msg += newmsg
+            split_msg = msg.split(b"\r\n")
+            if len(split_msg) < 2:
                 continue
+            data = split_msg[0:-1]
+            msg = split_msg[-1]
             minilog.debug(f"I got {data!r} from {ident!r}")
-            try:
-                cmd, args = utils.bytesToStd(data)
-                cmd = cmd.upper()
-                if cmd in _registered_commands:
-                    await _registered_commands[cmd](client, args)
-                else:
-                    raise exceptions.UnknownCommand(
-                        cmd + b" is an unknown command."
+            for cmdline in data:
+                try:
+                    cmd, args = utils.bytesToStd(cmdline)
+                    cmd = cmd.upper()
+                    if cmd in _registered_commands:
+                        await _registered_commands[cmd](client, args)
+                    else:
+                        raise exceptions.UnknownCommand(
+                            cmd + b" is an unknown command."
+                        )
+                except exceptions.IDCUserCausedException as e:
+                    await utils.send(
+                        client,
+                        e.severity,
+                        PROBLEM=e.error_type,
+                        COMMENT=e.args[0],
                     )
-            except exceptions.IDCUserCausedException as e:
-                await utils.send(
-                    client,
-                    e.severity,
-                    PROBLEM=e.error_type,
-                    COMMENT=e.args[0],
-                )
     except Exception as exc:
         traceback.print_exc()
         minilog.warning(f"{ident!r}: crashed: {exc!r}")
