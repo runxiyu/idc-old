@@ -49,7 +49,7 @@ import config
 
 PORT = 6835
 
-client_id_counter = count()
+client_id_counter = 1
 local_users: dict[bytes, entities.User] = {}
 local_channels: dict[bytes, entities.Channel] = {}
 
@@ -63,9 +63,14 @@ for username in config.users:
 for channelname in config.channels:
     local_channels[channelname] = entities.Channel(
         channelname=channelname,
-        broadcast_to=[local_users[username] for username in config.channels[channelname]["broadcast_to"]],
+        broadcast_to=[
+            local_users[username]
+            for username in config.channels[channelname]["broadcast_to"]
+        ],
         guild=None,
     )
+    for u in local_channels[channelname].broadcast_to:
+        u.in_channels.append(local_channels[channelname])
 
 
 _CMD_HANDLER = Callable[
@@ -91,7 +96,7 @@ async def _help_cmd(
     await utils.send(
         client,
         b"HELP",
-        available_commands=b",".join(_registered_commands),
+        available_commands=b" ".join(_registered_commands),
     )
 
 
@@ -114,7 +119,9 @@ async def _login_cmd(
             == attempting_password
         ):
             client.user = local_users[attempting_username]
-            local_users[attempting_username].connected_clients.append(client)
+            local_users[attempting_username].connected_clients.append(
+                client
+            )
             await utils.send(
                 client,
                 b"LOGIN_GOOD",
@@ -122,10 +129,31 @@ async def _login_cmd(
                 COMMENT=b"Login is good.",
             )
             assert client.user is not None
+            for c in client.user.in_channels:
+                await utils.send(
+                    client,
+                    b"JOIN",
+                    CHANNEL=c.channelname,
+                    USERS=b" ".join(
+                        [u.username for u in c.broadcast_to]
+                    ),
+                )
+            await utils.send(
+                client,
+                b"END_OFFLINE_MESSAGES",
+                COMMENT=b"I'm finished telling you the state you're in.",
+            )
             if client.user.queue:
-                for q in client.user.queue[-1::-1]:
+                #                for q in client.user.queue[-1::-1]:
+                #                    await utils.quote(client, q)
+                for q in client.user.queue:
                     await utils.quote(client, q)
                 client.user.queue = []
+            await utils.send(
+                client,
+                b"END_OFFLINE_MESSAGES",
+                COMMENT=b"I'm finished telling you your offline messages.",
+            )
         else:
             raise exceptions.LoginFailed(
                 b"Invalid password for " + attempting_username + b"."
@@ -176,6 +204,7 @@ async def _privmsg_cmd(
                 target_user,
                 b"PRIVMSG",
                 source=client.user.username,
+                type=args.get("TYPE", b"NORMAL"),
                 target=utils.carg(args, "TARGET"),
                 message=utils.carg(args, "MESSAGE"),
             )
@@ -184,6 +213,7 @@ async def _privmsg_cmd(
                     client.user,
                     b"PRIVMSG",
                     source=client.user.username,
+                    type=args.get("TYPE", b"NORMAL"),
                     target=utils.carg(args, "TARGET"),
                     message=utils.carg(args, "MESSAGE"),
                 )
@@ -203,16 +233,23 @@ async def _chanmsg_cmd(
         try:
             target_channel = local_channels[target_channel_name]
         except KeyError:
-            raise exceptions.NonexistantTargetError( b"The target channel " + target_channel_name + b"is nonexistant.")
+            raise exceptions.NonexistantTargetError(
+                b"The target channel "
+                + target_channel_name
+                + b"is nonexistant."
+            )
         else:
-            
+
             await utils.send(
                 target_channel,
                 b"CHANMSG",
                 source=client.user.username,
+                type=args.get("TYPE", b"NORMAL"),
                 target=target_channel_name,
                 message=utils.carg(args, "MESSAGE"),
             )
+
+
 #             await utils.send(
 #                 client.user,
 #                 b"CHANMSG",
@@ -223,9 +260,12 @@ async def _chanmsg_cmd(
 
 
 async def connection_loop(stream: trio.SocketStream) -> None:
-    ident = bytes(next(client_id_counter))
+    global client_id_counter
+    client_id_counter += 1
+    ident = bytes(client_id_counter)
     minilog.note(f"Connection {str(ident)} has started.")
     client = entities.Client(cid=ident, stream=stream)
+    await utils.send(client, b"MOTD", MESSAGE=config.motd)
     try:
         async for data in stream:
             if data == b"\r\n":

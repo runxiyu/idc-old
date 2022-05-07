@@ -187,7 +187,9 @@ V = Union[
 async def send(
     thing: V, command: bytes, **kwargs: Optional[bytes]
 ) -> None:
-    minilog.debug(f"send called: thing {thing!r} command {command!r} kwargs {kwargs!r}")
+    minilog.debug(
+        f"send called: thing {thing!r} command {command!r} kwargs {kwargs!r}"
+    )
     if isinstance(thing, list):
         for t in thing:
             await send(t, command, **kwargs)

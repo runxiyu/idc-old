@@ -60,6 +60,14 @@ guilds = {
 
 channels = {
     b"hackers": {
-        "broadcast_to": {b"andrew", b"lurk", b"luk3yx", b"hax", b"vitali64"}
+        "broadcast_to": {
+            b"andrew",
+            b"lurk",
+            b"luk3yx",
+            b"hax",
+            b"vitali64",
+        }
     }
 }
+
+motd = b"""Hi there! This is the best IDC server you'll ever encounter.  Good luck!"""

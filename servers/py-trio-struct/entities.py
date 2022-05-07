@@ -51,6 +51,7 @@ class User:
     password: bytes
     options: list[str]
     connected_clients: list[Client] = field(default_factory=list)
+    in_channels: list[Channel] = field(default_factory=list)
     queue: list[bytes] = field(default_factory=list)
 
 
