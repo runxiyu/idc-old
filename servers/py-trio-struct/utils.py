@@ -179,12 +179,15 @@ V = Union[
     entities.User,
     List[entities.User],
     List[entities.Client],
+    entities.Channel,
+    List[entities.Channel],
 ]
 
 
 async def send(
     thing: V, command: bytes, **kwargs: Optional[bytes]
 ) -> None:
+    minilog.debug(f"send called: thing {thing!r} command {command!r} kwargs {kwargs!r}")
     if isinstance(thing, list):
         for t in thing:
             await send(t, command, **kwargs)
@@ -196,6 +199,10 @@ async def send(
                 await send(c, command, **kwargs)
         else:
             thing.queue.append(stdToBytes(command, **kwargs))
+    elif isinstance(thing, entities.Channel):
+        await send(thing.broadcast_to, command, **kwargs)
+    else:
+        raise Exception("1")
 
 
 async def quote(c: entities.Client, line: bytes) -> None:
@@ -204,8 +211,3 @@ async def quote(c: entities.Client, line: bytes) -> None:
 
 def exit(i: int) -> None:
     sys.exit(i)
-
-
-def add_client_to_user(c: entities.Client, u: entities.User) -> None:
-    u.connected_clients.append(c)
-    c.user = u

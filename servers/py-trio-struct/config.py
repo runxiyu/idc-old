@@ -57,3 +57,9 @@ guilds = {
         "roles": [],
     }
 }
+
+channels = {
+    b"hackers": {
+        "broadcast_to": {b"andrew", b"lurk", b"luk3yx", b"hax", b"vitali64"}
+    }
+}

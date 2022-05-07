@@ -59,3 +59,17 @@ class Client:
     cid: bytes
     stream: trio.SocketStream
     user: Optional[User] = None
+
+
+@dataclass
+class Guild:
+    guildname: bytes
+    users: list[User]
+    channels: list[Channel]
+
+
+@dataclass
+class Channel:
+    channelname: bytes
+    guild: Optional[Guild]
+    broadcast_to: list[User]

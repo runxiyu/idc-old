@@ -146,3 +146,11 @@ class NonexistantTargetError(IDCUserCausedException):
     """
 
     error_type = b"NONEXISTANT_TARGET"
+
+
+class NoExternalMessagesError(IDCUserCausedException):
+    """
+    sender not in chan
+    """
+
+    error_type = b"NO_EXTERNAL_MESSAGES"

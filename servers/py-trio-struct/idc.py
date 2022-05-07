@@ -51,12 +51,20 @@ PORT = 6835
 
 client_id_counter = count()
 local_users: dict[bytes, entities.User] = {}
+local_channels: dict[bytes, entities.Channel] = {}
 
 for username in config.users:
     local_users[username] = entities.User(
         username=username,
         password=config.users[username]["password"],
         options=config.users[username]["options"],
+    )
+
+for channelname in config.channels:
+    local_channels[channelname] = entities.Channel(
+        channelname=channelname,
+        broadcast_to=[local_users[username] for username in config.channels[channelname]["broadcast_to"]],
+        guild=None,
     )
 
 
@@ -179,6 +187,38 @@ async def _privmsg_cmd(
                 message=utils.carg(args, "MESSAGE"),
             )
         # Do you think that we should put echo-message here, or in utils.send()?
+
+
+@register_command("CHANMSG")
+async def _chanmsg_cmd(
+    client: entities.Client, args: dict[str, bytes]
+) -> None:
+    if not client.user:
+        raise exceptions.NotLoggedIn(
+            b"You can't use CHANMSG before logging in!"
+        )
+    else:
+        target_channel_name = utils.carg(args, "TARGET")
+        try:
+            target_channel = local_channels[target_channel_name]
+        except KeyError:
+            raise exceptions.NonexistantTargetError( b"The target channel " + target_channel_name + b"is nonexistant.")
+        else:
+            
+            await utils.send(
+                target_channel,
+                b"CHANMSG",
+                source=client.user.username,
+                target=target_channel_name,
+                message=utils.carg(args, "MESSAGE"),
+            )
+            await utils.send(
+                client.user,
+                b"CHANMSG",
+                source=client.user.username,
+                target=target_channel_name,
+                message=utils.carg(args, "MESSAGE"),
+            )
 
 
 async def connection_loop(stream: trio.SocketStream) -> None:
