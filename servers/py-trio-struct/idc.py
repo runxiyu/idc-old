@@ -105,9 +105,8 @@ async def _login_cmd(
             local_users[attempting_username].password
             == attempting_password
         ):
-            utils.add_client_to_user(
-                client, local_users[attempting_username]
-            )
+            client.user = local_users[attempting_username]
+            local_users[attempting_username].connected_clients.append(client)
             await utils.send(
                 client,
                 b"LOGIN_GOOD",
