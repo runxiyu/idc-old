@@ -140,12 +140,10 @@ async def _login_cmd(
                 )
             await utils.send(
                 client,
-                b"END_OFFLINE_MESSAGES",
+                b"END_BURST",
                 COMMENT=b"I'm finished telling you the state you're in.",
             )
             if client.user.queue:
-                #                for q in client.user.queue[-1::-1]:
-                #                    await utils.quote(client, q)
                 for q in client.user.queue:
                     await utils.quote(client, q)
                 client.user.queue = []
@@ -178,8 +176,7 @@ async def _egg_cmd(
     await utils.send(
         client,
         b"EASTER_EGG",
-        moocow=b"MOOCOWS ARE OFTC",
-        cat=b"LIBERACHAT LOL",
+        yay=b"luk3yx: Never gonna give you up\nnever gonna let you down\nnever gonna run around and desert you\nnever gonna make you cry\nnever gonna say goodbye\nnever gonna tell a lie and hurt you",
     )
 
 
