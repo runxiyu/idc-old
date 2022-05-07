@@ -173,19 +173,20 @@ async def _privmsg_cmd(
             )
         else:
             await utils.send(
-                local_users[utils.carg(args, "TARGET")],
+                target_user,
                 b"PRIVMSG",
                 source=client.user.username,
                 target=utils.carg(args, "TARGET"),
                 message=utils.carg(args, "MESSAGE"),
             )
-            await utils.send(
-                client.user,
-                b"PRIVMSG",
-                source=client.user.username,
-                target=utils.carg(args, "TARGET"),
-                message=utils.carg(args, "MESSAGE"),
-            )
+            if target_user is not client.user:
+                await utils.send(
+                    client.user,
+                    b"PRIVMSG",
+                    source=client.user.username,
+                    target=utils.carg(args, "TARGET"),
+                    message=utils.carg(args, "MESSAGE"),
+                )
         # Do you think that we should put echo-message here, or in utils.send()?
 
 
@@ -212,13 +213,13 @@ async def _chanmsg_cmd(
                 target=target_channel_name,
                 message=utils.carg(args, "MESSAGE"),
             )
-            await utils.send(
-                client.user,
-                b"CHANMSG",
-                source=client.user.username,
-                target=target_channel_name,
-                message=utils.carg(args, "MESSAGE"),
-            )
+#             await utils.send(
+#                 client.user,
+#                 b"CHANMSG",
+#                 source=client.user.username,
+#                 target=target_channel_name,
+#                 message=utils.carg(args, "MESSAGE"),
+#             )
 
 
 async def connection_loop(stream: trio.SocketStream) -> None:
