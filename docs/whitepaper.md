@@ -1,5 +1,5 @@
 %%%
-Title = "Internet Delay Chat Protocol"
+title = "Internet Delay Chat Protocol"
 abbrev = "Internet Delay Chat Protocol"
 ipr= "none"
 area = "Internet"

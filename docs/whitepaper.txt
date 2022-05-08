@@ -5,7 +5,7 @@
 Andrew's Haxxor Working Group                                      A. Yu
                                                                         
                                                                  T. User
-                                                           21 April 2022
+                                                              8 May 2022
 
 
                       Internet Delay Chat Protocol
@@ -55,7 +55,7 @@ Table of Contents
 
 Yu & User                     Informational                     [Page 1]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
 
 
        5.2.1.  Join message  . . . . . . . . . . . . . . . . . . . .  13
@@ -111,7 +111,7 @@ Yu & User                     Informational                     [Page 1]
 
 Yu & User                     Informational                     [Page 2]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
 
 
 1.1.  Servers
@@ -167,7 +167,7 @@ Yu & User                     Informational                     [Page 2]
 
 Yu & User                     Informational                     [Page 3]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
 
 
    Space identifiers are strings with the form "&name@server", where
@@ -223,7 +223,7 @@ Yu & User                     Informational                     [Page 3]
 
 Yu & User                     Informational                     [Page 4]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
 
 
 2.2.  Anti-permissions
@@ -279,7 +279,7 @@ Yu & User                     Informational                     [Page 4]
 
 Yu & User                     Informational                     [Page 5]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
 
 
 3.  The IDC Specification
@@ -335,7 +335,7 @@ Yu & User                     Informational                     [Page 5]
 
 Yu & User                     Informational                     [Page 6]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
 
 
    IDC messages are always lines of characters terminated with a CR-LF
@@ -391,7 +391,7 @@ Yu & User                     Informational                     [Page 6]
 
 Yu & User                     Informational                     [Page 7]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
 
 
    6.  Use of the extended prefix (['!' <user> ] ['@' <host> ]) must not
@@ -447,7 +447,7 @@ Yu & User                     Informational                     [Page 7]
 
 Yu & User                     Informational                     [Page 8]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
 
 
 4.2.  One-to-many
@@ -503,7 +503,7 @@ Yu & User                     Informational                     [Page 8]
 
 Yu & User                     Informational                     [Page 9]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
 
 
    If a full set of parameters is presented, then each must be checked
@@ -559,7 +559,7 @@ Yu & User                     Informational                     [Page 9]
 
 Yu & User                     Informational                    [Page 10]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
 
 
           ERR_NEEDMOREPARAMS              ERR_ALREADYREGISTRED
@@ -615,7 +615,7 @@ Yu & User                     Informational                    [Page 10]
 
 Yu & User                     Informational                    [Page 11]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
 
 
 5.1.4.  Server message
@@ -671,7 +671,7 @@ Yu & User                     Informational                    [Page 11]
 
 Yu & User                     Informational                    [Page 12]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
 
 
    The <comment> should be supplied by all administrator who execute a
@@ -727,7 +727,7 @@ Yu & User                     Informational                    [Page 12]
 
 Yu & User                     Informational                    [Page 13]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
 
 
        ERR_NEEDMOREPARAMS              ERR_BANNEDFROMCHAN
@@ -783,7 +783,7 @@ Yu & User                     Informational                    [Page 13]
 
 Yu & User                     Informational                    [Page 14]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
 
 
 5.2.3.2.  User modes
@@ -839,7 +839,7 @@ Yu & User                     Informational                    [Page 14]
 
 Yu & User                     Informational                    [Page 15]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
 
 
    By using the NAMES command, a user can list all nicknames that are
@@ -895,7 +895,7 @@ Yu & User                     Informational                    [Page 15]
 
 Yu & User                     Informational                    [Page 16]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
 
 
        ERR_NEEDMOREPARAMS              ERR_NOSUCHCHANNEL
