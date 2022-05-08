@@ -150,18 +150,6 @@ async def _login_cmd(
                 for q in client.user.queue:
                     await utils.quote(client, q)
                     client.user.queue.remove(q)
-            for channel in client.user.in_channels:
-                if channel.queue:
-                    minilog.debug(f"{client.user.username!r} is looking for its offline queue of {channel.channelname!r}")
-                    for mqm in channel.queue:
-                        minilog.debug(f"{client.user.username!r} found a mqm for {channel.channelname!r}: {mqm.data!r} for {b', '.join([u.username for u in mqm.targets])!r}")
-                        if client.user in mqm.targets:
-                            minilog.debug(f"{client.user.username!r} sees that the mqm is for them!!")
-                            await utils.quote(client, mqm.data)
-                            mqm.targets.remove(client.user)
-                            minilog.debug(f"{client.user.username!r} removes itself from the {channel.channelname!r} mqm: {mqm.data!r} for {b', '.join([u.username for u in mqm.targets])!r}")
-                            if len(mqm.targets) == 1:
-                                channel.queue.remove(mqm)
             await utils.send(
                 client,
                 b"END_OFFLINE_MESSAGES",

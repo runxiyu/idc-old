@@ -74,11 +74,5 @@ class Channel:
     channelname: bytes
     guild: Optional[Guild]
     broadcast_to: list[User]
-    queue: list[MultitargetQueuedMessage] = field(default_factory=list)
 
 
-X = Union[Client, User, List[User], List[Client], Channel, List[Channel]]
-@dataclass
-class MultitargetQueuedMessage:
-    data: bytes
-    targets: list[X]
