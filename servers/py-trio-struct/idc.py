@@ -307,6 +307,9 @@ async def connection_loop(stream: trio.SocketStream) -> None:
 async def main() -> None:
     await trio.serve_tcp(connection_loop, PORT)
 
+def run_i_guess() -> None:
+    trio.run(main)
+
 
 if __name__ == "__main__":
     try:
