@@ -1,5 +1,4 @@
-- Guilds
 - Channel queues
-- Anti-DoS
+- Guilds
 - TLS
-- Max message size
+- Max message size; No DoS
