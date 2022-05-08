@@ -2,10 +2,20 @@ import weechat
 import socket
 import time
 
-weechat.register("weechat-idc", "Andrew Yu", "0.0.1", "UNLICENSE", "Internet Delay Chat Protocol for WeeChat", "", "") # last: shutdown_function and charset
+weechat.register(
+    "weechat-idc",
+    "Andrew Yu",
+    "0.0.1",
+    "UNLICENSE",
+    "Internet Delay Chat Protocol for WeeChat",
+    "",
+    "",
+)  # last: shutdown_function and charset
+
 
 def get_status(data):
     return "this is the result"
+
 
 def go_idc(data, command, return_code, out, err):
     if return_code == weechat.WEECHAT_HOOK_PROCESS_ERROR:
@@ -18,5 +28,6 @@ def go_idc(data, command, return_code, out, err):
     if err:
         weechat.prnt("", "stderr: %s" % err)
     return weechat.WEECHAT_RC_OK
+
 
 hook = weechat.hook_process("func:go_idc", 5000, "go_idc", "")

@@ -6,49 +6,61 @@
 #
 
 import miniirc, socket, threading, miniirc_idc
-from miniirc_extras.utils import ircv2_message_unparser, ircv3_message_parser
+from miniirc_extras.utils import (
+    ircv2_message_unparser,
+    ircv3_message_parser,
+)
 from concurrent.futures import ThreadPoolExecutor
+
 miniirc.version = None
 
 # A single network
 class Network:
-    _buffer  = b''
-    IRC      = miniirc_idc.IDC
-    encoding = 'utf-8'
-    _001     = False
+    _buffer = b""
+    IRC = miniirc_idc.IDC
+    encoding = "utf-8"
+    _001 = False
 
-    _main_lock     = False
-    block_incoming = frozenset(('PING', 'CAP', 'AUTHENTICATE'))
-    block_outgoing = frozenset(('CAP',))
+    _main_lock = False
+    block_incoming = frozenset(("PING", "CAP", "AUTHENTICATE"))
+    block_outgoing = frozenset(("CAP",))
 
     # :( what socket is this even
 
     # Send messages
     def send(self, cmd, hostmask, tags, args):
-        raw = ircv2_message_unparser(cmd, hostmask or (cmd, cmd, cmd), tags,
-            args, colon=False, encoding=self.encoding)
-        print('->', raw)
-        self.sock.sendall(raw[:510] + b'\r\n')
+        raw = ircv2_message_unparser(
+            cmd,
+            hostmask or (cmd, cmd, cmd),
+            tags,
+            args,
+            colon=False,
+            encoding=self.encoding,
+        )
+        print("->", raw)
+        self.sock.sendall(raw[:510] + b"\r\n")
 
     # Receive messages
     def recv(self):
         while True:
-            while b'\n' not in self._buffer:
+            while b"\n" not in self._buffer:
                 buf = self.sock.recv(4096)
-                assert buf, 'The socket has been closed!'
-                self._buffer += buf.replace(b'\r', b'\n')
+                assert buf, "The socket has been closed!"
+                self._buffer += buf.replace(b"\r", b"\n")
 
-            msg, self._buffer = self._buffer.split(b'\n', 1)
-            msg = msg.decode(self.encoding, 'replace')
+            msg, self._buffer = self._buffer.split(b"\n", 1)
+            msg = msg.decode(self.encoding, "replace")
             if msg:
-                cmd, _, tags, args = ircv3_message_parser(msg, colon=False)
+                cmd, _, tags, args = ircv3_message_parser(
+                    msg, colon=False
+                )
                 return tags, cmd.upper(), args
 
     # Handle everything
     def _miniirc_handler(self, irc, cmd, hostmask, tags, args):
-        if cmd.startswith('IRCV3 ') or cmd in self.block_incoming:
+        if cmd.startswith("IRCV3 ") or cmd in self.block_incoming:
             return
-        elif cmd == '001':
+        elif cmd == "001":
             if self._001:
                 return
 
@@ -61,9 +73,9 @@ class Network:
 
             # Start the main loop
             self._main()
-        elif cmd == 'ERROR':
-            self.send('PING', None, {}, [':ERROR'])
-        elif cmd == 'PONG' and args and args[-1] == 'miniirc-ping':
+        elif cmd == "ERROR":
+            self.send("PING", None, {}, [":ERROR"])
+        elif cmd == "PONG" and args and args[-1] == "miniirc-ping":
             return
 
         # Send the command to the client
@@ -71,20 +83,22 @@ class Network:
             self.send(cmd, hostmask, tags, args)
         except Exception as e:
             print(repr(e))
-            self.irc.disconnect('Connection closed.', auto_reconnect=False)
+            self.irc.disconnect(
+                "Connection closed.", auto_reconnect=False
+            )
 
     # The initial main loop
     def _init_thread(self):
         self._sendq = []
-        nick  = None
-        user  = None
+        nick = None
+        user = None
 
         # Wait for NICK and USER to be sent
         while not nick or not user:
             tags, cmd, args = self.recv()
-            if cmd == 'NICK' and len(args) == 1:
+            if cmd == "NICK" and len(args) == 1:
                 nick = args[0]
-            elif cmd == 'USER' and len(args) > 1:
+            elif cmd == "USER" and len(args) > 1:
                 user = args
             else:
                 self._sendq.append((tags, cmd, args))
@@ -100,8 +114,14 @@ class Network:
     # Send a command
     def _sendcmd(self, tags, cmd, args):
         if cmd not in self.block_outgoing:
-            raw = ircv2_message_unparser(cmd, (cmd, cmd, cmd), {}, args,
-                colon=False, encoding=None)
+            raw = ircv2_message_unparser(
+                cmd,
+                (cmd, cmd, cmd),
+                {},
+                args,
+                colon=False,
+                encoding=None,
+            )
             self.irc.quote(raw, tags=tags)
 
     # The more permanent main loop
@@ -142,7 +162,9 @@ class Network:
 
         # Add the IRC handler
         self._recvq = []
-        self.irc.CmdHandler(ircv3=True, colon=False)(self._miniirc_handler)
+        self.irc.CmdHandler(ircv3=True, colon=False)(
+            self._miniirc_handler
+        )
 
         # Start the main loop
         self.thread = threading.Thread(target=self._init_thread)
@@ -152,12 +174,20 @@ class Network:
     def __init__(self, conn, *args, bad_cmds=None, **kwargs):
         if bad_cmds is not None:
             self.bad_cmds = bad_cmds
-        self._init(conn, self.IRC(*args, auto_connect=False,
-                                  executor=ThreadPoolExecutor(1), **kwargs))
+        self._init(
+            conn,
+            self.IRC(
+                *args,
+                auto_connect=False,
+                executor=ThreadPoolExecutor(1),
+                **kwargs
+            ),
+        )
+
 
 # The bouncer class
 class Bouncer:
-    addr = ('', 1025)
+    addr = ("", 1025)
     Network = Network
 
     # Main loop
@@ -175,9 +205,17 @@ class Bouncer:
     def __init__(self, *args, **kwargs):
         self.args, self.kwargs = args, kwargs
 
+
 # Debugging
 def main():
-    Bouncer('127.0.0.1', 6835, 'luk3yx', debug=True, ns_identity='luk3yx billy').main()
+    Bouncer(
+        "127.0.0.1",
+        6835,
+        "luk3yx",
+        debug=True,
+        ns_identity="luk3yx billy",
+    ).main()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
