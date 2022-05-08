@@ -1,4 +1,5 @@
 # srIRCeBot, a Simple IRC RElay Bot
+# you should license it or unlicense it or whatever
 
 import miniirc
 import miniirc_idc
@@ -8,7 +9,7 @@ from time import sleep
 # Configuration
 
 server = [["irc.andrewyu.org", "IRC"], ["andrewyu.org", "IDC"]]
-relayedChannels = ["#IDC", "hackers"]
+relayedChannels = ["#IDC", "#hackers"]
 nick = "idcbot"
 debug = True
 
@@ -19,7 +20,7 @@ irc = miniirc.IRC(
     nick,
     relayedChannels[0],
     ns_identity=None,
-    debug=False,
+    debug=debug,
 )
 # IDC
 idc = miniirc_idc.IDC(
@@ -39,7 +40,7 @@ def relay_msgs(chat, hostmask, args, which):
     whichchan = 0 if which == 1 else 1
     # Send in the irc side what the user sent in the idc side and vice-versa
     print("NEW MESSAGE")
-    if chat == idc:
+    if chat is idc:
         chat.idc_send(
             "CHANMSG	TARGET=%s	MESSAGE=(%s) <%s> %s"
             % (
@@ -120,33 +121,33 @@ def relay_kicks(chat, hostmask, args, which):
 # Functions that run the relay functions, depending on the server where the message has been sent
 @irc.Handler("NICK", colon=False)
 def handle_nicks(chat, hostmask, args):
-    if chat == idc:
+    if chat is idc:
         relay_nick(irc, hostmask, args, 0)
-    elif chat == irc:
+    elif chat is irc:
         relay_nick(idc, hostmask, args, 1)
 
 
 @irc.Handler("KICK", colon=False)
 def handle_kicks(chat, hostmask, args):
-    if chat == irc:
+    if chat is irc:
         relay_kicks(idc, hostmask, args, 0)
-    elif chat == idc:
+    elif chat is idc:
         relay_kicks(irc, hostmask, args, 1)
 
 
 @miniirc.Handler("JOIN", colon=False)
 def handle_joins(chat, hostmask, args):
-    if chat == irc:
+    if chat is irc:
         relay_joins(idc, hostmask, args, 0)
-    elif chat == idc:
+    elif chat is idc:
         relay_joins(irc, hostmask, args, 1)
 
 
 @miniirc.Handler("PART", colon=False)
 def handle_quits(chat, hostmask, args):
-    if chat == irc:
+    if chat is irc:
         relay_quits(irc, hostmask, args, 0)
-    elif chat == idc:
+    elif chat is idc:
         relay_quits(idc, hostmask, args, 1)
 
 
@@ -173,7 +174,7 @@ def handle_chanmsgs(chat, hostmask, args):
 
 @miniirc.Handler("MODE", colon=False)
 def handle_mode(chat, hostmask, args):
-    if chat == irc:
+    if chat is irc:
         relay_mode(irc, hostmask, args, 0)
-    elif chat == idc:
+    elif chat is idc:
         relay_mode(idc, hostmask, args, 1)

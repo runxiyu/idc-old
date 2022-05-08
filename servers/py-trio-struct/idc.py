@@ -36,15 +36,17 @@
 #
 
 from __future__ import annotations
+from typing import Awaitable, Callable
 import time
 
-from typing import Awaitable, Callable
+from pprint import pprint
+
 import trio
-import minilog
 import traceback
 
 import exceptions
 import entities
+import minilog
 import utils
 import config
 
@@ -147,9 +149,12 @@ async def _login_cmd(
                 COMMENT=b"I'm finished telling you the state you're in.",
             )
             if client.user.queue:
-                for q in client.user.queue:
-                    await utils.quote(client, q)
-                    client.user.queue.remove(q)
+                for i in range(len(client.user.queue)):
+                    b = client.user.queue.pop(0)
+                    # Do not pop "i" here, because we're modifying the
+                    # iterated object within the iteration, so the
+                    # indexes change!  Therefore pop 0.
+                    await utils.quote(client, b)
             await utils.send(
                 client,
                 b"END_OFFLINE_MESSAGES",

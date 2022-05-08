@@ -66,6 +66,7 @@ channels = {
             b"luk3yx",
             b"hax",
             b"vitali64",
+            b"idcbot",
         }
     }
 }
