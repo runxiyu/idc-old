@@ -4,6 +4,12 @@ class listen:
 
 server_name = b"andrewyu.org"
 users = {
+    b"guest": {
+        "password": b"guest",
+        "bio": b"Guest",
+        "permissions": set(),
+        "options": ["offline-messages", "eat-cookies"],
+    },
     b"Noisytoot": {
         "password": b"pissnet",
         "bio": b"Ron",
@@ -30,7 +36,13 @@ users = {
     },
     b"idcbot": {
         "password": b"",
-        "bio": b"Nice person",
+        "bio": b"#IDC relay bot",
+        "permissions": {"kill", "new-guild"},
+        "options": ["offline-messages", "eat-cookies"],
+    },
+    b"speechbot": {
+        "password": b"",
+        "bio": b"#librespeech relay bot",
         "permissions": {"kill", "new-guild"},
         "options": ["offline-messages", "eat-cookies"],
     },
@@ -58,11 +70,24 @@ guilds = {
     }
 }
 
+
 channels = {
+    b"librespeech": {
+        "broadcast_to": {
+            b"andrew",
+            b"Noisytoot",
+            b"lurk",
+            b"luk3yx",
+            b"hax",
+            b"vitali64",
+            b"speechbot",
+        }
+    },
     b"hackers": {
         "broadcast_to": {
             b"andrew",
             b"lurk",
+            b"Noisytoot",
             b"luk3yx",
             b"hax",
             b"vitali64",

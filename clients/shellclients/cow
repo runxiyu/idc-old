@@ -1,0 +1,14 @@
+LOGIN	USERNAME=andrew	PASSWORD=hunter2
+CHANMSG	TARGET=hackers	MESSAGE=(1) quits don't exist, (2) joins aren't implemented yet. you could do it though, I'm not in the mood of writing code, (3) Test_User Test_User vitali64 luk3yx: During my inactivity you guys can join my tmux for idc stuff, but don't play with other stuff in here
+CHANMSG	TARGET=hackers	MESSAGE=In theory I could implement "presence"
+CHANMSG	TARGET=hackers	MESSAGE=similar to XMPP
+CHANMSG	TARGET=hackers	MESSAGE=But... what are quits good for?
+CHANMSG	TARGET=hackers	MESSAGE=Parts might be useful, but quits?
+CHANMSG	TARGET=hackers	MESSAGE=Remember, clients don't directly correlate to users here
+CHANMSG	TARGET=hackers	MESSAGE=Offline users still receive messages
+CHANMSG	TARGET=hackers	MESSAGE=It makes sense to have an "online status" rather than a quit
+CHANMSG	TARGET=hackers	MESSAGE=Ah, joins and parts will be implemented together when I feel like it
+CHANMSG	TARGET=hackers	MESSAGE=Goodnight, cya
+CHANMSG	TARGET=hackers	MESSAGE=.t Asia/Shanghai
+CHANMSG	TARGET=hackers	MESSAGE=Nice; Also, use th "rlwrap" command
+CHANMSG	TARGET=hackers	MESSAGE=for the shellclient

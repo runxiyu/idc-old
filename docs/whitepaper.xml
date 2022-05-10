@@ -5,16 +5,10 @@
 <front>
 <title abbrev="Internet Delay Chat Protocol">Internet Delay Chat Protocol</title><seriesInfo value="internet-delay-chat" stream="independent" status="informational" name="Internet-Draft"></seriesInfo>
 <author initials="A." surname="Yu" fullname="Andrew Yu"><organization></organization><address><postal><street></street>
-<city>Shanghai</city>
-<country>China</country>
 </postal><email>andrew@andrewyu.org</email>
 </address></author><author initials="T." surname="User" fullname="Test_User"><organization></organization><address><postal><street></street>
-<city>North Carolina</city>
-<country>United States</country>
 </postal><email>hax@andrewyu.org</email>
 </address></author><author initials="F." surname="EL HAFIDI" fullname="Ferass EL HAFIDI"><organization></organization><address><postal><street></street>
-<city>Unspecified</city>
-<country>Unspecified</country>
 </postal><email>vitali64pmemail@protonmail.com</email>
 </address></author><date/>
 <area>Internet</area>

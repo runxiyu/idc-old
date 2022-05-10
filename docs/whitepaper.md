@@ -50,6 +50,8 @@ The IDC (Internet Delay Chat) protocol has been designed over a number of months
 
 IDC itself is a messaging system, which (through the use of the client-server and server-to-server model) is well-suited to running on many machines in a distributed fashion.  A typical setup involves multiple servers each with multiple clients, that connect to each other in order to exchange messages, in a multi-centered fashion.
 
+## Limitations of Existing Protocols
+
 Existing protocols are limited.  The Internet Relay Chat Protocol as described in RFC 1459 is a very simple protocol for teleconferencing system.  Later updates such as RFC 2812 have been badly accepted.
 
 When a client disconnects, the IRC network no longer recognizes the client, and messages during the client's downtime are not saved.  This renders IRC unfit for instant messaging, where clients are forced to disconnect but messages are to be read later.
@@ -64,22 +66,22 @@ The Discord messaging platform is a proprietary platform for team, community and
 
 The Matrix protocol is a Free protocol that has encrypted messages, spaces (like Discord's "guilds"), and some more features.  The people behind Matrix also maintain the Element.io client which looks a lot like Discord.  However, that client is quite big and most other clients either lack features or are unstable.  The Matrix server software, Synapse, is also very big and uses lots of resources.  Matrix is federated however, but most people prefer using the Matrix.org homeserver, due to the instability and inefficency of its server-to-server protocol, with only a handful of people self-hosting their own.  While it is very user-friendly, Synapse is so slow that most people prefer using Matrix.org.  So one of the many issues of IRC is also there: most people join big instances, which is bad for privacy as this is one point of failure.  Matrix also uses a so-called "identity" server.  Most people use the vector.im identity server, which is also bad for privacy.
 
-Guilds
+IDC aims to solve these problems progressively.  The current version of IDC is a text-based non-federated protocol where users may have multiple connections and are not destroyed when all connections are destroyed, and servers save messages when the user is offline.  Future versions will be federated, and may be distributed in the far future.  This document describes the first version of IDC.
 
-IDC aims to solve these problems progressively.  The current version of IDC is a text-based non-federated protocol where users may have multiple connections and are not destroyed when all connections are destroyed, and servers save messages when the user is offline.  Future versions will be federated, and may be distributed in the far future.
 
+# General Concepts
 
 ## Servers
 
-The server forms the backbone of IDC, providing a point to which clients may connect to to talk to each other, and a point for other servers to connect to, forming the global IDC network.  The typical network configuration for IDC servers MUST BE that of a mesh where each server connects to other servers directly, except in cases where a server is unable to connect to another server, where then servers SHOULD utilize servers in between as routing.
+The server forms the backbone of IDC, providing a point to which clients may connect to to talk to each other, and a point for other servers to connect to, forming the global IDC network.  The network is a mesh where each server connects to other servers directly.
 
 ## Clients
 
-A client is anything connecting to a server that is not another server.  Each client is distinguished from other clients by a unique CID having a length of 9 characters, private to each server.
+A client is anything connecting to a server that is not another server.
 
 ## Users
 
-Each client is associated with a user.  Users are identified by a UID, in the form of user@host, where host is either (1) the FQDN of the server the user resides on or (2) a domain with a SRV record to the actual server.  The UID is unique in the Internet.  Messages are directed at users, which are then sent to all connected clients of the said user.  If the user has no connected clients, i.e. the user is offline, the message SHOULD be kept until the user reconnects.
+Each client is associated with a user when it logs in.  Users are identified by a UID, in the form of user@host, where host is either (1) the FQDN of the server the user resides on or (2) a domain with a SRV record to the actual server.  The UID is unique in the Internet.  Messages are directed at users, which are then sent to all connected clients of the said user.  If the user has no connected clients, i.e. the user is offline, the message SHOULD be kept until the user reconnects.
 
 
 ### Administrators

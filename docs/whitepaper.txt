@@ -971,20 +971,20 @@ Appendix A.  Acknowledgements
 Authors' Addresses
 
    Andrew Yu
-   Shanghai
-   China
    Email: andrew@andrewyu.org
 
 
    Test_User
-   North Carolina,
-   United States
    Email: hax@andrewyu.org
 
 
    Ferass EL HAFIDI
-   Unspecified
    Email: vitali64pmemail@protonmail.com
+
+
+
+
+
 
 
 
