@@ -9,7 +9,6 @@ status_line_row=0
 irc_host=''
 irc_channel=''
 irc_nick=''
-irc_gecos=''
 
 
 function scroll_bottom() {
@@ -66,7 +65,7 @@ function net_fd_helper() {
 	#read -s -r -t1 -u 44
 
 	printf 'NICK %s\r\n' "$irc_nick" >&44
-    printf 'USER %s %s %s :%s\r\n' "$irc_nick" "$HOSTNAME" "$USER" "$irc_gecos" >&44
+    printf 'USER %s %s %s\r\n' "$irc_nick" "$HOSTNAME" "$USER" >&44
 	
 	while true
 	do
@@ -106,11 +105,11 @@ function net_fd_helper() {
 				init_screen
 				break
 				;;
-			( /join* )
+			( /JOIN* )
 				irc_channel="${REPLY##*\ }"
 				printf '%s\r\n' "${REPLY/\//}" >&44
 				;;
-			( /quit* )
+			( /QUIT* )
                 printf 'QUIT :%s\r\n' "${REPLY#*\ }" >&44
 				exec 44>&-
 				exit 0
@@ -137,10 +136,8 @@ function main() {
 	scroll_bottom
 	read -p 'IRC Server: ' -e -r irc_host
 	read -p 'IRC Nickname: ' -e -r irc_nick
-	read -p 'IRC Realname: ' -e -r irc_gecos
 	init_screen
 	net_fd_helper "/dev/tcp/$irc_host/6667"
-    printf '\x1bc'
 }
 
 main
