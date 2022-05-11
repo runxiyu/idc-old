@@ -8,5 +8,5 @@ whitepaper.xml: whitepaper.md
 
 update: whitepaper.txt
 	git add .
-	git commit -m "auto update"
+	git commit -m "automatic documentation update"
 	git push

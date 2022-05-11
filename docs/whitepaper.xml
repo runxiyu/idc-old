@@ -5,20 +5,20 @@
 <front>
 <title abbrev="Internet Delay Chat Protocol">Internet Delay Chat Protocol</title><seriesInfo value="internet-delay-chat" stream="independent" status="informational" name="Internet-Draft"></seriesInfo>
 <author initials="A." surname="Yu" fullname="Andrew Yu"><organization></organization><address><postal><street></street>
-<city>Shanghai</city>
-<country>China</country>
 </postal><email>andrew@andrewyu.org</email>
 </address></author><author initials="T." surname="User" fullname="Test_User"><organization></organization><address><postal><street></street>
-<city>North Carolina</city>
-<country>United States</country>
 </postal><email>hax@andrewyu.org</email>
+</address></author><author initials="F." surname="EL HAFIDI" fullname="Ferass EL HAFIDI"><organization></organization><address><postal><street></street>
+</postal><email>vitali64pmemail@protonmail.com</email>
 </address></author><date/>
 <area>Internet</area>
-<workgroup>Andrew's Haxxor Working Group</workgroup>
+<workgroup>IDC Working Group</workgroup>
+<keyword>messaging</keyword>
+<keyword>protocol</keyword>
 
 <abstract>
-<t>Docs are out of date, will update; reference servers/pyasyncio.
-</t>
+<t>Documentation is usually out of date.  It is updated every few weeks.
+Please reference the Python Trio server implementation.</t>
 <t>This document specifies a new Internet Protocol for messaging over the Internet.</t>
 </abstract>
 
@@ -27,13 +27,17 @@
 <middle>
 
 <section anchor="introduction"><name>Introduction</name>
-<t>The IDC (Internet Delay Chat) protocol has been designed over a number of months for use with federated multimedia conferencing.  This document describes the current IDC protocol.</t>
+<t>The IDC (Internet Delay Chat) protocol has been designed over a number of months for federated multimedia conferencing.  This document describes the current IDC protocol.</t>
 <t>IDC itself is a messaging system, which (through the use of the client-server and server-to-server model) is well-suited to running on many machines in a distributed fashion.  A typical setup involves multiple servers each with multiple clients, that connect to each other in order to exchange messages, in a multi-centered fashion.</t>
-<t>Existing protocols are limited.  Internet Relay Chat as in RFC 1459 has been in use since May 1993, a very simple protocol for teleconferencing system.  Later updates such as RFC 2812 have been badly accepted.  It was not designed for personal instant messaging.</t>
-<t>IRC is real time.  When a client disconnects, the network no longer recognizes the client, and messages during the client's downtime are not saved.  This renders IRC unfit for instant messaging, where clients are forced to disconnect but messages are to be read later.  IRC is not federated, causing most people to be on the few large networks.  Though IRC is technically multi-centered, it is not pokitically.</t>
-<t>Most modern IRC networks use dedicated &quot;services&quot; servers for user, channel, and group management and dedicated client bots for extensible channel management.  Compared with these features built into the server, this is ineffective and redundent.  Temperory limitations on users such as timed bans must be handled server-side.</t>
-<t>The Extensible Messaging and Presence Protocol, also known as XMPP, was designed for presense, instant messaging, and conferences.  However, it is based on XML, and implementations are large and buggy.  IRC is a simple text-oriented protocol, where implementing is more straightforward and is harder to bug.</t>
-<t>XML is inherently bloated and causes unnecessary spam in the network.  XMPP is not multicast either, messages are slow and especially inefficent with multi user chats.</t>
+<t>Existing protocols are limited.  The Internet Relay Chat Protocol as described in RFC 1459 is a very simple protocol for teleconferencing system.  Later updates such as RFC 2812 have been badly accepted.</t>
+<t>When a client disconnects, the IRC network no longer recognizes the client, and messages during the client's downtime are not saved.  This renders IRC unfit for instant messaging, where clients are forced to disconnect but messages are to be read later.</t>
+<t>IRC is also not federated, causing most people to be on the few large networks which may lead to privacy and stability issues (for example, the freenode takeover [citation needed]).  Though IRC is technically multi-centered, it is not politically, as servers fully trust other servers, and thus are typically run by the same organization.</t>
+<t>Most modern IRC networks use dedicated &quot;services&quot; servers for user, channel, and group management and dedicated client bots for extensible channel management.  Compared with these features built into the server, this is ineffective.  Features such as timed mutes should be handled server-side rather than by a clientbot.</t>
+<t>The Extensible Messaging and Presence Protocol, also known as XMPP or Jabber, was designed for presense, instant messaging, and conferences.  However, it is based on XML, and implementations are large and buggy.  XML is inherently bloated and causes unnecessary spam in the network.  XMPP is not multicast either, messages are slow and especially inefficent with multi user chats.  IRC, on the other hand, is a simple text-oriented protocol, where implementing is more straightforward and is harder to write bugs into.</t>
+<t>The Discord messaging platform is a proprietary platform for team, community and personal communications.  It is very popular and widely used among gamers, but it's controlled by a single entity with bad privacy records, making it unfit for many communications.  Unlike other Free protocols (such as Matrix and XMPP), messages aren't encrypted, which means that the people behind Discord are able to see every message that you type.  They also actively block Tor users, which have to give Discord their phone number in order to use the platform.  Their client is also proprietary and they disallow alternative clients made with the bot API.  This is a platform that is very bad for privacy and security.  You also cannot host your own server (unlike Matrix, XMPP, and IRC).  You have to rely on centralised servers controlled by Discord themselves.</t>
+<t>The Matrix protocol is a Free protocol that has encrypted messages, spaces (like Discord's &quot;guilds&quot;), and some more features.  The people behind Matrix also maintain the Element.io client which looks a lot like Discord.  However, that client is quite big and most other clients either lack features or are unstable.  The Matrix server software, Synapse, is also very big and uses lots of resources.  Matrix is federated however, but most people prefer using the Matrix.org homeserver, due to the instability and inefficency of its server-to-server protocol, with only a handful of people self-hosting their own.  While it is very user-friendly, Synapse is so slow that most people prefer using Matrix.org.  So one of the many issues of IRC is also there: most people join big instances, which is bad for privacy as this is one point of failure.  Matrix also uses a so-called &quot;identity&quot; server.  Most people use the vector.im identity server, which is also bad for privacy.</t>
+<t>Guilds</t>
+<t>IDC aims to solve these problems progressively.  The current version of IDC is a text-based non-federated protocol where users may have multiple connections and are not destroyed when all connections are destroyed, and servers save messages when the user is offline.  Future versions will be federated, and may be distributed in the far future.</t>
 
 <section anchor="servers"><name>Servers</name>
 <t>The server forms the backbone of IDC, providing a point to which clients may connect to to talk to each other, and a point for other servers to connect to, forming the global IDC network.  The typical network configuration for IDC servers MUST BE that of a mesh where each server connects to other servers directly, except in cases where a server is unable to connect to another server, where then servers SHOULD utilize servers in between as routing.</t>
@@ -412,7 +416,10 @@ message and the nickname given as a parameter are both the same.</t>
 <t>Command: NAMES
    Parameters: [&lt;channel&gt;{,&lt;channel&gt;}]</t>
 <t>By using the NAMES command, a user can list all nicknames that are visible to them on any channel that they can see.  Channel names which they can see are those which aren't secret (+s) or those which they are actually on.  The &lt;channel&gt; parameter specifies which channel(s) to return information about if valid. There is no error reply for bad channel names.</t>
-<t>If no &lt;channel&gt; parameter is given, a list of all channels and their occupants is returned.  At the end of this list, a list of users who are visible but either not on any channel or not on a visible channel are listed as being on `channel' &quot;*&quot;.</t>
+<t>If no &lt;channel&gt; parameter is given, a list of all channels and their
+occupants is returned.  At the end of this list, a list of users who are
+visible but either not on any channel or not on a visible channel are
+listed as being on 'channel' &quot;*&quot;.</t>
 <t>Numerics:</t>
 
 <artwork>    RPL_NAMREPLY                    RPL_ENDOFNAMES
@@ -461,10 +468,14 @@ the  victim  from  the channel.</t>
 <section anchor="security-considerations"><name>Security Considerations</name>
 </section>
 
+</middle>
+
+<back>
+
 <section anchor="acknowledgements"><name>Acknowledgements</name>
-<t>This document has multiple ideas suggested by Test_User &lt;hax@andrewyu.org&gt; and luk3yx.</t>
+<t>This document has multiple ideas suggested by luk3yx.</t>
 </section>
 
-</middle>
+</back>
 
 </rfc>

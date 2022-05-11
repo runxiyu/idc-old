@@ -2,10 +2,12 @@
 
 
 
-Andrew's Haxxor Working Group                                      A. Yu
+IDC Working Group                                                  A. Yu
                                                                         
                                                                  T. User
-                                                           21 April 2022
+                                                                        
+                                                            F. EL HAFIDI
+                                                              8 May 2022
 
 
                       Internet Delay Chat Protocol
@@ -13,7 +15,8 @@ Andrew's Haxxor Working Group                                      A. Yu
 
 Abstract
 
-   Docs are out of date, will update; reference servers/pyasyncio.
+   Documentation is usually out of date.  It is updated every few weeks.
+   Please reference the Python Trio server implementation.
 
    This document specifies a new Internet Protocol for messaging over
    the Internet.
@@ -21,56 +24,57 @@ Abstract
 Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
-     1.1.  Servers . . . . . . . . . . . . . . . . . . . . . . . . .   3
-     1.2.  Clients . . . . . . . . . . . . . . . . . . . . . . . . .   3
-     1.3.  Users . . . . . . . . . . . . . . . . . . . . . . . . . .   3
-       1.3.1.  Administrators  . . . . . . . . . . . . . . . . . . .   3
-     1.4.  Spaces  . . . . . . . . . . . . . . . . . . . . . . . . .   3
-     1.5.  Channels  . . . . . . . . . . . . . . . . . . . . . . . .   4
-   2.  Permission System . . . . . . . . . . . . . . . . . . . . . .   4
-     2.1.  Permissions . . . . . . . . . . . . . . . . . . . . . . .   4
-     2.2.  Anti-permissions  . . . . . . . . . . . . . . . . . . . .   5
-     2.3.  Roles . . . . . . . . . . . . . . . . . . . . . . . . . .   5
-     2.4.  Management Permissions  . . . . . . . . . . . . . . . . .   5
-   3.  The IDC Specification . . . . . . . . . . . . . . . . . . . .   6
-     3.1.  Overview  . . . . . . . . . . . . . . . . . . . . . . . .   6
-     3.2.  Character codes . . . . . . . . . . . . . . . . . . . . .   6
-     3.3.  Messages  . . . . . . . . . . . . . . . . . . . . . . . .   6
-   4.  IDC Concepts. . . . . . . . . . . . . . . . . . . . . . . . .   8
-     4.1.  One-to-one communication  . . . . . . . . . . . . . . . .   8
-     4.2.  One-to-many . . . . . . . . . . . . . . . . . . . . . . .   9
-       4.2.1.  To a list . . . . . . . . . . . . . . . . . . . . . .   9
-       4.2.2.  To a channel  . . . . . . . . . . . . . . . . . . . .   9
-   5.  Message details . . . . . . . . . . . . . . . . . . . . . . .   9
-     5.1.  Connection Registration . . . . . . . . . . . . . . . . .  10
-       5.1.1.  Password message  . . . . . . . . . . . . . . . . . .  10
-       5.1.2.  Nick message  . . . . . . . . . . . . . . . . . . . .  11
-       5.1.3.  User message  . . . . . . . . . . . . . . . . . . . .  11
-       5.1.4.  Server message  . . . . . . . . . . . . . . . . . . .  12
-       5.1.5.  Quit  . . . . . . . . . . . . . . . . . . . . . . . .  12
-       5.1.6.  Server quit message . . . . . . . . . . . . . . . . .  12
-     5.2.  Channel operations  . . . . . . . . . . . . . . . . . . .  13
+     1.1.  Servers . . . . . . . . . . . . . . . . . . . . . . . . .   4
+     1.2.  Clients . . . . . . . . . . . . . . . . . . . . . . . . .   4
+     1.3.  Users . . . . . . . . . . . . . . . . . . . . . . . . . .   4
+       1.3.1.  Administrators  . . . . . . . . . . . . . . . . . . .   4
+     1.4.  Spaces  . . . . . . . . . . . . . . . . . . . . . . . . .   4
+     1.5.  Channels  . . . . . . . . . . . . . . . . . . . . . . . .   5
+   2.  Permission System . . . . . . . . . . . . . . . . . . . . . .   5
+     2.1.  Permissions . . . . . . . . . . . . . . . . . . . . . . .   5
+     2.2.  Anti-permissions  . . . . . . . . . . . . . . . . . . . .   6
+     2.3.  Roles . . . . . . . . . . . . . . . . . . . . . . . . . .   6
+     2.4.  Management Permissions  . . . . . . . . . . . . . . . . .   6
+   3.  The IDC Specification . . . . . . . . . . . . . . . . . . . .   7
+     3.1.  Overview  . . . . . . . . . . . . . . . . . . . . . . . .   7
+     3.2.  Character codes . . . . . . . . . . . . . . . . . . . . .   7
+     3.3.  Messages  . . . . . . . . . . . . . . . . . . . . . . . .   7
+   4.  IDC Concepts. . . . . . . . . . . . . . . . . . . . . . . . .   9
+     4.1.  One-to-one communication  . . . . . . . . . . . . . . . .   9
+     4.2.  One-to-many . . . . . . . . . . . . . . . . . . . . . . .  10
+       4.2.1.  To a list . . . . . . . . . . . . . . . . . . . . . .  10
+       4.2.2.  To a channel  . . . . . . . . . . . . . . . . . . . .  10
+   5.  Message details . . . . . . . . . . . . . . . . . . . . . . .  10
+     5.1.  Connection Registration . . . . . . . . . . . . . . . . .  11
+       5.1.1.  Password message  . . . . . . . . . . . . . . . . . .  11
+       5.1.2.  Nick message  . . . . . . . . . . . . . . . . . . . .  12
+       5.1.3.  User message  . . . . . . . . . . . . . . . . . . . .  12
+       5.1.4.  Server message  . . . . . . . . . . . . . . . . . . .  13
 
 
 
-Yu & User                     Informational                     [Page 1]
+Yu, et al.                    Informational                     [Page 1]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
 
 
-       5.2.1.  Join message  . . . . . . . . . . . . . . . . . . . .  13
-       5.2.2.  Part message  . . . . . . . . . . . . . . . . . . . .  14
-       5.2.3.  Mode message  . . . . . . . . . . . . . . . . . . . .  14
-     5.3.  Server queries and commands . . . . . . . . . . . . . . .  17
-   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  17
-   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  17
-   8.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  17
+       5.1.5.  Quit  . . . . . . . . . . . . . . . . . . . . . . . .  13
+       5.1.6.  Server quit message . . . . . . . . . . . . . . . . .  13
+     5.2.  Channel operations  . . . . . . . . . . . . . . . . . . .  14
+       5.2.1.  Join message  . . . . . . . . . . . . . . . . . . . .  14
+       5.2.2.  Part message  . . . . . . . . . . . . . . . . . . . .  15
+       5.2.3.  Mode message  . . . . . . . . . . . . . . . . . . . .  15
+     5.3.  Server queries and commands . . . . . . . . . . . . . . .  18
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  18
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  18
+   Appendix A.  Acknowledgements . . . . . . . . . . . . . . . . . .  18
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  18
 
 1.  Introduction
 
    The IDC (Internet Delay Chat) protocol has been designed over a
-   number of months for use with federated multimedia conferencing.
-   This document describes the current IDC protocol.
+   number of months for federated multimedia conferencing.  This
+   document describes the current IDC protocol.
 
    IDC itself is a messaging system, which (through the use of the
    client-server and server-to-server model) is well-suited to running
@@ -78,40 +82,92 @@ Yu & User                     Informational                     [Page 1]
    multiple servers each with multiple clients, that connect to each
    other in order to exchange messages, in a multi-centered fashion.
 
-   Existing protocols are limited.  Internet Relay Chat as in RFC 1459
-   has been in use since May 1993, a very simple protocol for
-   teleconferencing system.  Later updates such as RFC 2812 have been
-   badly accepted.  It was not designed for personal instant messaging.
+   Existing protocols are limited.  The Internet Relay Chat Protocol as
+   described in RFC 1459 is a very simple protocol for teleconferencing
+   system.  Later updates such as RFC 2812 have been badly accepted.
 
-   IRC is real time.  When a client disconnects, the network no longer
-   recognizes the client, and messages during the client's downtime are
-   not saved.  This renders IRC unfit for instant messaging, where
-   clients are forced to disconnect but messages are to be read later.
-   IRC is not federated, causing most people to be on the few large
-   networks.  Though IRC is technically multi-centered, it is not
-   pokitically.
+   When a client disconnects, the IRC network no longer recognizes the
+   client, and messages during the client's downtime are not saved.
+   This renders IRC unfit for instant messaging, where clients are
+   forced to disconnect but messages are to be read later.
+
+   IRC is also not federated, causing most people to be on the few large
+   networks which may lead to privacy and stability issues (for example,
+   the freenode takeover [citation needed]).  Though IRC is technically
+   multi-centered, it is not politically, as servers fully trust other
+   servers, and thus are typically run by the same organization.
 
    Most modern IRC networks use dedicated "services" servers for user,
    channel, and group management and dedicated client bots for
    extensible channel management.  Compared with these features built
-   into the server, this is ineffective and redundent.  Temperory
-   limitations on users such as timed bans must be handled server-side.
+   into the server, this is ineffective.  Features such as timed mutes
+   should be handled server-side rather than by a clientbot.
 
-   The Extensible Messaging and Presence Protocol, also known as XMPP,
-   was designed for presense, instant messaging, and conferences.
-   However, it is based on XML, and implementations are large and buggy.
-   IRC is a simple text-oriented protocol, where implementing is more
-   straightforward and is harder to bug.
-
-   XML is inherently bloated and causes unnecessary spam in the network.
-   XMPP is not multicast either, messages are slow and especially
-   inefficent with multi user chats.
+   The Extensible Messaging and Presence Protocol, also known as XMPP or
+   Jabber, was designed for presense, instant messaging, and
+   conferences.  However, it is based on XML, and implementations are
 
 
 
-Yu & User                     Informational                     [Page 2]
+Yu, et al.                    Informational                     [Page 2]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
+
+
+   large and buggy.  XML is inherently bloated and causes unnecessary
+   spam in the network.  XMPP is not multicast either, messages are slow
+   and especially inefficent with multi user chats.  IRC, on the other
+   hand, is a simple text-oriented protocol, where implementing is more
+   straightforward and is harder to write bugs into.
+
+   The Discord messaging platform is a proprietary platform for team,
+   community and personal communications.  It is very popular and widely
+   used among gamers, but it's controlled by a single entity with bad
+   privacy records, making it unfit for many communications.  Unlike
+   other Free protocols (such as Matrix and XMPP), messages aren't
+   encrypted, which means that the people behind Discord are able to see
+   every message that you type.  They also actively block Tor users,
+   which have to give Discord their phone number in order to use the
+   platform.  Their client is also proprietary and they disallow
+   alternative clients made with the bot API.  This is a platform that
+   is very bad for privacy and security.  You also cannot host your own
+   server (unlike Matrix, XMPP, and IRC).  You have to rely on
+   centralised servers controlled by Discord themselves.
+
+   The Matrix protocol is a Free protocol that has encrypted messages,
+   spaces (like Discord's "guilds"), and some more features.  The people
+   behind Matrix also maintain the Element.io client which looks a lot
+   like Discord.  However, that client is quite big and most other
+   clients either lack features or are unstable.  The Matrix server
+   software, Synapse, is also very big and uses lots of resources.
+   Matrix is federated however, but most people prefer using the
+   Matrix.org homeserver, due to the instability and inefficency of its
+   server-to-server protocol, with only a handful of people self-hosting
+   their own.  While it is very user-friendly, Synapse is so slow that
+   most people prefer using Matrix.org.  So one of the many issues of
+   IRC is also there: most people join big instances, which is bad for
+   privacy as this is one point of failure.  Matrix also uses a so-
+   called "identity" server.  Most people use the vector.im identity
+   server, which is also bad for privacy.
+
+   Guilds
+
+   IDC aims to solve these problems progressively.  The current version
+   of IDC is a text-based non-federated protocol where users may have
+   multiple connections and are not destroyed when all connections are
+   destroyed, and servers save messages when the user is offline.
+   Future versions will be federated, and may be distributed in the far
+   future.
+
+
+
+
+
+
+
+Yu, et al.                    Informational                     [Page 3]
+
+                      Internet Delay Chat Protocol              May 2022
 
 
 1.1.  Servers
@@ -165,9 +221,9 @@ Yu & User                     Informational                     [Page 2]
 
 
 
-Yu & User                     Informational                     [Page 3]
+Yu, et al.                    Informational                     [Page 4]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
 
 
    Space identifiers are strings with the form "&name@server", where
@@ -221,9 +277,9 @@ Yu & User                     Informational                     [Page 3]
 
 
 
-Yu & User                     Informational                     [Page 4]
+Yu, et al.                    Informational                     [Page 5]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
 
 
 2.2.  Anti-permissions
@@ -277,9 +333,9 @@ Yu & User                     Informational                     [Page 4]
 
 
 
-Yu & User                     Informational                     [Page 5]
+Yu, et al.                    Informational                     [Page 6]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
 
 
 3.  The IDC Specification
@@ -333,9 +389,9 @@ Yu & User                     Informational                     [Page 5]
 
 
 
-Yu & User                     Informational                     [Page 6]
+Yu, et al.                    Informational                     [Page 7]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
 
 
    IDC messages are always lines of characters terminated with a CR-LF
@@ -389,9 +445,9 @@ Yu & User                     Informational                     [Page 6]
 
 
 
-Yu & User                     Informational                     [Page 7]
+Yu, et al.                    Informational                     [Page 8]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
 
 
    6.  Use of the extended prefix (['!' <user> ] ['@' <host> ]) must not
@@ -445,9 +501,9 @@ Yu & User                     Informational                     [Page 7]
 
 
 
-Yu & User                     Informational                     [Page 8]
+Yu, et al.                    Informational                     [Page 9]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
 
 
 4.2.  One-to-many
@@ -501,9 +557,9 @@ Yu & User                     Informational                     [Page 8]
 
 
 
-Yu & User                     Informational                     [Page 9]
+Yu, et al.                    Informational                    [Page 10]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
 
 
    If a full set of parameters is presented, then each must be checked
@@ -557,9 +613,9 @@ Yu & User                     Informational                     [Page 9]
 
 
 
-Yu & User                     Informational                    [Page 10]
+Yu, et al.                    Informational                    [Page 11]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
 
 
           ERR_NEEDMOREPARAMS              ERR_ALREADYREGISTRED
@@ -613,9 +669,9 @@ Yu & User                     Informational                    [Page 10]
 
 
 
-Yu & User                     Informational                    [Page 11]
+Yu, et al.                    Informational                    [Page 12]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
 
 
 5.1.4.  Server message
@@ -669,9 +725,9 @@ Yu & User                     Informational                    [Page 11]
 
 
 
-Yu & User                     Informational                    [Page 12]
+Yu, et al.                    Informational                    [Page 13]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
 
 
    The <comment> should be supplied by all administrator who execute a
@@ -725,9 +781,9 @@ Yu & User                     Informational                    [Page 12]
 
 
 
-Yu & User                     Informational                    [Page 13]
+Yu, et al.                    Informational                    [Page 14]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
 
 
        ERR_NEEDMOREPARAMS              ERR_BANNEDFROMCHAN
@@ -781,9 +837,9 @@ Yu & User                     Informational                    [Page 13]
 
 
 
-Yu & User                     Informational                    [Page 14]
+Yu, et al.                    Informational                    [Page 15]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
 
 
 5.2.3.2.  User modes
@@ -837,9 +893,9 @@ Yu & User                     Informational                    [Page 14]
 
 
 
-Yu & User                     Informational                    [Page 15]
+Yu, et al.                    Informational                    [Page 16]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
 
 
    By using the NAMES command, a user can list all nicknames that are
@@ -852,7 +908,7 @@ Yu & User                     Informational                    [Page 15]
    If no <channel> parameter is given, a list of all channels and their
    occupants is returned.  At the end of this list, a list of users who
    are visible but either not on any channel or not on a visible channel
-   are listed as being on `channel' "*".
+   are listed as being on 'channel' "*".
 
    Numerics:
 
@@ -893,9 +949,9 @@ Yu & User                     Informational                    [Page 15]
 
 
 
-Yu & User                     Informational                    [Page 16]
+Yu, et al.                    Informational                    [Page 17]
 
-                      Internet Delay Chat Protocol            April 2022
+                      Internet Delay Chat Protocol              May 2022
 
 
        ERR_NEEDMOREPARAMS              ERR_NOSUCHCHANNEL
@@ -908,24 +964,22 @@ Yu & User                     Informational                    [Page 16]
 
 7.  Security Considerations
 
-8.  Acknowledgements
+Appendix A.  Acknowledgements
 
-   This document has multiple ideas suggested by Test_User
-   <hax@andrewyu.org> and luk3yx.
+   This document has multiple ideas suggested by luk3yx.
 
+Authors' Addresses
 
-
-
-
-
+   Andrew Yu
+   Email: andrew@andrewyu.org
 
 
+   Test_User
+   Email: hax@andrewyu.org
 
 
-
-
-
-
+   Ferass EL HAFIDI
+   Email: vitali64pmemail@protonmail.com
 
 
 
@@ -949,4 +1003,6 @@ Yu & User                     Informational                    [Page 16]
 
 
 
-Yu & User                     Informational                    [Page 17]
+
+
+Yu, et al.                    Informational                    [Page 18]
