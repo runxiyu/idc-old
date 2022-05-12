@@ -42,6 +42,7 @@ import time
 from pprint import pprint
 
 import trio
+import ssl
 import traceback
 
 import exceptions
@@ -53,6 +54,8 @@ import config
 starttime = time.time()
 
 PORT = 6835
+
+ctx = ssl.create_default_context()
 
 client_id_counter = -1
 local_users: dict[bytes, entities.User] = {}
@@ -264,7 +267,7 @@ async def _chanmsg_cmd(
 #             )
 
 
-async def connection_loop(stream: trio.SocketStream) -> None:
+async def connection_loop(stream: trio.abc.Stream) -> None:
     global client_id_counter
     client_id_counter += 1
     ident = str(client_id_counter).encode("ascii")
@@ -309,8 +312,12 @@ async def connection_loop(stream: trio.SocketStream) -> None:
         minilog.note(f"Connection {str(ident)} has ended.")
 
 
+async def tls_wrapper(s: trio.SocketStream) -> None:
+    await connection_loop(trio.SSLStream(s, ctx))
+
+
 async def main() -> None:
-    await trio.serve_tcp(connection_loop, PORT)
+    await trio.serve_tcp(tls_wrapper, PORT)
 
 def run_i_guess() -> None:
     trio.run(main)
