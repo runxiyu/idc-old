@@ -287,7 +287,7 @@ async def connection_loop(stream: trio.SSLStream) -> None:
                 continue
             data = split_msg[0:-1]
             msg = split_msg[-1]
-            minilog.debug(f"I got {data!r} from {ident!r}")
+            minilog.debug(f"{ident.decode('ascii')} >>> {data!r}")
             for cmdline in data:
                 try:
                     cmd, args = utils.bytesToStd(cmdline)

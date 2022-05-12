@@ -189,29 +189,31 @@ V = Union[
 
 
 async def send(
-    wheretosend: V,
+    recver: V,
     command: bytes,
     delayable: bool = True,
     **kwargs: Optional[bytes],
 ) -> None:
-    if isinstance(wheretosend, list):
-        for t in wheretosend:
+    if isinstance(recver, list):
+        for t in recver:
             await send(t, command, delayable, **kwargs)
-    elif isinstance(wheretosend, entities.Client):
-        await wheretosend.stream.send_all(stdToBytes(command, **kwargs))
-    elif isinstance(wheretosend, entities.User):
-        if wheretosend.connected_clients:
-            for c in wheretosend.connected_clients:
+    elif isinstance(recver, entities.Client):
+        b = stdToBytes(command, **kwargs)
+        minilog.debug(f"{recver('ascii')} <<< {b!r}")
+        await recver.stream.send_all(b)
+    elif isinstance(recver, entities.User):
+        if recver.connected_clients:
+            for c in recver.connected_clients:
                 await send(c, command, delayable, **kwargs)
         elif delayable:
-            wheretosend.queue.append(stdToBytes(command, **kwargs))
+            recver.queue.append(stdToBytes(command, **kwargs))
         else:
             raise exceptions.TargetOfflineError(
-                wheretosend.username
+                recver.username
                 + b" is offline and this action requires them to be online."
             )
-    elif isinstance(wheretosend, entities.Channel):
-        for t in wheretosend.broadcast_to:
+    elif isinstance(recver, entities.Channel):
+        for t in recver.broadcast_to:
             await send(t, command, delayable, **kwargs)
 
     else:

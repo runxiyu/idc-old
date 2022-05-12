@@ -29,9 +29,13 @@ async def echo_server(server_stream):
 
 
 async def tls_wrapper(server_stream):
-    return await echo_server(trio.SSLStream(server_stream, ctx, server_side=True))
+    return await echo_server(
+        trio.SSLStream(server_stream, ctx, server_side=True)
+    )
+
 
 async def main():
     await trio.serve_tcp(tls_wrapper, PORT)
+
 
 trio.run(main)

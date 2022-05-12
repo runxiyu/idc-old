@@ -1,3 +1,6 @@
+import entities
+
+
 class listen:
     port = 1025
 
@@ -95,5 +98,28 @@ channels = {
         }
     },
 }
+
+
+guilds = {
+    b"idc": {
+        "users": {
+            b"andrew",
+            b"lurk",
+            b"Noisytoot",
+            b"luk3yx",
+            b"hax",
+            b"vitali64",
+            b"idcbot",
+        },
+        "channels": {
+            b"testing",
+            b"protocol",
+            b"server",
+            b"client",
+            b"general",
+        },
+    }
+}
+
 
 motd = b"""Hi there! This is the best IDC server you'll ever encounter.  Good luck!"""
