@@ -34,7 +34,7 @@
 from __future__ import annotations
 from typing import Optional, Union, List, Sequence
 from dataclasses import dataclass, field
-import trio
+import trio.abc
 
 
 @dataclass
@@ -58,7 +58,7 @@ class User:
 @dataclass
 class Client:
     cid: bytes
-    stream: trio.SocketStream
+    stream: trio.abc.Stream
     user: Optional[User] = None
 
 
