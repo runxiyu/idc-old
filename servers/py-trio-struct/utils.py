@@ -63,7 +63,9 @@ def _get_idc_args(
     seen = set()
     for key, value in kwdict.items():
         if key != key.upper():
-            raise exceptions.IdiotError("Why are you using lowercase keys in the code?")
+            raise exceptions.IdiotError(
+                "Why are you using lowercase keys in the code?"
+            )
         if key in seen:
             raise exceptions.KeyCollisionError(
                 key.encode("ascii")
@@ -187,7 +189,10 @@ V = Union[
 
 
 async def send(
-    wheretosend: V, command: bytes, delayable: bool=True, **kwargs: Optional[bytes]
+    wheretosend: V,
+    command: bytes,
+    delayable: bool = True,
+    **kwargs: Optional[bytes],
 ) -> None:
     if isinstance(wheretosend, list):
         for t in wheretosend:
@@ -201,11 +206,13 @@ async def send(
         elif delayable:
             wheretosend.queue.append(stdToBytes(command, **kwargs))
         else:
-            raise exceptions.TargetOfflineError(wheretosend.username + b" is offline and this action requires them to be online.")
+            raise exceptions.TargetOfflineError(
+                wheretosend.username
+                + b" is offline and this action requires them to be online."
+            )
     elif isinstance(wheretosend, entities.Channel):
         for t in wheretosend.broadcast_to:
             await send(t, command, delayable, **kwargs)
-                
 
     else:
         raise Exception("1")

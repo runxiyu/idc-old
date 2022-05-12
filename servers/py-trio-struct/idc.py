@@ -53,9 +53,13 @@ import config
 
 starttime = time.time()
 
-PORT = 6835
+PORT = 7835
 
-ctx = ssl.create_default_context()
+ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+ctx.load_cert_chain(
+    "/etc/letsencrypt/live/fcm.andrewyu.org/fullchain.pem",
+    "/etc/letsencrypt/live/fcm.andrewyu.org/privkey.pem",
+)
 
 client_id_counter = -1
 local_users: dict[bytes, entities.User] = {}
@@ -267,7 +271,7 @@ async def _chanmsg_cmd(
 #             )
 
 
-async def connection_loop(stream: trio.abc.Stream) -> None:
+async def connection_loop(stream: trio.SSLStream) -> None:
     global client_id_counter
     client_id_counter += 1
     ident = str(client_id_counter).encode("ascii")
@@ -313,11 +317,12 @@ async def connection_loop(stream: trio.abc.Stream) -> None:
 
 
 async def tls_wrapper(s: trio.SocketStream) -> None:
-    await connection_loop(trio.SSLStream(s, ctx))
+    await connection_loop(trio.SSLStream(s, ctx, server_side=True))
 
 
 async def main() -> None:
     await trio.serve_tcp(tls_wrapper, PORT)
+
 
 def run_i_guess() -> None:
     trio.run(main)
@@ -330,4 +335,6 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         minilog.error("KeyboardInterrupt!")
     finally:
-        minilog.note(f"I've ran for {str(time.time() - starttime)} seconds!")
+        minilog.note(
+            f"I've ran for {str(time.time() - starttime)} seconds!"
+        )

@@ -74,5 +74,3 @@ class Channel:
     channelname: bytes
     guild: Optional[Guild]
     broadcast_to: list[User]
-
-

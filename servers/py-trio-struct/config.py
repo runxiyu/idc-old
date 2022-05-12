@@ -93,7 +93,7 @@ channels = {
             b"vitali64",
             b"idcbot",
         }
-    }
+    },
 }
 
 motd = b"""Hi there! This is the best IDC server you'll ever encounter.  Good luck!"""
