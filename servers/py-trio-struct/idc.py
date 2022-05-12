@@ -53,7 +53,7 @@ import config
 
 starttime = time.time()
 
-PORT = 7835
+PORT = 6835
 
 ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 ctx.load_cert_chain(
@@ -191,7 +191,7 @@ async def _egg_cmd(
     await utils.send(
         client,
         b"EASTER_EGG",
-        YAY=b"luk3yx: Never gonna give you up\nnever gonna let you down\nnever gonna run around and desert you\nnever gonna make you cry\nnever gonna say goodbye\nnever gonna tell a lie and hurt you",
+        YAY=b"Andrew: Never gonna give you up\nnever gonna let you down\nnever gonna run around and desert you\nnever gonna make you cry\nnever gonna say goodbye\nnever gonna tell a lie and hurt you",
     )
 
 
@@ -317,7 +317,10 @@ async def connection_loop(stream: trio.SSLStream) -> None:
 
 
 async def tls_wrapper(s: trio.SocketStream) -> None:
-    await connection_loop(trio.SSLStream(s, ctx, server_side=True))
+    try:
+        await connection_loop(trio.SSLStream(s, ctx, server_side=True))
+    except trio.BrokenResourceError:
+        minilog.caution("Some client has messed-up TLS.")
 
 
 async def main() -> None:

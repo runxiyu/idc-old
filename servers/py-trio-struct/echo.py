@@ -1,3 +1,4 @@
+# this thigng works, but idc.py drops incomingmessages
 import trio
 from itertools import count
 import ssl
