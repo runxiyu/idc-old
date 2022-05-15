@@ -32,7 +32,7 @@ debug           = True
 # IRC
 irc = miniirc.IRC(server[0][0], 6697, nick, relayedChannels[0], ns_identity=None, debug=False)
 # IDC
-idc = miniirc_idc.IDC(server[1][0], 6835, nick, relayedChannels[1], ns_identity=["idcbot", ""], debug=debug)
+idc = miniirc_idc.IDC(server[1][0], 6835, nick, relayedChannels[1], ns_identity=["idcbot", ""], debug=debug, ssl=True)
 
 # Relay functions
 
