@@ -278,8 +278,8 @@ async def connection_loop(stream: trio.SSLStream) -> None:
     minilog.note(f"Connection {str(ident)} has started.")
     client = entities.Client(cid=ident, stream=stream)
     await utils.send(client, b"MOTD", MESSAGE=config.motd)
-    client.ccrt = stream.getpeercert()
-    await utils.send(client, b"CLIENT_CERT", FINGERPRINT=repr(client.ccrt).encode("utf-8"))
+    client.ccrt = stream.getpeercert() or b"unknown"
+    await utils.send(client, b"CLIENT_CERT", FINGERPRINT=client.ccrt)
     try:
         msg = b""
         async for newmsg in stream:

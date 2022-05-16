@@ -38,7 +38,7 @@ fullname="Ferass EL HAFIDI"
 .# Abstract
 
 Documentation is usually out of date.  It is updated every few weeks.
-Please reference the Python Trio server implementation.
+Please refer to the Python Trio server implementation for the latest current practice.
 
 This document specifies a new Internet Protocol for messaging over the Internet.
 

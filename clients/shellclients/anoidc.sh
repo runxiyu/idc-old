@@ -6,17 +6,17 @@ term_height=0
 term_width=0
 term_scroll_height=0
 status_line_row=0
-irc_host=''
-irc_channel=''
-irc_nick=''
+idc_host=''
+idc_channel=''
+idc_nick=''
+idc_gecos=''
 
 
-function scroll_bottom() {
+scroll_bottom() {
 	printf '\e[999B'
 }
 
-#figure out terminal height, NOTE: moves cursor to bottom of terminal
-function term_height() {
+term_height() {
 	printf '\e[999B\e[6n'
 	read -s -r -d'['
 	read -s -r -d';' term_height
@@ -24,55 +24,58 @@ function term_height() {
 	printf '\e[999D'
 }
 
-# Set the area the terminal is allowed to scroll in
-function scroll_helper() {
+scroll_helper() {
 	term_scroll_height=$((term_height-2))
 	status_line_row=$((term_height-1))
     printf '\e[0;%sr' "$term_scroll_height"
 }
 
-function bottom_line() {
+bottom_line() {
     printf '\e[%s;0f' "$term_height"
 }
 
-function paste_data() {
+paste_data() {
 	printf '\e7\e[%s;0f\n' "$term_scroll_height"
 	printf ' %s' "$1"
 	printf '\e8'
 }
 
-function status_line() {
+status_line() {
 	printf '\e7\e[%s;0f\e[2K' "$status_line_row"
-	printf '\e[4;44mSTATUS: %s in %s  @ %s\e[0m' "$irc_nick" "$irc_channel" "$irc_host"
+	printf '\e[4;44mSTATUS: %s in %s  @ %s\e[0m' "$idc_nick" "$idc_channel" "$idc_host"
 	printf '\e8'
 }
 
-function init_screen() {
+init_screen() {
 	printf '\e[r'
 	term_height
 	scroll_helper
 	bottom_line
 }
 
-function net_fd_helper() {
+escape() {
+    local str="${1//\\/\\\\}"
+    str=${str//$'\t'/\\t}
+    str=${str//$'\r'/\\r}
+    str=${str//$'\n'/\\n}
+    printf "%s" "$str"
+}
+
+net_fd_helper() {
 	local buff=''
 	
 	#close 44 if open, then open read/write
 	exec 44>&-
 	exec 44<>"$1"
 	
-	#delay slightly to improve chance of success
-	#read -s -r -t1 -u 44
-
-	printf 'NICK %s\r\n' "$irc_nick" >&44
-    printf 'USER %s %s %s\r\n' "$irc_nick" "$HOSTNAME" "$USER" >&44
+	printf 'LOGIN\tUSERNAME=%s\tPASSWORD=%s\r\n' "$idc_user" "$idc_pass" >&44
 	
 	while true
 	do
 		while IFS='' read -s -r -t1 -u 44
 		do
 			case "$REPLY" in
-			( :irc* ) 
+			( :idc* ) 
 				paste_data "$REPLY"
 				;;
 			( PING* )
@@ -105,11 +108,11 @@ function net_fd_helper() {
 				init_screen
 				break
 				;;
-			( /JOIN* )
-				irc_channel="${REPLY##*\ }"
+			( /join* )
+				idc_channel="${REPLY##*\ }"
 				printf '%s\r\n' "${REPLY/\//}" >&44
 				;;
-			( /QUIT* )
+			( /quit* )
                 printf 'QUIT :%s\r\n' "${REPLY#*\ }" >&44
 				exec 44>&-
 				exit 0
@@ -121,23 +124,28 @@ function net_fd_helper() {
 				break
 				;;
 			( * )
-                printf 'PRIVMSG %s :%s\r\n' "$irc_channel" "$REPLY" >&44
+                printf 'PRIVMSG %s :%s\r\n' "$idc_channel" "$REPLY" >&44
 				;;
 			esac
 			
-			buff="<$irc_nick> ${REPLY}"
+			buff="<$idc_nick> ${REPLY}"
 			paste_data "$buff"
 		done
 	done
 }
 
-function main() {
-	local irc_fd=''
+main() {
+	local idc_fd=''
 	scroll_bottom
-	read -p 'IRC Server: ' -e -r irc_host
-	read -p 'IRC Nickname: ' -e -r irc_nick
+	read -p 'IDC Server: ' -e -r idc_host
+	read -p 'IDC Port: ' -e -r idc_port
+	read -p 'IDC Username: ' -e -r idc_user
+#    printf 'IDC Password: '
+	read -s -p 'IDC Password: ' -e -r idc_pass
+    printf '\n'
 	init_screen
-	net_fd_helper "/dev/tcp/$irc_host/6667"
+	net_fd_helper "/dev/tcp/$idc_host/$idc_port"
+    printf '\x1bc'
 }
 
 main

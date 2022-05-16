@@ -75,27 +75,26 @@ guilds = {
 
 
 channels = {
-    b"#librespeech@" + server_name: {
+    b"librespeech@" + server_name: {
         "broadcast_to": {
-            b"andrew@andrewyu.org",
-            b"Noisytoot@andrewyu.org",
-            b"lurk@andrewyu.org",
-            b"luk3yx@andrewyu.org",
-            b"hax@andrewyu.org",
-            b"vitali64@andrewyu.org",
-            b"speechbot@andrewyu.org",
-            b"guest@andrewyu.org",
+            b"@andrew@andrewyu.org",
+            b"@Noisytoot@andrewyu.org",
+            b"@lurk@andrewyu.org",
+            b"@luk3yx@andrewyu.org",
+            b"@hax@andrewyu.org",
+            b"@vitali64@andrewyu.org",
+            b"@speechbot@andrewyu.org",
         }
     },
-    b"#hackers@" + server_name: {
+    b"hackers@" + server_name: {
         "broadcast_to": {
-            b"andrew@andrewyu.org",
-            b"lurk@andrewyu.org",
-            b"Noisytoot@andrewyu.org",
-            b"luk3yx@andrewyu.org",
-            b"hax@andrewyu.org",
-            b"vitali64@andrewyu.org",
-            b"idcbot@andrewyu.org",
+            b"@andrew@andrewyu.org",
+            b"@lurk@andrewyu.org",
+            b"@Noisytoot@andrewyu.org",
+            b"@luk3yx@andrewyu.org",
+            b"@hax@andrewyu.org",
+            b"@vitali64@andrewyu.org",
+            b"@idcbot@andrewyu.org",
         }
     },
 }
@@ -104,13 +103,13 @@ channels = {
 guilds = {
     b"idc": {
         "users": {
-            b"@andrew@andrewyu.org",
-            b"@lurk@andrewyu.org",
-            b"@Noisytoot@andrewyu.org",
-            b"@luk3yx@andrewyu.org",
-            b"@hax@andrewyu.org",
-            b"@vitali64@andrewyu.org",
-            b"@idcbot@andrewyu.org",
+            b"andrew@andrewyu.org",
+            b"lurk@andrewyu.org",
+            b"Noisytoot@andrewyu.org",
+            b"luk3yx@andrewyu.org",
+            b"hax@andrewyu.org",
+            b"vitali64@andrewyu.org",
+            b"idcbot@andrewyu.org",
         },
         "channels": {
             b"testing@andrewyu.org",
