@@ -25,14 +25,14 @@ from time import sleep
 # Configuration
 
 server          = [ ['irc.andrewyu.org', 'IRC'], ['andrewyu.org', 'IDC'] ]
-relayedChannels = [ '#IDC'                     , '#hackers'              ]
+relayedChannels = [ '#IDC'                     , '#hackers@andrewyu.org' ]
 nick            = 'idcbot'
 debug           = True
 
 # IRC
 irc = miniirc.IRC(server[0][0], 6697, nick, relayedChannels[0], ns_identity=None, debug=False)
 # IDC
-idc = miniirc_idc.IDC(server[1][0], 6835, nick, relayedChannels[1], ns_identity=["idcbot", ""], debug=debug)
+idc = miniirc_idc.IDC(server[1][0], 6835, nick, relayedChannels[1], ns_identity=["idcbot", ""], debug=debug, ssl=True)
 
 # Relay functions
 
@@ -42,47 +42,46 @@ def relay_msgs(chat, hostmask, args, which):
     # Send in the irc side what the user sent in the idc side and vice-versa
     print("NEW MESSAGE")
     chat.send('PRIVMSG', relayedChannels[whichchan], 
-                "(%s) <%s> %s" 
-                % (server[which][1], hostmask[0], args[-1]))
+                "<\x03%s%s\x0300> %s" 
+                % (len(hostmask[0]), hostmask[0], args[-1]))
 
 def relay_nick(chat, hostmask, args, which):
     #sleep(0.5)
     whichchan = 0 if which == 1 else 1
     # Send in the idc side the nick change in the irc side
     chat.send('PRIVMSG', relayedChannels[whichchan], 
-                "(%s) %s is now known as %s" 
-                % (server[which][1], hostmask[0], args[0]))
+                "\x03%s%s\x0300 is now known as \x0302%s" 
+                % (len(hostmask[0]), hostmask[0], args[-1]))
 
 def relay_joins(chat, hostmask, args, which):
     #sleep(0.5)
     whichchan = 0 if which == 0 else 1
     # Send in the idc side joins in the irc side and vice-versa
     chat.send('PRIVMSG', relayedChannels[whichchan], 
-                "(%s) %s has joined %s" 
-                % (server[which][1], hostmask[0], args[0]))
+                "\x03%s%s\x03 has joined \x02%s" 
+                % (len(hostmask[0]), hostmask[0], args[-1]))
 
 def relay_mode(chat, hostmask, args, which):
     #sleep(0.5)
     whichchan = 0 if which == 1 else 1
     chat.send('PRIVMSG', relayedChannels[whichchan], 
-                "(%s) %s: [%s] by %s" 
-                % (server[which][1], args[0], args[1], hostmask[0]))
-    # Doesn't work for some reason
+                "mode/%s: [%s %s] by %s" 
+                % (server[which][1], args[0], args[1], args[2], hostmask[0]))
 
 def relay_quits(chat, hostmask, args, which):
     #sleep(0.5)
     whichchan = 0 if which == 1 else 1
     # Send in the idc side quits in the irc side and vice-versa
     chat.send('PRIVMSG', relayedChannels[whichchan], 
-                "(%s) %s has quit %s" 
-                % (server[which][1], hostmask[0], args[0]))
+                "\x03%s%s\x03 has quit %s" 
+                % (len(hostmask[0]), hostmask[0], args[0]))
 
 def relay_kicks(chat, hostmask, args, which):
     #sleep(0.5)
     whichchan = 0 if which == 1 else 1
     # Send in the idc side kicks in the irc side and vice-versa
     chat.send('PRIVMSG', relayedChannels[whichchan], 
-                "(%s) %s was kicked from %s by %s" 
+                "%s was kicked from %s by %s" 
                 % (server[which][1], args[1], args[0], hostmask[0]))
 
 # Functions that run the relay functions, depending on the server where the message has been sent
